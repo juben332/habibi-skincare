@@ -140,9 +140,11 @@ p { color: var(--muted); line-height: 1.8; }
   max-width: var(--max-w); margin: 0 auto; height: 100%;
   display: flex; align-items: center; justify-content: space-between;
 }
-.nav__logo { font-family: var(--serif); font-size: 1.55rem; font-weight: 700; color: #fff; letter-spacing: 0.03em; }
+.nav__logo { font-family: var(--serif); font-size: 1.55rem; font-weight: 700; color: #fff; letter-spacing: 0.03em; display: flex; align-items: center; gap: 10px; }
 .nav--scrolled .nav__logo { color: var(--brown); }
 .nav__logo span { color: var(--gold); }
+.nav__logo-img { height: 38px; width: auto; object-fit: contain; flex-shrink: 0; filter: brightness(0) invert(1); transition: var(--ease); }
+.nav--scrolled .nav__logo-img { filter: none; }
 
 .nav__links { display: flex; align-items: center; gap: 36px; }
 .nav__link { font-size: 0.85rem; font-weight: 500; color: rgba(255,255,255,0.88); letter-spacing: 0.06em; position: relative; }
