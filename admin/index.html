@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Habibi Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar__brand">
+      <img src="../images/logo.png" alt="Logo" class="sidebar__brand-logo" onerror="this.style.display='none'">
+      <div class="sidebar__brand-name">Habibi<span>.</span></div>
+    </div>
+    <nav class="sidebar__nav">
+      <div class="sidebar__section">Main</div>
+      <a href="index.html" class="sidebar__link active"><i class="fas fa-th-large"></i> Dashboard</a>
+      <a href="products.html" class="sidebar__link"><i class="fas fa-box-open"></i> Products</a>
+      <a href="orders.html" class="sidebar__link"><i class="fas fa-receipt"></i> Orders <span class="badge" id="pendingCount">0</span></a>
+      <div class="sidebar__section">Marketing</div>
+      <a href="#" class="sidebar__link"><i class="fas fa-envelope"></i> Subscribers</a>
+      <div class="sidebar__section">Settings</div>
+      <a href="../index.html" class="sidebar__link" target="_blank"><i class="fas fa-external-link-alt"></i> View Website</a>
+    </nav>
+    <div class="sidebar__footer">
+      <div class="sidebar__user">
+        <div class="sidebar__user-avatar" id="userAvatar">A</div>
+        <div>
+          <div class="sidebar__user-name" id="userEmail">Admin</div>
+          <div class="sidebar__user-role">Administrator</div>
+        </div>
+      </div>
+      <button class="sidebar__logout" id="logoutBtn">
+        <i class="fas fa-sign-out-alt"></i> Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="admin-main">
+    <header class="topbar">
+      <div class="topbar__title">Dashboard</div>
+      <div class="topbar__right">
+        <span style="font-size:0.82rem;color:var(--a-muted)" id="dateDisplay"></span>
+        <a href="products.html" class="topbar__btn topbar__btn--primary">
+          <i class="fas fa-plus"></i> Add Product
+        </a>
+      </div>
+    </header>
+
+    <div class="admin-content">
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card__icon"><i class="fas fa-box-open"></i></div>
+          <div class="stat-card__label">Total Products</div>
+          <div class="stat-card__value" id="statProducts">—</div>
+          <div class="stat-card__change"><i class="fas fa-arrow-up"></i> In stock</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon"><i class="fas fa-receipt"></i></div>
+          <div class="stat-card__label">Total Orders</div>
+          <div class="stat-card__value" id="statOrders">—</div>
+          <div class="stat-card__change"><i class="fas fa-clock"></i> <span id="statPending">0</span> pending</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon"><i class="fas fa-peso-sign"></i></div>
+          <div class="stat-card__label">Total Revenue</div>
+          <div class="stat-card__value" id="statRevenue">—</div>
+          <div class="stat-card__change"><i class="fas fa-arrow-up"></i> All time</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon"><i class="fas fa-envelope"></i></div>
+          <div class="stat-card__label">Subscribers</div>
+          <div class="stat-card__value" id="statSubs">—</div>
+          <div class="stat-card__change"><i class="fas fa-users"></i> Newsletter</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Recent Orders -->
+        <div class="panel">
+          <div class="panel__head">
+            <div class="panel__title">Recent Orders</div>
+            <a href="orders.html" style="font-size:0.8rem;color:var(--a-pink);font-weight:600">View all →</a>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Order</th>
+                  <th>Customer</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="recentOrdersBody">
+                <tr class="loading-row"><td colspan="4"><span class="spinner"></span> Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Recent Subscribers -->
+        <div class="panel">
+          <div class="panel__head">
+            <div class="panel__title">Latest Subscribers</div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Email</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="subsBody">
+                <tr class="loading-row"><td colspan="2"><span class="spinner"></span> Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Products -->
+      <div class="panel" style="margin-top:20px">
+        <div class="panel__head">
+          <div class="panel__title">Product Overview</div>
+          <a href="products.html" style="font-size:0.8rem;color:var(--a-pink);font-weight:600">Manage →</a>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Badge</th>
+                <th>Stock</th>
+              </tr>
+            </thead>
+            <tbody id="productsBody">
+              <tr class="loading-row"><td colspan="5"><span class="spinner"></span> Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { auth, db } from '../js/firebase-config.js';
+  import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { collection, getDocs, query, orderBy, limit, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // Auth guard
+  onAuthStateChanged(auth, user => {
+    if (!user) { window.location.href = '../login.html'; return; }
+    document.getElementById('userEmail').textContent = user.email;
+    document.getElementById('userAvatar').textContent = user.email[0].toUpperCase();
+    loadDashboard();
+  });
+
+  // Logout
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await signOut(auth);
+    window.location.href = '../login.html';
+  });
+
+  // Date
+  document.getElementById('dateDisplay').textContent = new Date().toLocaleDateString('en-PH', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+  async function loadDashboard() {
+    try {
+      const [products, orders, subs] = await Promise.all([
+        getDocs(collection(db, 'products')),
+        getDocs(collection(db, 'orders')),
+        getDocs(collection(db, 'subscribers'))
+      ]);
+
+      // Stats
+      const orderDocs = orders.docs.map(d => ({ id: d.id, ...d.data() }));
+      const pending   = orderDocs.filter(o => o.status === 'pending').length;
+      const revenue   = orderDocs.reduce((s, o) => s + (o.total || 0), 0);
+
+      document.getElementById('statProducts').textContent = products.size;
+      document.getElementById('statOrders').textContent   = orders.size;
+      document.getElementById('statPending').textContent  = pending;
+      document.getElementById('statRevenue').textContent  = '₱' + revenue.toLocaleString();
+      document.getElementById('statSubs').textContent     = subs.size;
+      document.getElementById('pendingCount').textContent = pending;
+
+      // Recent orders (last 5)
+      const recent = orderDocs.sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0)).slice(0,5);
+      const ordersBody = document.getElementById('recentOrdersBody');
+      ordersBody.innerHTML = recent.length ? recent.map(o => `
+        <tr>
+          <td><div class="table-name">#${o.id.slice(-6).toUpperCase()}</div><div class="table-sub">${o.items?.length || 0} item(s)</div></td>
+          <td><div class="table-name">${o.customer?.name || 'Guest'}</div><div class="table-sub">${o.customer?.email || ''}</div></td>
+          <td style="font-weight:700">₱${(o.total||0).toLocaleString()}</td>
+          <td><span class="badge badge-${o.status||'pending'}">${capitalize(o.status||'pending')}</span></td>
+        </tr>`).join('') : '<tr><td colspan="4" style="text-align:center;padding:32px;color:var(--a-muted)">No orders yet</td></tr>';
+
+      // Subscribers
+      const subDocs = subs.docs.map(d => d.data()).slice(0,6);
+      document.getElementById('subsBody').innerHTML = subDocs.length ? subDocs.map(s => `
+        <tr>
+          <td>${s.email}</td>
+          <td style="color:var(--a-muted);font-size:0.8rem">${s.subscribedAt ? new Date(s.subscribedAt.seconds*1000).toLocaleDateString() : '—'}</td>
+        </tr>`).join('') : '<tr><td colspan="2" style="text-align:center;padding:32px;color:var(--a-muted)">No subscribers yet</td></tr>';
+
+      // Products
+      const productDocs = products.docs.map(d => ({ id: d.id, ...d.data() })).slice(0,8);
+      document.getElementById('productsBody').innerHTML = productDocs.length ? productDocs.map(p => `
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:12px">
+              <img class="table-img" src="${p.image||''}" alt="${p.name}" onerror="this.style.background='var(--a-bg)';this.removeAttribute('src')">
+              <div class="table-name">${p.name}</div>
+            </div>
+          </td>
+          <td style="text-transform:capitalize">${p.category||'—'}</td>
+          <td style="font-weight:700">₱${(p.price||0).toLocaleString()}</td>
+          <td>${p.badge ? `<span class="badge badge-${p.badge}">${capitalize(p.badge)}</span>` : '—'}</td>
+          <td><span class="badge ${p.inStock !== false ? 'badge-delivered' : 'badge-cancelled'}">${p.inStock !== false ? 'In Stock' : 'Out of Stock'}</span></td>
+        </tr>`).join('') : '<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--a-muted)">No products yet. <a href="products.html" style="color:var(--a-pink)">Add your first product</a></td></tr>';
+
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+</script>
+</body>
+</html>

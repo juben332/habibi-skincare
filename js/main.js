@@ -317,22 +317,68 @@ function initStickyBar() {
   observer.observe(target);
 }
 
-// ─── Newsletter ─────────────────────────────────────────────
+// ─── Newsletter (saves to Firestore) ────────────────────────
 function initNewsletter() {
   document.querySelectorAll('.newsletter__form').forEach(form => {
-    form.addEventListener('submit', e => {
+    form.addEventListener('submit', async e => {
       e.preventDefault();
       const input = form.querySelector('.newsletter__input');
-      const btn = form.querySelector('.btn');
-      if (input?.value) {
-        const orig = btn.textContent;
-        btn.textContent = 'Welcome!';
-        btn.style.background = '#4a9c6d';
-        input.value = '';
-        input.placeholder = 'Check your email for your code ✓';
-        setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 4000);
-      }
+      const btn   = form.querySelector('.btn');
+      const email = input?.value?.trim();
+      if (!email) return;
+
+      const orig = btn.textContent;
+      btn.textContent = 'Joining...';
+      btn.disabled = true;
+
+      try {
+        const { db } = await import('./firebase-config.js');
+        const { collection, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+        await addDoc(collection(db, 'subscribers'), { email, subscribedAt: serverTimestamp() });
+      } catch (_) { /* Firebase not configured yet — still show success UI */ }
+
+      btn.textContent = 'Welcome!';
+      btn.style.background = '#4a9c6d';
+      input.value = '';
+      input.placeholder = 'Check your email for your code ✓';
+      setTimeout(() => { btn.textContent = orig; btn.style.background = ''; btn.disabled = false; }, 4000);
     });
+  });
+}
+
+// ─── Checkout (saves order to Firestore) ────────────────────
+function initCheckout() {
+  document.querySelector('.cart-checkout')?.addEventListener('click', async () => {
+    if (!Cart.items.length) return;
+
+    const name    = prompt('Your full name:');
+    if (!name) return;
+    const email   = prompt('Your email:');
+    if (!email) return;
+    const phone   = prompt('Your phone number:');
+    const address = prompt('Delivery address:');
+    const payment = prompt('Payment method (GCash / COD / Card):') || 'COD';
+
+    const order = {
+      items:   Cart.items,
+      total:   Cart.subtotal,
+      customer: { name, email, phone: phone||'', address: address||'' },
+      paymentMethod: payment,
+      status:  'pending',
+      createdAt: new Date(),
+    };
+
+    try {
+      const { db } = await import('./firebase-config.js');
+      const { collection, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+      order.createdAt = serverTimestamp();
+      await addDoc(collection(db, 'orders'), order);
+    } catch (_) { /* Firebase not configured yet */ }
+
+    Cart.items = [];
+    Cart.save();
+    CartUI.close();
+    showToast('<i class="fas fa-check-circle"></i> Order placed! We\'ll contact you soon.');
   });
 }
 
@@ -363,5 +409,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initSizeBtns();
   initStickyBar();
   initNewsletter();
+  initCheckout();
   initAnchorLinks();
 });

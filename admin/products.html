@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Products — Habibi Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar__brand">
+      <img src="../images/logo.png" alt="Logo" class="sidebar__brand-logo" onerror="this.style.display='none'">
+      <div class="sidebar__brand-name">Habibi<span>.</span></div>
+    </div>
+    <nav class="sidebar__nav">
+      <div class="sidebar__section">Main</div>
+      <a href="index.html" class="sidebar__link"><i class="fas fa-th-large"></i> Dashboard</a>
+      <a href="products.html" class="sidebar__link active"><i class="fas fa-box-open"></i> Products</a>
+      <a href="orders.html" class="sidebar__link"><i class="fas fa-receipt"></i> Orders</a>
+      <div class="sidebar__section">Marketing</div>
+      <a href="#" class="sidebar__link"><i class="fas fa-envelope"></i> Subscribers</a>
+      <div class="sidebar__section">Settings</div>
+      <a href="../index.html" class="sidebar__link" target="_blank"><i class="fas fa-external-link-alt"></i> View Website</a>
+    </nav>
+    <div class="sidebar__footer">
+      <div class="sidebar__user">
+        <div class="sidebar__user-avatar" id="userAvatar">A</div>
+        <div>
+          <div class="sidebar__user-name" id="userEmail">Admin</div>
+          <div class="sidebar__user-role">Administrator</div>
+        </div>
+      </div>
+      <button class="sidebar__logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="admin-main">
+    <header class="topbar">
+      <div class="topbar__title">Products</div>
+      <div class="topbar__right">
+        <button class="topbar__btn topbar__btn--ghost" id="seedBtn"><i class="fas fa-database"></i> Seed Default Products</button>
+        <button class="topbar__btn topbar__btn--primary" id="addProductBtn"><i class="fas fa-plus"></i> Add Product</button>
+      </div>
+    </header>
+
+    <div class="admin-content">
+      <div class="panel">
+        <div class="panel__head">
+          <div class="panel__title">All Products <span id="productCount" style="font-size:0.8rem;color:var(--a-muted);font-family:var(--sans);font-weight:400"></span></div>
+          <div class="toolbar" style="margin:0">
+            <div class="search-wrap" style="min-width:180px">
+              <i class="fas fa-search"></i>
+              <input type="text" class="search-input" id="searchInput" placeholder="Search products...">
+            </div>
+            <select class="filter-select" id="categoryFilter">
+              <option value="">All Categories</option>
+              <option value="cleanser">Cleanser</option>
+              <option value="toner">Toner</option>
+              <option value="serum">Serum</option>
+              <option value="moisturizer">Moisturizer</option>
+              <option value="treatment">Treatment</option>
+              <option value="spf">Sun Protection</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Badge</th>
+                <th>Stock</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="productsBody">
+              <tr class="loading-row"><td colspan="6"><span class="spinner"></span> Loading products...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <span id="paginationInfo">Showing 0 products</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add / Edit Modal -->
+<div class="modal-backdrop" id="productModal">
+  <div class="modal">
+    <div class="modal__head">
+      <h3 class="modal__title" id="modalTitle">Add Product</h3>
+      <button class="modal__close" id="closeModal"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal__body">
+      <form id="productForm">
+        <input type="hidden" id="productId">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Product Name *</label>
+            <input type="text" class="form-input" id="pName" placeholder="e.g. Luminous Gel Cleanser" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category *</label>
+            <select class="form-select" id="pCategory" required>
+              <option value="">Select category</option>
+              <option value="cleanser">Cleanser</option>
+              <option value="toner">Toner</option>
+              <option value="serum">Serum</option>
+              <option value="moisturizer">Moisturizer</option>
+              <option value="treatment">Treatment</option>
+              <option value="spf">Sun Protection</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Price (₱) *</label>
+            <input type="number" class="form-input" id="pPrice" placeholder="890" min="0" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Size / Volume</label>
+            <input type="text" class="form-input" id="pSize" placeholder="e.g. 30ml, 150ml">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Short Benefit *</label>
+          <input type="text" class="form-input" id="pBenefit" placeholder="e.g. Deeply cleanses & brightens dull skin" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea class="form-textarea" id="pDescription" placeholder="Full product description..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Image URL</label>
+          <input type="url" class="form-input" id="pImage" placeholder="https://images.unsplash.com/...">
+          <span class="form-hint">Paste a direct image URL (Unsplash, your CDN, etc.)</span>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Badge</label>
+            <select class="form-select" id="pBadge">
+              <option value="">No badge</option>
+              <option value="new">New</option>
+              <option value="best">Bestseller</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Stock Status</label>
+            <select class="form-select" id="pStock">
+              <option value="true">In Stock</option>
+              <option value="false">Out of Stock</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal__foot">
+      <button class="btn btn-secondary" id="cancelModal">Cancel</button>
+      <button class="btn btn-primary" id="saveProduct"><i class="fas fa-save"></i> Save Product</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-backdrop" id="deleteModal">
+  <div class="modal" style="max-width:400px">
+    <div class="modal__head">
+      <h3 class="modal__title">Delete Product</h3>
+      <button class="modal__close" id="closeDelete"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal__body">
+      <p style="color:var(--a-muted)">Are you sure you want to delete <strong id="deleteProductName" style="color:var(--a-text)"></strong>? This action cannot be undone.</p>
+    </div>
+    <div class="modal__foot">
+      <button class="btn btn-secondary" id="cancelDelete">Cancel</button>
+      <button class="btn btn-danger" id="confirmDelete"><i class="fas fa-trash"></i> Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="a-toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg"></span></div>
+
+<script type="module">
+  import { auth, db } from '../js/firebase-config.js';
+  import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import {
+    collection, getDocs, addDoc, updateDoc, deleteDoc,
+    doc, serverTimestamp, query, orderBy
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  let allProducts = [], deleteTargetId = null;
+
+  // Auth guard
+  onAuthStateChanged(auth, user => {
+    if (!user) { window.location.href = '../login.html'; return; }
+    document.getElementById('userEmail').textContent = user.email;
+    document.getElementById('userAvatar').textContent = user.email[0].toUpperCase();
+    loadProducts();
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => { await signOut(auth); window.location.href = '../login.html'; });
+
+  // Load products
+  async function loadProducts() {
+    try {
+      const snap = await getDocs(query(collection(db, 'products'), orderBy('createdAt', 'desc')));
+      allProducts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderProducts(allProducts);
+    } catch (e) {
+      renderProducts([]);
+    }
+  }
+
+  function renderProducts(products) {
+    document.getElementById('productCount').textContent = `(${products.length})`;
+    document.getElementById('paginationInfo').textContent = `Showing ${products.length} product${products.length !== 1 ? 's' : ''}`;
+    const body = document.getElementById('productsBody');
+    if (!products.length) {
+      body.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fas fa-box-open"></i><h3>No products yet</h3><p>Click "Add Product" to get started.</p></div></td></tr>`;
+      return;
+    }
+    body.innerHTML = products.map(p => `
+      <tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:12px">
+            <img class="table-img" src="${p.image||''}" alt="${p.name}" onerror="this.style.background='var(--a-bg)';this.removeAttribute('src')">
+            <div>
+              <div class="table-name">${p.name}</div>
+              <div class="table-sub">${p.benefit||''}</div>
+            </div>
+          </div>
+        </td>
+        <td style="text-transform:capitalize">${p.category||'—'}</td>
+        <td style="font-weight:700;color:var(--a-pink)">₱${(p.price||0).toLocaleString()}</td>
+        <td>${p.badge ? `<span class="badge badge-${p.badge}">${capitalize(p.badge)}</span>` : '<span style="color:var(--a-muted)">—</span>'}</td>
+        <td><span class="badge ${p.inStock !== false ? 'badge-delivered' : 'badge-cancelled'}">${p.inStock !== false ? 'In Stock' : 'Out of Stock'}</span></td>
+        <td>
+          <div class="action-btns">
+            <button class="btn-icon edit" title="Edit" onclick="editProduct('${p.id}')"><i class="fas fa-pen"></i></button>
+            <button class="btn-icon del" title="Delete" onclick="deleteProduct('${p.id}','${p.name.replace(/'/g,"\\'")}')"><i class="fas fa-trash"></i></button>
+          </div>
+        </td>
+      </tr>`).join('');
+  }
+
+  // Search & filter
+  document.getElementById('searchInput').addEventListener('input', filterProducts);
+  document.getElementById('categoryFilter').addEventListener('change', filterProducts);
+  function filterProducts() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    const cat = document.getElementById('categoryFilter').value;
+    const filtered = allProducts.filter(p =>
+      (!q || p.name?.toLowerCase().includes(q) || p.benefit?.toLowerCase().includes(q)) &&
+      (!cat || p.category === cat)
+    );
+    renderProducts(filtered);
+  }
+
+  // Modal open/close
+  const modal = document.getElementById('productModal');
+  document.getElementById('addProductBtn').addEventListener('click', () => openModal());
+  document.getElementById('closeModal').addEventListener('click', closeModal);
+  document.getElementById('cancelModal').addEventListener('click', closeModal);
+  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+  function openModal(product = null) {
+    document.getElementById('modalTitle').textContent = product ? 'Edit Product' : 'Add Product';
+    document.getElementById('productId').value = product?.id || '';
+    document.getElementById('pName').value = product?.name || '';
+    document.getElementById('pCategory').value = product?.category || '';
+    document.getElementById('pPrice').value = product?.price || '';
+    document.getElementById('pSize').value = product?.size || '';
+    document.getElementById('pBenefit').value = product?.benefit || '';
+    document.getElementById('pDescription').value = product?.description || '';
+    document.getElementById('pImage').value = product?.image || '';
+    document.getElementById('pBadge').value = product?.badge || '';
+    document.getElementById('pStock').value = product?.inStock === false ? 'false' : 'true';
+    modal.classList.add('open');
+  }
+  function closeModal() { modal.classList.remove('open'); }
+
+  // Edit (exposed to global for onclick)
+  window.editProduct = (id) => {
+    const p = allProducts.find(p => p.id === id);
+    if (p) openModal(p);
+  };
+
+  // Save product
+  document.getElementById('saveProduct').addEventListener('click', async () => {
+    const id   = document.getElementById('productId').value;
+    const data = {
+      name:        document.getElementById('pName').value.trim(),
+      category:    document.getElementById('pCategory').value,
+      price:       +document.getElementById('pPrice').value,
+      size:        document.getElementById('pSize').value.trim(),
+      benefit:     document.getElementById('pBenefit').value.trim(),
+      description: document.getElementById('pDescription').value.trim(),
+      image:       document.getElementById('pImage').value.trim(),
+      badge:       document.getElementById('pBadge').value,
+      inStock:     document.getElementById('pStock').value === 'true',
+      updatedAt:   serverTimestamp(),
+    };
+    if (!data.name || !data.category || !data.price) { showToast('Please fill in all required fields.', 'error'); return; }
+
+    const btn = document.getElementById('saveProduct');
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Saving...';
+
+    try {
+      if (id) {
+        await updateDoc(doc(db, 'products', id), data);
+        showToast('Product updated successfully!', 'success');
+      } else {
+        data.createdAt = serverTimestamp();
+        await addDoc(collection(db, 'products'), data);
+        showToast('Product added successfully!', 'success');
+      }
+      closeModal();
+      await loadProducts();
+    } catch (e) {
+      showToast('Error saving product: ' + e.message, 'error');
+    }
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> Save Product';
+  });
+
+  // Delete
+  const deleteModal = document.getElementById('deleteModal');
+  window.deleteProduct = (id, name) => {
+    deleteTargetId = id;
+    document.getElementById('deleteProductName').textContent = name;
+    deleteModal.classList.add('open');
+  };
+  document.getElementById('closeDelete').addEventListener('click', () => deleteModal.classList.remove('open'));
+  document.getElementById('cancelDelete').addEventListener('click', () => deleteModal.classList.remove('open'));
+  document.getElementById('confirmDelete').addEventListener('click', async () => {
+    if (!deleteTargetId) return;
+    try {
+      await deleteDoc(doc(db, 'products', deleteTargetId));
+      deleteModal.classList.remove('open');
+      showToast('Product deleted.', 'info');
+      await loadProducts();
+    } catch (e) { showToast('Error: ' + e.message, 'error'); }
+  });
+
+  // Seed default products
+  document.getElementById('seedBtn').addEventListener('click', async () => {
+    if (!confirm('This will add the default Habibi products to Firestore. Continue?')) return;
+    const defaults = [
+      { name:'Luminous Gel Cleanser',       category:'cleanser',    price:890,  size:'150ml', benefit:'Deeply cleanses & brightens dull skin',     image:'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&auto=format&fit=crop&q=80', badge:'best', inStock:true },
+      { name:'24K Gold Radiance Serum',      category:'serum',       price:1590, size:'30ml',  benefit:'Firms, brightens & reduces dark spots',       image:'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=600&auto=format&fit=crop&q=80', badge:'new',  inStock:true },
+      { name:'Desert Rose Moisturizer',      category:'moisturizer', price:1290, size:'50ml',  benefit:'Intensely hydrates & softens texture',        image:'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=600&auto=format&fit=crop&q=80', badge:'',    inStock:true },
+      { name:'Rose Water Balancing Toner',   category:'toner',       price:790,  size:'200ml', benefit:'Balances pH & preps skin for serums',         image:'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=600&auto=format&fit=crop&q=80', badge:'',    inStock:true },
+      { name:'Saffron Eye Revival Cream',    category:'treatment',   price:1890, size:'15ml',  benefit:'Reduces dark circles & puffiness',            image:'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=600&auto=format&fit=crop&q=80', badge:'new',  inStock:true },
+      { name:'Veil SPF 50+ Sunscreen Fluid', category:'spf',         price:990,  size:'50ml',  benefit:'Invisible protection with a dewy finish',     image:'https://images.unsplash.com/photo-1570194065650-d99fb4abbd90?w=600&auto=format&fit=crop&q=80', badge:'',    inStock:true },
+    ];
+    try {
+      for (const p of defaults) await addDoc(collection(db, 'products'), { ...p, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+      showToast(`${defaults.length} products seeded!`, 'success');
+      await loadProducts();
+    } catch (e) { showToast('Error seeding: ' + e.message, 'error'); }
+  });
+
+  // Toast
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
+    t.className = `a-toast ${type}`;
+    t.innerHTML = `<i class="fas ${icon}"></i> <span>${msg}</span>`;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+</script>
+</body>
+</html>

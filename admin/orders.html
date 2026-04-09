@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orders — Habibi Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar__brand">
+      <img src="../images/logo.png" alt="Logo" class="sidebar__brand-logo" onerror="this.style.display='none'">
+      <div class="sidebar__brand-name">Habibi<span>.</span></div>
+    </div>
+    <nav class="sidebar__nav">
+      <div class="sidebar__section">Main</div>
+      <a href="index.html" class="sidebar__link"><i class="fas fa-th-large"></i> Dashboard</a>
+      <a href="products.html" class="sidebar__link"><i class="fas fa-box-open"></i> Products</a>
+      <a href="orders.html" class="sidebar__link active"><i class="fas fa-receipt"></i> Orders</a>
+      <div class="sidebar__section">Marketing</div>
+      <a href="#" class="sidebar__link"><i class="fas fa-envelope"></i> Subscribers</a>
+      <div class="sidebar__section">Settings</div>
+      <a href="../index.html" class="sidebar__link" target="_blank"><i class="fas fa-external-link-alt"></i> View Website</a>
+    </nav>
+    <div class="sidebar__footer">
+      <div class="sidebar__user">
+        <div class="sidebar__user-avatar" id="userAvatar">A</div>
+        <div>
+          <div class="sidebar__user-name" id="userEmail">Admin</div>
+          <div class="sidebar__user-role">Administrator</div>
+        </div>
+      </div>
+      <button class="sidebar__logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="admin-main">
+    <header class="topbar">
+      <div class="topbar__title">Orders</div>
+      <div class="topbar__right">
+        <span style="font-size:0.82rem;color:var(--a-muted)" id="orderSummary"></span>
+      </div>
+    </header>
+
+    <div class="admin-content">
+
+      <!-- Status filter tabs -->
+      <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+        <button class="topbar__btn topbar__btn--primary status-tab" data-status="">All Orders</button>
+        <button class="topbar__btn topbar__btn--ghost status-tab" data-status="pending">Pending</button>
+        <button class="topbar__btn topbar__btn--ghost status-tab" data-status="processing">Processing</button>
+        <button class="topbar__btn topbar__btn--ghost status-tab" data-status="shipped">Shipped</button>
+        <button class="topbar__btn topbar__btn--ghost status-tab" data-status="delivered">Delivered</button>
+        <button class="topbar__btn topbar__btn--ghost status-tab" data-status="cancelled">Cancelled</button>
+      </div>
+
+      <div class="panel">
+        <div class="panel__head">
+          <div class="panel__title">Order List</div>
+          <div class="search-wrap" style="width:220px">
+            <i class="fas fa-search"></i>
+            <input type="text" class="search-input" id="searchInput" placeholder="Search by name or email...">
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Payment</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="ordersBody">
+              <tr class="loading-row"><td colspan="8"><span class="spinner"></span> Loading orders...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <span id="paginationInfo">Showing 0 orders</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Order Detail Modal -->
+<div class="modal-backdrop" id="orderModal">
+  <div class="modal" style="max-width:620px">
+    <div class="modal__head">
+      <h3 class="modal__title" id="orderModalTitle">Order Details</h3>
+      <button class="modal__close" id="closeOrderModal"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal__body" id="orderModalBody"></div>
+    <div class="modal__foot">
+      <label style="font-size:0.82rem;font-weight:600;color:var(--a-text);margin-right:8px">Update Status:</label>
+      <select class="filter-select" id="statusSelect">
+        <option value="pending">Pending</option>
+        <option value="processing">Processing</option>
+        <option value="shipped">Shipped</option>
+        <option value="delivered">Delivered</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+      <button class="btn btn-primary" id="updateStatusBtn" style="margin-left:auto"><i class="fas fa-check"></i> Update</button>
+    </div>
+  </div>
+</div>
+
+<div class="a-toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg"></span></div>
+
+<script type="module">
+  import { auth, db } from '../js/firebase-config.js';
+  import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { collection, getDocs, updateDoc, doc, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  let allOrders = [], currentOrderId = null, activeStatus = '';
+
+  onAuthStateChanged(auth, user => {
+    if (!user) { window.location.href = '../login.html'; return; }
+    document.getElementById('userEmail').textContent = user.email;
+    document.getElementById('userAvatar').textContent = user.email[0].toUpperCase();
+    loadOrders();
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => { await signOut(auth); window.location.href = '../login.html'; });
+
+  async function loadOrders() {
+    try {
+      const snap = await getDocs(query(collection(db, 'orders'), orderBy('createdAt', 'desc')));
+      allOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const pending = allOrders.filter(o => o.status === 'pending').length;
+      const revenue = allOrders.reduce((s,o) => s + (o.total||0), 0);
+      document.getElementById('orderSummary').textContent = `${allOrders.length} total · ${pending} pending · ₱${revenue.toLocaleString()} revenue`;
+      renderOrders();
+    } catch (e) { renderOrders(); }
+  }
+
+  function renderOrders() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    let filtered = allOrders.filter(o => {
+      const matchStatus = !activeStatus || o.status === activeStatus;
+      const matchSearch = !q || o.customer?.name?.toLowerCase().includes(q) || o.customer?.email?.toLowerCase().includes(q) || o.id.includes(q);
+      return matchStatus && matchSearch;
+    });
+
+    document.getElementById('paginationInfo').textContent = `Showing ${filtered.length} order${filtered.length !== 1 ? 's' : ''}`;
+    const body = document.getElementById('ordersBody');
+    if (!filtered.length) {
+      body.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fas fa-receipt"></i><h3>No orders found</h3><p>Orders placed on your website will appear here.</p></div></td></tr>`;
+      return;
+    }
+
+    body.innerHTML = filtered.map(o => {
+      const date = o.createdAt?.seconds ? new Date(o.createdAt.seconds*1000).toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'}) : '—';
+      return `
+      <tr>
+        <td><div class="table-name">#${o.id.slice(-6).toUpperCase()}</div></td>
+        <td>
+          <div class="table-name">${o.customer?.name || 'Guest'}</div>
+          <div class="table-sub">${o.customer?.email || ''}</div>
+        </td>
+        <td style="color:var(--a-muted)">${o.items?.length || 0} item(s)</td>
+        <td style="font-weight:700;color:var(--a-pink)">₱${(o.total||0).toLocaleString()}</td>
+        <td style="text-transform:capitalize;font-size:0.82rem">${o.paymentMethod || 'COD'}</td>
+        <td style="font-size:0.8rem;color:var(--a-muted)">${date}</td>
+        <td><span class="badge badge-${o.status||'pending'}">${capitalize(o.status||'pending')}</span></td>
+        <td>
+          <button class="btn-icon view" title="View" onclick="viewOrder('${o.id}')"><i class="fas fa-eye"></i></button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Status tabs
+  document.querySelectorAll('.status-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.status-tab').forEach(t => { t.className = 'topbar__btn topbar__btn--ghost status-tab'; });
+      tab.className = 'topbar__btn topbar__btn--primary status-tab';
+      activeStatus = tab.dataset.status;
+      renderOrders();
+    });
+  });
+
+  document.getElementById('searchInput').addEventListener('input', renderOrders);
+
+  // View order detail
+  const orderModal = document.getElementById('orderModal');
+  window.viewOrder = (id) => {
+    const o = allOrders.find(o => o.id === id);
+    if (!o) return;
+    currentOrderId = id;
+    document.getElementById('orderModalTitle').textContent = `Order #${id.slice(-6).toUpperCase()}`;
+    document.getElementById('statusSelect').value = o.status || 'pending';
+
+    const date = o.createdAt?.seconds ? new Date(o.createdAt.seconds*1000).toLocaleString('en-PH') : '—';
+    document.getElementById('orderModalBody').innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+        <div style="background:var(--a-bg);border-radius:10px;padding:16px">
+          <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--a-muted);margin-bottom:10px">Customer</div>
+          <div style="font-weight:600;color:var(--a-text)">${o.customer?.name || 'Guest'}</div>
+          <div style="font-size:0.82rem;color:var(--a-muted)">${o.customer?.email || '—'}</div>
+          <div style="font-size:0.82rem;color:var(--a-muted)">${o.customer?.phone || ''}</div>
+        </div>
+        <div style="background:var(--a-bg);border-radius:10px;padding:16px">
+          <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--a-muted);margin-bottom:10px">Shipping Address</div>
+          <div style="font-size:0.85rem;color:var(--a-text);line-height:1.6">${o.customer?.address || 'No address provided'}</div>
+        </div>
+      </div>
+      <div style="background:var(--a-bg);border-radius:10px;padding:16px;margin-bottom:16px">
+        <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--a-muted);margin-bottom:12px">Order Items</div>
+        ${(o.items||[]).map(item => `
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--a-border)">
+            <div>
+              <div style="font-weight:600;font-size:0.875rem">${item.name}</div>
+              <div style="font-size:0.76rem;color:var(--a-muted)">${item.size||''} × ${item.qty||1}</div>
+            </div>
+            <div style="font-weight:700;color:var(--a-pink)">₱${((item.price||0)*(item.qty||1)).toLocaleString()}</div>
+          </div>`).join('')}
+        <div style="display:flex;justify-content:space-between;padding-top:12px;font-weight:700;font-size:1rem">
+          <span>Total</span><span style="color:var(--a-pink)">₱${(o.total||0).toLocaleString()}</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;font-size:0.82rem;color:var(--a-muted)">
+        <span><i class="fas fa-calendar" style="margin-right:4px"></i>${date}</span>
+        <span><i class="fas fa-credit-card" style="margin-right:4px"></i>${capitalize(o.paymentMethod||'COD')}</span>
+        <span><span class="badge badge-${o.status||'pending'}">${capitalize(o.status||'pending')}</span></span>
+      </div>`;
+    orderModal.classList.add('open');
+  };
+
+  document.getElementById('closeOrderModal').addEventListener('click', () => orderModal.classList.remove('open'));
+  orderModal.addEventListener('click', e => { if (e.target === orderModal) orderModal.classList.remove('open'); });
+
+  document.getElementById('updateStatusBtn').addEventListener('click', async () => {
+    if (!currentOrderId) return;
+    const newStatus = document.getElementById('statusSelect').value;
+    try {
+      await updateDoc(doc(db, 'orders', currentOrderId), { status: newStatus, updatedAt: new Date() });
+      const order = allOrders.find(o => o.id === currentOrderId);
+      if (order) order.status = newStatus;
+      orderModal.classList.remove('open');
+      showToast(`Order status updated to ${capitalize(newStatus)}!`, 'success');
+      renderOrders();
+    } catch (e) { showToast('Error updating status: ' + e.message, 'error'); }
+  });
+
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+    t.className = `a-toast ${type}`;
+    t.innerHTML = `<i class="fas ${icon}"></i> <span>${msg}</span>`;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+  function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+</script>
+</body>
+</html>
