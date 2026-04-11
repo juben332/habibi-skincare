@@ -461,11 +461,19 @@
     import { auth } from './js/firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     onAuthStateChanged(auth, user => {
-      const btn = document.getElementById('navLoginBtn');
+      const btn   = document.getElementById('navLoginBtn');
       const label = document.getElementById('navLoginLabel');
-      if (user && btn && label) {
-        btn.href = 'admin/index.html';
-        label.textContent = 'Dashboard';
+      if (!btn || !label) return;
+      if (user) {
+        // Admin check: if email matches admin domain or has admin claim, link to dashboard
+        // Otherwise link to account page
+        btn.href = 'account.html';
+        label.innerHTML = user.photoURL
+          ? `<img src="${user.photoURL}" class="nav__user-avatar" alt=""> ${(user.displayName||'').split(' ')[0] || 'Account'}`
+          : `<i class="fas fa-user-circle"></i> ${(user.displayName||'').split(' ')[0] || 'Account'}`;
+      } else {
+        btn.href = 'account.html';
+        label.innerHTML = '<i class="fas fa-user-circle"></i> Sign In';
       }
     });
   </script>

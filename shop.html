@@ -301,7 +301,11 @@
     onAuthStateChanged(auth, user => {
       const btn = document.getElementById('navLoginBtn');
       const label = document.getElementById('navLoginLabel');
-      if (user && btn && label) { btn.href = 'admin/index.html'; label.textContent = 'Dashboard'; }
+      if (!btn || !label) return;
+      btn.href = 'account.html';
+      label.innerHTML = user
+        ? (user.photoURL ? `<img src="${user.photoURL}" class="nav__user-avatar" alt=""> ${(user.displayName||'').split(' ')[0]||'Account'}` : `<i class="fas fa-user-circle"></i> ${(user.displayName||'').split(' ')[0]||'Account'}`)
+        : '<i class="fas fa-user-circle"></i> Sign In';
     });
   </script>
 </body>

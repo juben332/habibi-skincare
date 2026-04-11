@@ -346,40 +346,227 @@ function initNewsletter() {
   });
 }
 
-// ─── Checkout (saves order to Firestore) ────────────────────
-function initCheckout() {
-  document.querySelector('.cart-checkout')?.addEventListener('click', async () => {
-    if (!Cart.items.length) return;
+// ─── Checkout Modal ──────────────────────────────────────────
+function createCheckoutModal() {
+  if (document.getElementById('checkoutModal')) return;
+  const m = document.createElement('div');
+  m.id = 'checkoutModal';
+  m.innerHTML = `
+    <div class="co-backdrop"></div>
+    <div class="co-modal">
+      <button class="co-close" id="coClose"><i class="fas fa-times"></i></button>
+      <div class="co-header">
+        <h2>Complete Your Order</h2>
+        <p>Fill in your details and we'll deliver to your door.</p>
+      </div>
+      <form id="coForm" autocomplete="on">
+        <div class="co-section-title">Contact Information</div>
+        <div class="co-row">
+          <div class="co-field">
+            <label>Full Name *</label>
+            <input type="text" id="coName" placeholder="Juan dela Cruz" required autocomplete="name">
+          </div>
+          <div class="co-field">
+            <label>Email *</label>
+            <input type="email" id="coEmail" placeholder="juan@email.com" required autocomplete="email">
+          </div>
+        </div>
+        <div class="co-field">
+          <label>Phone Number *</label>
+          <input type="tel" id="coPhone" placeholder="09XX XXX XXXX" required autocomplete="tel">
+        </div>
+        <div class="co-section-title">Delivery Address</div>
+        <div class="co-field">
+          <label>Street Address *</label>
+          <input type="text" id="coAddress" placeholder="House/Unit No., Street Name" required autocomplete="street-address">
+        </div>
+        <div class="co-row">
+          <div class="co-field">
+            <label>City</label>
+            <input type="text" id="coCity" placeholder="Davao City" autocomplete="address-level2">
+          </div>
+          <div class="co-field">
+            <label>ZIP Code</label>
+            <input type="text" id="coZip" placeholder="8000" autocomplete="postal-code">
+          </div>
+        </div>
+        <div class="co-section-title">Payment Method</div>
+        <div class="co-payment-opts">
+          <label class="co-pay-opt">
+            <input type="radio" name="payment" value="GCash" checked>
+            <span><i class="fas fa-mobile-alt"></i> GCash</span>
+          </label>
+          <label class="co-pay-opt">
+            <input type="radio" name="payment" value="COD">
+            <span><i class="fas fa-money-bill-wave"></i> Cash on Delivery</span>
+          </label>
+          <label class="co-pay-opt">
+            <input type="radio" name="payment" value="Card">
+            <span><i class="fas fa-credit-card"></i> Card</span>
+          </label>
+        </div>
+        <div class="co-note-field">
+          <label>Order Notes (optional)</label>
+          <textarea id="coNote" placeholder="Any special instructions for your order..."></textarea>
+        </div>
+        <div class="co-summary" id="coSummary"></div>
+        <button type="submit" class="co-submit" id="coSubmit">
+          <i class="fas fa-check-circle"></i> Place Order
+        </button>
+      </form>
+    </div>`;
+  document.body.appendChild(m);
 
-    const name    = prompt('Your full name:');
-    if (!name) return;
-    const email   = prompt('Your email:');
-    if (!email) return;
-    const phone   = prompt('Your phone number:');
-    const address = prompt('Delivery address:');
-    const payment = prompt('Payment method (GCash / COD / Card):') || 'COD';
+  // Inject styles
+  if (!document.getElementById('coStyles')) {
+    const s = document.createElement('style');
+    s.id = 'coStyles';
+    s.textContent = `
+      #checkoutModal { position:fixed;inset:0;z-index:9999;display:none; }
+      #checkoutModal.open { display:flex;align-items:center;justify-content:center; }
+      .co-backdrop { position:absolute;inset:0;background:rgba(61,26,34,0.55);backdrop-filter:blur(3px); }
+      .co-modal {
+        position:relative;z-index:1;background:#fff;border-radius:20px;
+        padding:36px 40px;width:100%;max-width:560px;max-height:90vh;
+        overflow-y:auto;box-shadow:0 24px 80px rgba(61,26,34,0.25);
+        scrollbar-width:thin;
+      }
+      .co-close {
+        position:absolute;top:16px;right:16px;background:var(--beige);border:none;
+        width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:0.9rem;
+        color:var(--brown);display:flex;align-items:center;justify-content:center;
+        transition:background 0.2s;
+      }
+      .co-close:hover { background:var(--sand); }
+      .co-header { margin-bottom:24px; }
+      .co-header h2 { font-family:var(--serif);font-size:1.5rem;color:var(--brown);margin-bottom:4px; }
+      .co-header p { font-size:0.85rem;color:var(--muted); }
+      .co-section-title {
+        font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+        color:var(--gold);margin:20px 0 10px;border-bottom:1px solid var(--border);padding-bottom:6px;
+      }
+      .co-row { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
+      .co-field { display:flex;flex-direction:column;gap:5px;margin-bottom:12px; }
+      .co-field label { font-size:0.78rem;font-weight:600;color:var(--brown); }
+      .co-field input, .co-field textarea {
+        padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;
+        font-size:0.88rem;color:var(--brown);font-family:var(--sans);
+        background:var(--cream);outline:none;transition:border 0.2s,box-shadow 0.2s;
+      }
+      .co-field input:focus, .co-field textarea:focus {
+        border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,104,122,0.12);background:#fff;
+      }
+      .co-note-field { margin-bottom:12px; }
+      .co-note-field label { font-size:0.78rem;font-weight:600;color:var(--brown);display:block;margin-bottom:5px; }
+      .co-note-field textarea { width:100%;resize:vertical;min-height:70px;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:0.88rem;color:var(--brown);font-family:var(--sans);background:var(--cream);outline:none;transition:border 0.2s; }
+      .co-note-field textarea:focus { border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,104,122,0.12);background:#fff; }
+      .co-payment-opts { display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px; }
+      .co-pay-opt { display:flex;align-items:center; cursor:pointer; }
+      .co-pay-opt input { display:none; }
+      .co-pay-opt span {
+        padding:9px 16px;border:1.5px solid var(--border);border-radius:100px;
+        font-size:0.82rem;font-weight:600;color:var(--muted);
+        display:flex;align-items:center;gap:6px;transition:all 0.2s;
+      }
+      .co-pay-opt input:checked + span { border-color:var(--gold);background:var(--gold-light);color:var(--gold); }
+      .co-summary {
+        background:var(--cream);border-radius:12px;padding:14px 16px;
+        margin:16px 0;font-size:0.85rem;color:var(--brown);
+      }
+      .co-summary-row { display:flex;justify-content:space-between;margin-bottom:6px; }
+      .co-summary-row:last-child { margin-bottom:0;font-weight:700;font-size:0.95rem;border-top:1px solid var(--border);padding-top:8px;margin-top:4px; }
+      .co-submit {
+        width:100%;padding:14px;background:var(--gold);color:#fff;border:none;
+        border-radius:100px;font-size:0.95rem;font-weight:700;font-family:var(--sans);
+        cursor:pointer;transition:all 0.25s;display:flex;align-items:center;justify-content:center;gap:8px;
+      }
+      .co-submit:hover:not(:disabled) { background:var(--gold-dark);transform:translateY(-1px);box-shadow:0 6px 20px rgba(212,104,122,0.4); }
+      .co-submit:disabled { opacity:0.65;cursor:not-allowed; }
+      @media(max-width:500px){ .co-modal{padding:24px 18px;border-radius:14px 14px 0 0;max-height:95vh;} .co-row{grid-template-columns:1fr;} #checkoutModal.open{align-items:flex-end;} }
+    `;
+    document.head.appendChild(s);
+  }
+
+  // Close handlers
+  document.querySelector('.co-backdrop').addEventListener('click', closeCheckoutModal);
+  document.getElementById('coClose').addEventListener('click', closeCheckoutModal);
+
+  // Form submit
+  document.getElementById('coForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = document.getElementById('coSubmit');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner" style="border-color:rgba(255,255,255,0.3);border-top-color:#fff;width:16px;height:16px;border-width:2px;display:inline-block;border-radius:50%;animation:spin 0.7s linear infinite"></span> Placing order...';
 
     const order = {
-      items:   Cart.items,
-      total:   Cart.subtotal,
-      customer: { name, email, phone: phone||'', address: address||'' },
-      paymentMethod: payment,
-      status:  'pending',
+      items: Cart.items,
+      total: Cart.subtotal,
+      customer: {
+        name:    document.getElementById('coName').value.trim(),
+        email:   document.getElementById('coEmail').value.trim(),
+        phone:   document.getElementById('coPhone').value.trim(),
+        address: [
+          document.getElementById('coAddress').value.trim(),
+          document.getElementById('coCity').value.trim(),
+          document.getElementById('coZip').value.trim()
+        ].filter(Boolean).join(', '),
+      },
+      paymentMethod: document.querySelector('input[name="payment"]:checked')?.value || 'COD',
+      notes:  document.getElementById('coNote').value.trim(),
+      status: 'pending',
       createdAt: new Date(),
     };
 
     try {
-      const { db } = await import('./firebase-config.js');
+      const { db, auth } = await import('./firebase-config.js');
       const { collection, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
       order.createdAt = serverTimestamp();
+      // Attach customer user ID if logged in
+      const user = auth.currentUser;
+      if (user) { order.userId = user.uid; order.customer.email = order.customer.email || user.email; }
       await addDoc(collection(db, 'orders'), order);
-    } catch (_) { /* Firebase not configured yet */ }
+    } catch (_) { /* Firebase not configured */ }
 
     Cart.items = [];
     Cart.save();
+    closeCheckoutModal();
     CartUI.close();
     showToast('<i class="fas fa-check-circle"></i> Order placed! We\'ll contact you soon.');
   });
+}
+
+function openCheckoutModal() {
+  if (!Cart.items.length) return;
+  createCheckoutModal();
+  // Pre-fill from Firebase auth if logged in
+  import('./firebase-config.js').then(({ auth }) => {
+    const user = auth.currentUser;
+    if (user) {
+      const nameEl  = document.getElementById('coName');
+      const emailEl = document.getElementById('coEmail');
+      if (nameEl && !nameEl.value)   nameEl.value  = user.displayName || '';
+      if (emailEl && !emailEl.value) emailEl.value = user.email || '';
+    }
+  }).catch(() => {});
+
+  // Render order summary
+  const summary = document.getElementById('coSummary');
+  if (summary) {
+    summary.innerHTML = `
+      ${Cart.items.map(i => `<div class="co-summary-row"><span>${i.name} × ${i.qty}</span><span>₱${(i.price * i.qty).toLocaleString()}</span></div>`).join('')}
+      <div class="co-summary-row"><span>Total</span><span>₱${Cart.subtotal.toLocaleString()}</span></div>`;
+  }
+  document.getElementById('checkoutModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCheckoutModal() {
+  document.getElementById('checkoutModal')?.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function initCheckout() {
+  document.querySelector('.cart-checkout')?.addEventListener('click', openCheckoutModal);
 }
 
 // ─── Smooth anchor links ─────────────────────────────────────

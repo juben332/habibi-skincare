@@ -181,6 +181,12 @@ p { color: var(--muted); line-height: 1.8; }
 .nav--scrolled .nav__login-btn:hover { background: var(--gold-light); border-color: var(--gold); color: var(--gold); }
 .nav__login-btn i { font-size: 0.75rem; }
 
+.nav__user-avatar {
+  width: 28px; height: 28px; border-radius: 50%; object-fit: cover;
+  border: 1.5px solid rgba(255,255,255,0.6); flex-shrink: 0;
+}
+.nav--scrolled .nav__user-avatar { border-color: var(--border); }
+
 .nav__hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
 .nav__hamburger span { display: block; width: 22px; height: 2px; background: #fff; border-radius: 2px; transition: var(--ease); }
 .nav--scrolled .nav__hamburger span { background: var(--charcoal); }
