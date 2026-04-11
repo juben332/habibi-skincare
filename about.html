@@ -302,16 +302,24 @@
 
   <script src="js/main.js"></script>
   <script type="module">
-    import { auth } from './js/firebase-config.js';
+    import { auth, isAdmin } from './js/firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     onAuthStateChanged(auth, user => {
       const btn = document.getElementById('navLoginBtn');
       const label = document.getElementById('navLoginLabel');
       if (!btn || !label) return;
-      btn.href = 'account.html';
-      label.innerHTML = user
-        ? (user.photoURL ? `<img src="${user.photoURL}" class="nav__user-avatar" alt=""> ${(user.displayName||'').split(' ')[0]||'Account'}` : `<i class="fas fa-user-circle"></i> ${(user.displayName||'').split(' ')[0]||'Account'}`)
-        : '<i class="fas fa-user-circle"></i> Sign In';
+      if (user && isAdmin(user)) {
+        btn.href = 'admin/index.html';
+        label.innerHTML = '<i class="fas fa-shield-alt"></i> Dashboard';
+      } else if (user) {
+        btn.href = 'account.html';
+        label.innerHTML = user.photoURL
+          ? `<img src="${user.photoURL}" class="nav__user-avatar" alt=""> ${(user.displayName||'').split(' ')[0]||'Account'}`
+          : `<i class="fas fa-user-circle"></i> ${(user.displayName||'').split(' ')[0]||'Account'}`;
+      } else {
+        btn.href = 'account.html';
+        label.innerHTML = '<i class="fas fa-user-circle"></i> Sign In';
+      }
     });
   </script>
 </body>
