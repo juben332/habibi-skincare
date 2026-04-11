@@ -588,12 +588,55 @@ function createCheckoutModal() {
       await addDoc(collection(db, 'orders'), order);
     } catch (_) { /* Firebase not configured */ }
 
+    // Send admin email notification via EmailJS
+    sendOrderNotification(order);
+
     Cart.items = [];
     Cart.save();
     closeCheckoutModal();
     CartUI.close();
     showToast('<i class="fas fa-check-circle"></i> Order placed! We\'ll contact you soon.');
   });
+}
+
+// ─── EmailJS order notification ──────────────────────────────
+// Replace these 3 values with your own from emailjs.com
+const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';
+const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
+const EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';
+
+async function sendOrderNotification(order) {
+  try {
+    // Lazy-load EmailJS SDK
+    if (!window.emailjs) {
+      await new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+        s.onload = resolve;
+        s.onerror = reject;
+        document.head.appendChild(s);
+      });
+      window.emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+    }
+
+    const itemsList = order.items
+      .map(i => `${i.name} × ${i.qty}  —  ₱${(i.price * i.qty).toLocaleString()}`)
+      .join('\n');
+
+    await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      customer_name:    order.customer.name,
+      customer_email:   order.customer.email,
+      customer_phone:   order.customer.phone,
+      customer_address: order.customer.address,
+      order_items:      itemsList,
+      order_total:      `₱${order.total.toLocaleString()}`,
+      payment_method:   order.paymentMethod,
+      order_notes:      order.notes || 'None',
+      admin_email:      'wardopon123@gmail.com',
+    });
+  } catch (err) {
+    console.warn('Email notification failed:', err);
+  }
 }
 
 function openCheckoutModal() {
