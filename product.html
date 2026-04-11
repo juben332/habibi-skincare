@@ -29,6 +29,9 @@
           <i class="fas fa-shopping-bag"></i>
           <span class="cart-count"></span>
         </button>
+        <a href="login.html" class="nav__login-btn" id="navLoginBtn">
+          <i class="fas fa-user-circle"></i> <span id="navLoginLabel">Admin</span>
+        </a>
         <button class="nav__hamburger" id="burger"><span></span><span></span><span></span></button>
       </div>
     </div>
@@ -443,5 +446,14 @@
   </div>
 
   <script src="js/main.js"></script>
+  <script type="module">
+    import { auth } from './js/firebase-config.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    onAuthStateChanged(auth, user => {
+      const btn = document.getElementById('navLoginBtn');
+      const label = document.getElementById('navLoginLabel');
+      if (user && btn && label) { btn.href = 'admin/index.html'; label.textContent = 'Dashboard'; }
+    });
+  </script>
 </body>
 </html>
