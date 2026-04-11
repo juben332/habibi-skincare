@@ -607,7 +607,7 @@ const EMAILJS_PUBLIC_KEY  = 'XR-KQNf0fAnc8qfRBssi9';
 
 async function sendOrderNotification(order) {
   try {
-    // Lazy-load EmailJS SDK
+    // Load EmailJS SDK if not already loaded
     if (!window.emailjs) {
       await new Promise((resolve, reject) => {
         const s = document.createElement('script');
@@ -616,26 +616,27 @@ async function sendOrderNotification(order) {
         s.onerror = reject;
         document.head.appendChild(s);
       });
-      window.emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
     }
 
+    // Always init (safe to call multiple times)
+    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
     const itemsList = order.items
-      .map(i => `${i.name} × ${i.qty}  —  ₱${(i.price * i.qty).toLocaleString()}`)
+      .map(i => `${i.name} x ${i.qty} - P${(i.price * i.qty).toLocaleString()}`)
       .join('\n');
 
-    await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-      customer_name:    order.customer.name,
-      customer_email:   order.customer.email,
-      customer_phone:   order.customer.phone,
-      customer_address: order.customer.address,
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      customer_name:    order.customer.name    || 'N/A',
+      customer_email:   order.customer.email   || 'N/A',
+      customer_phone:   order.customer.phone   || 'N/A',
+      customer_address: order.customer.address || 'N/A',
       order_items:      itemsList,
-      order_total:      `₱${order.total.toLocaleString()}`,
-      payment_method:   order.paymentMethod,
-      order_notes:      order.notes || 'None',
-      admin_email:      'wardopon123@gmail.com',
+      order_total:      `P${(order.total || 0).toLocaleString()}`,
+      payment_method:   order.paymentMethod    || 'COD',
+      order_notes:      order.notes            || 'None',
     });
   } catch (err) {
-    console.warn('Email notification failed:', err);
+    console.error('Email notification failed:', err);
   }
 }
 
