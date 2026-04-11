@@ -122,14 +122,16 @@
 <div class="a-toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg"></span></div>
 
 <script type="module">
-  import { auth, db } from '../js/firebase-config.js';
+  import { auth, db, isAdmin } from '../js/firebase-config.js';
   import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import { collection, getDocs, updateDoc, doc, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   let allOrders = [], currentOrderId = null, activeStatus = '';
 
+  // Auth guard — admin only
   onAuthStateChanged(auth, user => {
     if (!user) { window.location.href = '../login.html'; return; }
+    if (!isAdmin(user)) { window.location.href = '../login.html?error=unauthorized'; return; }
     document.getElementById('userEmail').textContent = user.email;
     document.getElementById('userAvatar').textContent = user.email[0].toUpperCase();
     loadOrders();

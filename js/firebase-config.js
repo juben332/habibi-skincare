@@ -22,4 +22,12 @@ const app  = initializeApp(firebaseConfig);
 const db   = getFirestore(app);
 const auth = getAuth(app);
 
-export { app, db, auth };
+// ── Admin whitelist ──────────────────────────────────────────
+// Only these emails can access the admin panel.
+const ADMIN_EMAILS = ['wardopon123@gmail.com'];
+
+function isAdmin(user) {
+  return user && ADMIN_EMAILS.includes(user.email?.toLowerCase());
+}
+
+export { app, db, auth, ADMIN_EMAILS, isAdmin };
