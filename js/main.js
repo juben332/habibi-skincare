@@ -607,36 +607,36 @@ const EMAILJS_PUBLIC_KEY  = 'XR-KQNf0fAnc8qfRBssi9';
 
 async function sendOrderNotification(order) {
   try {
-    // Load EmailJS SDK if not already loaded
-    if (!window.emailjs) {
-      await new Promise((resolve, reject) => {
-        const s = document.createElement('script');
-        s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
-        s.onload = resolve;
-        s.onerror = reject;
-        document.head.appendChild(s);
-      });
-    }
-
-    // Always init (safe to call multiple times)
-    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
-
     const itemsList = order.items
       .map(i => `${i.name} x ${i.qty} - P${(i.price * i.qty).toLocaleString()}`)
       .join('\n');
 
-    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-      name:             order.customer.name    || 'Customer',
-      email:            order.customer.email   || 'N/A',
-      customer_name:    order.customer.name    || 'N/A',
-      customer_email:   order.customer.email   || 'N/A',
-      customer_phone:   order.customer.phone   || 'N/A',
-      customer_address: order.customer.address || 'N/A',
-      order_items:      itemsList,
-      order_total:      `P${(order.total || 0).toLocaleString()}`,
-      payment_method:   order.paymentMethod    || 'COD',
-      order_notes:      order.notes            || 'None',
+    const res = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        service_id:  EMAILJS_SERVICE_ID,
+        template_id: EMAILJS_TEMPLATE_ID,
+        user_id:     EMAILJS_PUBLIC_KEY,
+        template_params: {
+          name:             order.customer.name    || 'Customer',
+          email:            order.customer.email   || 'N/A',
+          customer_name:    order.customer.name    || 'N/A',
+          customer_email:   order.customer.email   || 'N/A',
+          customer_phone:   order.customer.phone   || 'N/A',
+          customer_address: order.customer.address || 'N/A',
+          order_items:      itemsList,
+          order_total:      'P' + (order.total || 0).toLocaleString(),
+          payment_method:   order.paymentMethod    || 'COD',
+          order_notes:      order.notes            || 'None',
+        }
+      })
     });
+
+    if (!res.ok) {
+      const text = await res.text();
+      console.error('EmailJS error:', res.status, text);
+    }
   } catch (err) {
     console.error('Email notification failed:', err);
   }
