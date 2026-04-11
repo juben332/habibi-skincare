@@ -10,12 +10,12 @@ import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebas
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey:            "YOUR_API_KEY",
-  authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId:         "YOUR_PROJECT_ID",
-  storageBucket:     "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId:             "YOUR_APP_ID"
+  apiKey:            "AIzaSyAMuah7QKl-S2mI4vbRwBxIryjaZZLAVWA",
+  authDomain:        "habibi-skincare-ph.firebaseapp.com",
+  projectId:         "habibi-skincare-ph",
+  storageBucket:     "habibi-skincare-ph.firebasestorage.app",
+  messagingSenderId: "912886683524",
+  appId:             "1:912886683524:web:219785683a0a87bfe6afd1"
 };
 
 const app  = initializeApp(firebaseConfig);
