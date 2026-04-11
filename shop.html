@@ -149,18 +149,25 @@
               onerror="this.parentElement.style.background='linear-gradient(145deg,var(--beige),var(--sand))'">` :
               `<div style="height:100%;background:linear-gradient(145deg,var(--beige),var(--sand))"></div>`}
             <div class="product-card__overlay">
-              <button class="quick-add" data-add-to-cart
-                data-id="${p.id}"
-                data-name="${p.name}"
-                data-price="${p.price || 0}"
-                data-size="${p.size || '30ml'}"
-                data-image="${p.image || ''}">Add to Cart</button>
+              ${p.inStock === false
+                ? `<button class="quick-add" disabled style="opacity:0.5;cursor:not-allowed">Out of Stock</button>`
+                : `<button class="quick-add" data-add-to-cart
+                    data-id="${p.id}"
+                    data-name="${p.name}"
+                    data-price="${p.price || 0}"
+                    data-size="${p.size || '30ml'}"
+                    data-image="${p.image || ''}">Add to Cart</button>`}
             </div>
           </div>
           <div class="product-card__body">
             <span class="product-card__cat">${capitalize(p.category || '')}</span>
             <h3 class="product-card__name"><a href="product.html">${p.name}</a></h3>
             <p class="product-card__benefit">${p.benefit || ''}</p>
+            ${p.stock != null && p.stock > 0 && p.stock <= 10
+              ? `<p style="font-size:0.75rem;color:#e07b39;font-weight:500;margin:0 0 6px"><i class="fas fa-fire" style="margin-right:3px"></i>Only ${p.stock} left!</p>`
+              : p.inStock === false
+              ? `<p style="font-size:0.75rem;color:var(--muted);margin:0 0 6px">Out of stock</p>`
+              : ''}
             <div class="product-card__foot">
               <span class="product-card__price">₱${(p.price || 0).toLocaleString()}</span>
               <button class="wishlist-btn"><i class="far fa-heart"></i></button>
