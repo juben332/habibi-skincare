@@ -1,0 +1,30 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Products — anyone can read, only admin can write
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if request.auth != null
+        && request.auth.token.email == 'wardopon123@gmail.com';
+    }
+
+    // Orders — anyone can create, customers read their own, admin reads all
+    match /orders/{orderId} {
+      allow create: if true;
+      allow read: if request.auth != null
+        && (resource.data.userId == request.auth.uid
+          || request.auth.token.email == 'wardopon123@gmail.com');
+      allow update: if request.auth != null
+        && request.auth.token.email == 'wardopon123@gmail.com';
+    }
+
+    // Subscribers (newsletter) — anyone can add, only admin reads
+    match /subscribers/{subId} {
+      allow create: if true;
+      allow read: if request.auth != null
+        && request.auth.token.email == 'wardopon123@gmail.com';
+    }
+  }
+}

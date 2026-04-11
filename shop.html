@@ -176,7 +176,7 @@
 
     async function loadProducts() {
       try {
-        const snap = await getDocs(query(collection(db, 'products'), orderBy('createdAt', 'desc')));
+        const snap = await getDocs(collection(db, 'products'));
         allProducts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       } catch (e) {
         // Firebase not configured — show empty state gracefully

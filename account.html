@@ -390,8 +390,7 @@
       try {
         const q = query(
           collection(db, 'orders'),
-          where('userId', '==', user.uid),
-          orderBy('createdAt', 'desc')
+          where('userId', '==', user.uid)
         );
         const snap = await getDocs(q);
         if (snap.empty) {
@@ -426,7 +425,7 @@
     async function loadProducts() {
       const grid = document.getElementById('acProductsGrid');
       try {
-        const snap = await getDocs(query(collection(db, 'products'), orderBy('createdAt', 'desc')));
+        const snap = await getDocs(collection(db, 'products'));
         const products = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(p => p.inStock !== false);
         if (!products.length) {
           grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">No products available yet.</div>';

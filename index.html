@@ -156,7 +156,7 @@
 
     const delays = ['d1', 'd2', 'd3'];
     try {
-      const snap = await getDocs(query(collection(db, 'products'), orderBy('createdAt', 'desc'), limit(6)));
+      const snap = await getDocs(query(collection(db, 'products'), limit(6)));
       const products = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(p => p.inStock !== false);
       const grid = document.getElementById('featuredGrid');
       if (!products.length) {
