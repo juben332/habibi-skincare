@@ -163,11 +163,13 @@
             <span class="product-card__cat">${capitalize(p.category || '')}</span>
             <h3 class="product-card__name"><a href="product.html">${p.name}</a></h3>
             <p class="product-card__benefit">${p.benefit || ''}</p>
-            ${p.stock != null && p.stock > 0 && p.stock <= 10
+            ${p.inStock === false
+              ? `<p style="font-size:0.75rem;color:#c0392b;font-weight:500;margin:0 0 6px"><i class="fas fa-times-circle" style="margin-right:3px"></i>Out of stock</p>`
+              : p.stock != null && p.stock <= 10
               ? `<p style="font-size:0.75rem;color:#e07b39;font-weight:500;margin:0 0 6px"><i class="fas fa-fire" style="margin-right:3px"></i>Only ${p.stock} left!</p>`
-              : p.inStock === false
-              ? `<p style="font-size:0.75rem;color:var(--muted);margin:0 0 6px">Out of stock</p>`
-              : ''}
+              : p.stock != null
+              ? `<p style="font-size:0.75rem;color:#2ecc71;font-weight:500;margin:0 0 6px"><i class="fas fa-check-circle" style="margin-right:3px"></i>${p.stock} in stock</p>`
+              : `<p style="font-size:0.75rem;color:#2ecc71;font-weight:500;margin:0 0 6px"><i class="fas fa-check-circle" style="margin-right:3px"></i>In stock</p>`}
             <div class="product-card__foot">
               <span class="product-card__price">₱${(p.price || 0).toLocaleString()}</span>
               <button class="wishlist-btn"><i class="far fa-heart"></i></button>
