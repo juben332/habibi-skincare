@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wishlist — Habibi Skincare</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav nav--scrolled" id="nav">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__logo"><img src="images/logo.png" alt="Habibi Skincare Logo" class="nav__logo-img">Habibi<span>.</span></a>
+      <ul class="nav__links">
+        <li><a href="shop.html" class="nav__link">Shop</a></li>
+        <li><a href="about.html" class="nav__link">Our Story</a></li>
+        <li><a href="index.html#routine" class="nav__link">Routine</a></li>
+        <li><a href="index.html#contact" class="nav__link">Contact</a></li>
+      </ul>
+      <div class="nav__actions">
+        <button class="nav__icon" aria-label="Search"><i class="fas fa-search"></i></button>
+        <a href="wishlist.html" class="nav__icon" aria-label="Wishlist" style="position:relative;text-decoration:none;color:var(--gold)">
+          <i class="fas fa-heart"></i>
+          <span class="wishlist-count"></span>
+        </a>
+        <button class="nav__icon" data-cart-open aria-label="Cart">
+          <i class="fas fa-shopping-bag"></i>
+          <span class="cart-count"></span>
+        </button>
+        <a href="account.html" class="nav__login-btn" id="navLoginBtn">
+          <span id="navLoginLabel"><i class="fas fa-user-circle"></i> Sign In</span>
+        </a>
+        <button class="nav__hamburger" id="burger"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="nav__mobile" id="mobileMenu">
+    <a href="shop.html" class="nav__link">Shop</a>
+    <a href="about.html" class="nav__link">Our Story</a>
+    <a href="index.html#routine" class="nav__link">Routine</a>
+    <a href="index.html#contact" class="nav__link">Contact</a>
+  </div>
+
+  <!-- Hero -->
+  <div class="shop-hero">
+    <div class="container">
+      <span class="eyebrow" style="justify-content:center"><i class="fas fa-heart" style="color:var(--gold);margin-right:6px"></i> Your Wishlist</span>
+      <h1>Saved Items</h1>
+      <p style="color:var(--muted);font-size:1.05rem;max-width:480px;margin:0 auto">Products you've loved. Add them to your cart whenever you're ready.</p>
+    </div>
+  </div>
+
+  <!-- Wishlist Grid -->
+  <section class="section" style="background:var(--cream);">
+    <div class="container">
+      <div id="wishlistGrid" class="grid-4 products-grid" style="row-gap:44px;"></div>
+      <div id="wishlistEmpty" style="display:none;text-align:center;padding:80px 20px;">
+        <i class="far fa-heart" style="font-size:3rem;color:var(--border);display:block;margin-bottom:20px"></i>
+        <h3 style="font-family:var(--serif);color:var(--brown);margin-bottom:10px">Your wishlist is empty</h3>
+        <p style="color:var(--muted);margin-bottom:28px">Start adding products you love by clicking the heart icon.</p>
+        <a href="shop.html" class="btn btn-primary">Browse Products</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Newsletter -->
+  <section class="newsletter">
+    <div class="container">
+      <div class="section-header">
+        <span class="eyebrow">Join the Glow Club</span>
+        <h2>Get 10% Off Your First Order</h2>
+        <p>Subscribe for exclusive drops, skincare tips, and member-only offers.</p>
+      </div>
+      <form class="newsletter__form" onsubmit="return false;">
+        <input type="email" class="newsletter__input" placeholder="Your email address" required>
+        <button type="submit" class="btn btn-primary">Join Now</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__top">
+        <div>
+          <div class="footer__logo">Habibi<span>.</span></div>
+          <p style="color:rgba(255,255,255,0.45);font-size:0.85rem;max-width:260px;margin-top:12px;line-height:1.6">
+            Premium skincare rooted in nature, crafted for radiance. Davao City, Philippines.
+          </p>
+        </div>
+        <div>
+          <div class="footer__heading">Shop</div>
+          <a href="shop.html" class="footer__link">All Products</a>
+          <a href="shop.html" class="footer__link">Cleansers</a>
+          <a href="shop.html" class="footer__link">Serums</a>
+          <a href="shop.html" class="footer__link">Moisturizers</a>
+        </div>
+        <div>
+          <div class="footer__heading">Company</div>
+          <a href="about.html" class="footer__link">Our Story</a>
+          <a href="index.html#contact" class="footer__link">Contact</a>
+          <a href="account.html" class="footer__link">My Account</a>
+          <a href="wishlist.html" class="footer__link">Wishlist</a>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <span>© 2025 Habibi Skincare. All rights reserved.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Cart Sidebar -->
+  <div class="cart-overlay"></div>
+  <div class="cart-sidebar">
+    <div class="cart-sidebar__header">
+      <h3>Your Cart</h3>
+      <button class="cart-close"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="cart-sidebar__items"></div>
+    <div class="cart-sidebar__footer">
+      <div class="cart-subtotal"><span>Subtotal</span><strong>₱0</strong></div>
+      <button class="cart-checkout btn btn-primary" style="width:100%">Checkout</button>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script>
+    // Render wishlist from localStorage
+    function renderWishlist() {
+      const items  = JSON.parse(localStorage.getItem('habibi_wishlist') || '[]');
+      const grid   = document.getElementById('wishlistGrid');
+      const empty  = document.getElementById('wishlistEmpty');
+
+      if (!items.length) {
+        grid.innerHTML  = '';
+        empty.style.display = 'block';
+        return;
+      }
+
+      empty.style.display = 'none';
+      const delays = ['', 'd1', 'd2', 'd3'];
+      grid.innerHTML = items.map((p, i) => `
+        <div class="product-card anim ${delays[i % 4]}" data-id="${p.id}" data-category="${p.category||''}" data-price="${p.price||0}">
+          <div class="product-card__img-wrap">
+            ${p.image
+              ? `<img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.parentElement.style.background='linear-gradient(145deg,var(--beige),var(--sand))'">`
+              : `<div style="height:100%;background:linear-gradient(145deg,var(--beige),var(--sand))"></div>`}
+            <div class="product-card__overlay">
+              <button class="quick-add" data-add-to-cart
+                data-id="${p.id}" data-name="${p.name}"
+                data-price="${p.price||0}" data-size="${p.size||'30ml'}"
+                data-image="${p.image||''}">Add to Cart</button>
+            </div>
+          </div>
+          <div class="product-card__body">
+            <span class="product-card__cat">${p.category ? p.category.charAt(0).toUpperCase() + p.category.slice(1) : ''}</span>
+            <h3 class="product-card__name"><a href="shop.html">${p.name}</a></h3>
+            <p class="product-card__benefit">${p.benefit||''}</p>
+            <div class="product-card__foot">
+              <span class="product-card__price">₱${(p.price||0).toLocaleString()}</span>
+              <button class="wishlist-btn wished" data-id="${p.id}" title="Remove from wishlist">
+                <i class="fas fa-heart"></i>
+              </button>
+            </div>
+          </div>
+        </div>`).join('');
+    }
+
+    renderWishlist();
+
+    // Re-render after wishlist toggle (heart click removes item)
+    document.addEventListener('click', e => {
+      if (e.target.closest('.wishlist-btn')) {
+        setTimeout(renderWishlist, 50);
+      }
+    });
+  </script>
+  <script type="module">
+    import { auth, isAdmin } from './js/firebase-config.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    onAuthStateChanged(auth, user => {
+      const btn = document.getElementById('navLoginBtn');
+      const label = document.getElementById('navLoginLabel');
+      if (!btn || !label) return;
+      btn.href = 'account.html';
+      label.innerHTML = user
+        ? (user.photoURL ? `<img src="${user.photoURL}" class="nav__user-avatar" alt=""> ${(user.displayName||'').split(' ')[0]||'Account'}` : `<i class="fas fa-user-circle"></i> ${(user.displayName||'').split(' ')[0]||'Account'}`)
+        : '<i class="fas fa-user-circle"></i> Sign In';
+    });
+  </script>
+</body>
+</html>

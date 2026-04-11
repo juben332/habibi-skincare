@@ -187,6 +187,13 @@ p { color: var(--muted); line-height: 1.8; }
 }
 .nav--scrolled .nav__user-avatar { border-color: var(--border); }
 
+.wishlist-count {
+  position: absolute; top: -3px; right: -3px; background: var(--gold); color: #fff;
+  font-size: 0.62rem; font-weight: 700; width: 17px; height: 17px; border-radius: 50%;
+  display: none; align-items: center; justify-content: center;
+}
+.wishlist-count.visible { display: flex; }
+
 .nav__hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
 .nav__hamburger span { display: block; width: 22px; height: 2px; background: #fff; border-radius: 2px; transition: var(--ease); }
 .nav--scrolled .nav__hamburger span { background: var(--charcoal); }

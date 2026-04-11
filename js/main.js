@@ -190,19 +190,80 @@ function initCartEvents() {
 }
 
 // ─── Wishlist ───────────────────────────────────────────────
+const Wishlist = {
+  key: 'habibi_wishlist',
+  items() { return JSON.parse(localStorage.getItem(this.key) || '[]'); },
+  save(items) { localStorage.setItem(this.key, JSON.stringify(items)); },
+  has(id) { return this.items().some(p => p.id === id); },
+  add(product) {
+    const items = this.items();
+    if (!items.some(p => p.id === product.id)) { items.push(product); this.save(items); }
+  },
+  remove(id) { this.save(this.items().filter(p => p.id !== id)); },
+  toggle(product) {
+    if (this.has(product.id)) { this.remove(product.id); return false; }
+    else { this.add(product); return true; }
+  },
+  count() { return this.items().length; },
+  updateBadges() {
+    const count = this.count();
+    document.querySelectorAll('.wishlist-count').forEach(el => {
+      el.textContent = count;
+      el.classList.toggle('visible', count > 0);
+    });
+  }
+};
+
 function initWishlist() {
+  // Mark already-wishlisted buttons on page load
+  document.querySelectorAll('.wishlist-btn').forEach(btn => {
+    const card = btn.closest('[data-id], .product-card');
+    const id = card?.dataset?.id || btn.dataset?.id;
+    if (id && Wishlist.has(id)) {
+      btn.classList.add('wished');
+      const icon = btn.querySelector('i');
+      if (icon) { icon.classList.replace('far', 'fas'); }
+    }
+  });
+
+  Wishlist.updateBadges();
+
   document.addEventListener('click', e => {
     const btn = e.target.closest('.wishlist-btn');
     if (!btn) return;
-    btn.classList.toggle('wished');
+
+    const card = btn.closest('.product-card');
+    const product = {
+      id:      card?.dataset?.id    || btn.dataset?.id    || 'p-' + Date.now(),
+      name:    card?.querySelector('.product-card__name')?.textContent?.trim() || 'Product',
+      price:   Number(card?.dataset?.price) || 0,
+      image:   card?.querySelector('img')?.src || '',
+      size:    card?.querySelector('.product-card__cat')?.textContent?.trim() || '',
+      benefit: card?.querySelector('.product-card__benefit')?.textContent?.trim() || '',
+      category:card?.dataset?.category || '',
+    };
+
+    // Try to get id and name from add-to-cart btn inside the same card
+    const addBtn = card?.querySelector('[data-add-to-cart]');
+    if (addBtn) {
+      product.id    = addBtn.dataset.id    || product.id;
+      product.name  = addBtn.dataset.name  || product.name;
+      product.price = Number(addBtn.dataset.price) || product.price;
+      product.image = addBtn.dataset.image || product.image;
+      product.size  = addBtn.dataset.size  || product.size;
+    }
+
+    const added = Wishlist.toggle(product);
+    btn.classList.toggle('wished', added);
     const icon = btn.querySelector('i');
     if (icon) {
-      icon.classList.toggle('fas', btn.classList.contains('wished'));
-      icon.classList.toggle('far', !btn.classList.contains('wished'));
+      icon.classList.toggle('fas', added);
+      icon.classList.toggle('far', !added);
     }
-    if (btn.classList.contains('wished')) {
-      showToast('<i class="fas fa-heart"></i> Added to wishlist');
-    }
+    Wishlist.updateBadges();
+    showToast(added
+      ? '<i class="fas fa-heart"></i> Added to wishlist'
+      : '<i class="far fa-heart"></i> Removed from wishlist');
   });
 }
 
