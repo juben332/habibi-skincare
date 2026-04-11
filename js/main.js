@@ -603,7 +603,7 @@ function createCheckoutModal() {
 // Replace these 3 values with your own from emailjs.com
 const EMAILJS_SERVICE_ID  = 'service_276np7v';
 const EMAILJS_TEMPLATE_ID = 'template_hqkqnna';
-const EMAILJS_PUBLIC_KEY  = 'XR-KQNf0fAnc8qfRBssi9';
+const EMAILJS_PUBLIC_KEY  = 'tvLVIIrQWaEV5G0lC';
 
 async function sendOrderNotification(order) {
   try {
