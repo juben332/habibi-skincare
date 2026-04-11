@@ -626,6 +626,8 @@ async function sendOrderNotification(order) {
       .join('\n');
 
     await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      name:             order.customer.name    || 'Customer',
+      email:            order.customer.email   || 'N/A',
       customer_name:    order.customer.name    || 'N/A',
       customer_email:   order.customer.email   || 'N/A',
       customer_phone:   order.customer.phone   || 'N/A',
