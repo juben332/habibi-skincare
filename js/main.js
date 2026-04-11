@@ -601,9 +601,9 @@ function createCheckoutModal() {
 
 // ─── EmailJS order notification ──────────────────────────────
 // Replace these 3 values with your own from emailjs.com
-const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';
-const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
-const EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';
+const EMAILJS_SERVICE_ID  = 'service_276np7v';
+const EMAILJS_TEMPLATE_ID = 'template_hqkqnna';
+const EMAILJS_PUBLIC_KEY  = 'XR-KQNf0fAnc8qfRBssi9';
 
 async function sendOrderNotification(order) {
   try {
