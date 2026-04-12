@@ -580,12 +580,29 @@ function createCheckoutModal() {
 
     try {
       const { db, auth } = await import('./firebase-config.js');
-      const { collection, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+      const { collection, addDoc, updateDoc, doc, serverTimestamp, increment, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
       order.createdAt = serverTimestamp();
       // Attach customer user ID if logged in
       const user = auth.currentUser;
       if (user) { order.userId = user.uid; order.customer.email = order.customer.email || user.email; }
       await addDoc(collection(db, 'orders'), order);
+
+      // Decrease stock for each ordered item
+      for (const item of order.items) {
+        if (!item.id) continue;
+        try {
+          const productRef = doc(db, 'products', item.id);
+          const snap = await getDoc(productRef);
+          if (!snap.exists()) continue;
+          const currentStock = snap.data().stock;
+          if (currentStock == null) continue; // skip if no stock field
+          const newStock = Math.max(0, currentStock - (item.qty || 1));
+          await updateDoc(productRef, {
+            stock: newStock,
+            inStock: newStock > 0,
+          });
+        } catch (_) { /* skip individual product update errors */ }
+      }
     } catch (_) { /* Firebase not configured */ }
 
     // Send admin email notification via EmailJS
