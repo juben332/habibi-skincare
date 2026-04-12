@@ -23,7 +23,7 @@
   --nav-h: 80px;
   --max-w: 1320px;
   --pad: 0 40px;
-  --section: 120px 0;
+  --section: 80px 0;
 
   --sh-xs: 0 1px 4px rgba(61,26,34,0.06);
   --sh-sm: 0 2px 10px rgba(61,26,34,0.08);
@@ -342,7 +342,7 @@ p { color: var(--muted); line-height: 1.8; }
 
 /* 8. Brand Story
    ============================================================ */
-.brand-story { padding: 140px 0; background: var(--beige); position: relative; overflow: hidden; }
+.brand-story { padding: 80px 0; background: var(--beige); position: relative; overflow: hidden; }
 .brand-story__bg {
   position: absolute; inset: 0; opacity: 0.025;
   background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%233D1A22' fill-rule='evenodd'%3E%3Cpath d='M30 0L0 30l30 30 30-30z'/%3E%3C/g%3E%3C/svg%3E");
