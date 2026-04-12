@@ -144,7 +144,7 @@
       const snap = await getDocs(query(collection(db, 'orders'), orderBy('createdAt', 'desc')));
       allOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       const pending = allOrders.filter(o => o.status === 'pending').length;
-      const revenue = allOrders.reduce((s,o) => s + (o.total||0), 0);
+      const revenue = allOrders.filter(o => o.status === 'delivered').reduce((s,o) => s + (o.total||0), 0);
       document.getElementById('orderSummary').textContent = `${allOrders.length} total · ${pending} pending · ₱${revenue.toLocaleString()} revenue`;
       renderOrders();
     } catch (e) { renderOrders(); }
