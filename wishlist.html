@@ -146,7 +146,7 @@
       empty.style.display = 'none';
       const delays = ['', 'd1', 'd2', 'd3'];
       grid.innerHTML = items.map((p, i) => `
-        <div class="product-card anim ${delays[i % 4]}" data-id="${p.id}" data-category="${p.category||''}" data-price="${p.price||0}">
+        <div class="product-card anim ${delays[i % 4]}" data-id="${p.id}" data-category="${p.category||''}" data-price="${p.price||0}" style="cursor:pointer" onclick="if(!event.target.closest('button'))window.location.href='product.html?id=${p.id}'"
           <div class="product-card__img-wrap">
             ${p.image
               ? `<img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.parentElement.style.background='linear-gradient(145deg,var(--beige),var(--sand))'">`
