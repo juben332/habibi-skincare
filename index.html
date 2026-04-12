@@ -97,9 +97,7 @@
     <div class="container">
       <div class="grid-2">
         <div class="brand-story__img-wrap anim">
-          <img id="storyImg" src="" alt="Habibi Skincare — Natural Ingredients"
-               style="opacity:0;transition:opacity 0.8s ease"
-               onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(145deg,var(--beige),var(--sand))'">
+          <div id="storyImg" style="width:100%;height:100%;background-size:cover;background-position:center;background-color:var(--sand);transition:opacity 0.8s ease;opacity:0"></div>
           <div class="brand-story__badge">
             <span class="brand-story__badge-n">100%</span>
             <span class="brand-story__badge-t">Natural</span>
@@ -485,9 +483,8 @@
       const storyProduct = withImg[1] || withImg[0] || allWithImg[0];
       if (storyProduct) {
         const si = document.getElementById('storyImg');
-        si.src = storyProduct.image;
-        si.alt = storyProduct.name || 'Habibi Skincare';
-        si.onload = () => { si.style.opacity = '1'; };
+        si.style.backgroundImage = `url('${storyProduct.image}')`;
+        si.style.opacity = '1';
       }
     } catch (_) { /* stays empty if Firestore fails */ }
   </script>
