@@ -174,12 +174,8 @@
 
     renderWishlist();
 
-    // Re-render after wishlist toggle (heart click removes item)
-    document.addEventListener('click', e => {
-      if (e.target.closest('.wishlist-btn')) {
-        setTimeout(renderWishlist, 50);
-      }
-    });
+    // Re-render instantly whenever wishlist changes
+    window.addEventListener('wishlistUpdated', renderWishlist);
   </script>
   <script type="module">
     import { auth, isAdmin } from './js/firebase-config.js';
