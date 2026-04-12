@@ -100,7 +100,10 @@ const CartUI = {
               </button>
             </div>
           </div>
-          <div class="cart-item__price">₱${(item.price * item.qty).toLocaleString()}</div>
+          <div class="cart-item__price">
+            <span style="font-size:0.78rem;color:var(--muted);display:block;text-align:right">₱${item.price.toLocaleString()} each</span>
+            ₱${(item.price * item.qty).toLocaleString()}
+          </div>
         </div>`).join('');
     }
 
@@ -581,7 +584,7 @@ function createCheckoutModal() {
 
     try {
       const { db, auth } = await import('./firebase-config.js');
-      const { collection, addDoc, updateDoc, doc, serverTimestamp, increment, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+      const { collection, addDoc, updateDoc, doc, serverTimestamp, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
       order.createdAt = serverTimestamp();
       // Attach customer user ID if logged in
       const user = auth.currentUser;
