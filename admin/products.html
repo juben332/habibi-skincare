@@ -423,15 +423,15 @@
 
   function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
 
-  // ImgBB image upload
+  // Cloudinary image upload
   document.getElementById('imgUpload').addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const statusEl  = document.getElementById('uploadStatus');
-    const previewEl = document.getElementById('imgPreview');
+    const statusEl   = document.getElementById('uploadStatus');
+    const previewEl  = document.getElementById('imgPreview');
     const previewImg = document.getElementById('imgPreviewImg');
-    const label     = document.getElementById('uploadLabel');
+    const label      = document.getElementById('uploadLabel');
 
     statusEl.style.display = 'block';
     statusEl.innerHTML = '<i class="fas fa-spinner fa-spin" style="color:var(--a-pink)"></i> Uploading...';
@@ -439,20 +439,20 @@
 
     try {
       const formData = new FormData();
-      formData.append('image', file);
-      formData.append('key', '27979a9bbe01b40b94421ca70afb6e0e');
+      formData.append('file', file);
+      formData.append('upload_preset', 'htxesrcz');
 
-      const res  = await fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: formData });
+      const res  = await fetch('https://api.cloudinary.com/v1_1/dxazm18iv/image/upload', { method: 'POST', body: formData });
       const data = await res.json();
 
-      if (data.success) {
-        const url = data.data.url;
+      if (data.secure_url) {
+        const url = data.secure_url;
         document.getElementById('pImage').value = url;
         previewImg.src = url;
         previewEl.style.display = 'block';
         statusEl.innerHTML = '<i class="fas fa-check-circle" style="color:#2ecc71"></i> Image uploaded successfully!';
       } else {
-        statusEl.innerHTML = '<i class="fas fa-exclamation-circle" style="color:#e74c3c"></i> Upload failed. Try again.';
+        statusEl.innerHTML = '<i class="fas fa-exclamation-circle" style="color:#e74c3c"></i> Upload failed: ' + (data.error?.message || 'Try again.');
       }
     } catch (err) {
       statusEl.innerHTML = '<i class="fas fa-exclamation-circle" style="color:#e74c3c"></i> Upload error: ' + err.message;
