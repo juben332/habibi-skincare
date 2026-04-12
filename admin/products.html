@@ -143,9 +143,19 @@
           <textarea class="form-textarea" id="pDescription" placeholder="Full product description..."></textarea>
         </div>
         <div class="form-group">
-          <label class="form-label">Image URL</label>
-          <input type="url" class="form-input" id="pImage" placeholder="https://images.unsplash.com/...">
-          <span class="form-hint">Paste a direct image URL (Unsplash, your CDN, etc.)</span>
+          <label class="form-label">Product Image</label>
+          <div style="display:flex;gap:10px;align-items:center">
+            <input type="url" class="form-input" id="pImage" placeholder="https://... or upload below">
+            <label for="imgUpload" id="uploadLabel" style="cursor:pointer;white-space:nowrap;padding:0 16px;height:42px;display:flex;align-items:center;gap:8px;background:var(--a-card);border:1px solid var(--a-border);border-radius:8px;font-size:0.83rem;font-weight:500;color:var(--a-text);transition:background 0.2s" onmouseover="this.style.background='var(--a-bg)'" onmouseout="this.style.background='var(--a-card)'">
+              <i class="fas fa-upload" style="color:var(--a-pink)"></i> Upload
+            </label>
+            <input type="file" id="imgUpload" accept="image/*" style="display:none">
+          </div>
+          <div id="uploadStatus" style="margin-top:8px;font-size:0.8rem;display:none"></div>
+          <div id="imgPreview" style="margin-top:10px;display:none">
+            <img id="imgPreviewImg" src="" alt="Preview" style="max-height:120px;border-radius:8px;border:1px solid var(--a-border);object-fit:cover">
+          </div>
+          <span class="form-hint">Upload a photo from your device or paste an image URL</span>
         </div>
         <div class="form-row">
           <div class="form-group">
@@ -299,6 +309,12 @@
     document.getElementById('pImage').value = product?.image || '';
     document.getElementById('pBadge').value = product?.badge || '';
     document.getElementById('pQuantity').value = product?.stock != null ? product.stock : 50;
+    // Reset upload UI
+    document.getElementById('uploadStatus').style.display = 'none';
+    const prev = document.getElementById('imgPreview');
+    const prevImg = document.getElementById('imgPreviewImg');
+    if (product?.image) { prevImg.src = product.image; prev.style.display = 'block'; }
+    else { prev.style.display = 'none'; }
     modal.classList.add('open');
   }
   function closeModal() { modal.classList.remove('open'); }
@@ -406,6 +422,54 @@
   }
 
   function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+
+  // ImgBB image upload
+  document.getElementById('imgUpload').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const statusEl  = document.getElementById('uploadStatus');
+    const previewEl = document.getElementById('imgPreview');
+    const previewImg = document.getElementById('imgPreviewImg');
+    const label     = document.getElementById('uploadLabel');
+
+    statusEl.style.display = 'block';
+    statusEl.innerHTML = '<i class="fas fa-spinner fa-spin" style="color:var(--a-pink)"></i> Uploading...';
+    label.innerHTML = '<i class="fas fa-spinner fa-spin" style="color:var(--a-pink)"></i> Uploading...';
+
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      formData.append('key', '27979a9bbe01b40b94421ca70afb6e0e');
+
+      const res  = await fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: formData });
+      const data = await res.json();
+
+      if (data.success) {
+        const url = data.data.url;
+        document.getElementById('pImage').value = url;
+        previewImg.src = url;
+        previewEl.style.display = 'block';
+        statusEl.innerHTML = '<i class="fas fa-check-circle" style="color:#2ecc71"></i> Image uploaded successfully!';
+      } else {
+        statusEl.innerHTML = '<i class="fas fa-exclamation-circle" style="color:#e74c3c"></i> Upload failed. Try again.';
+      }
+    } catch (err) {
+      statusEl.innerHTML = '<i class="fas fa-exclamation-circle" style="color:#e74c3c"></i> Upload error: ' + err.message;
+    }
+
+    label.innerHTML = '<i class="fas fa-upload" style="color:var(--a-pink)"></i> Upload';
+    e.target.value = ''; // reset file input
+  });
+
+  // Show preview when URL is pasted manually
+  document.getElementById('pImage').addEventListener('change', () => {
+    const url = document.getElementById('pImage').value.trim();
+    const previewEl  = document.getElementById('imgPreview');
+    const previewImg = document.getElementById('imgPreviewImg');
+    if (url) { previewImg.src = url; previewEl.style.display = 'block'; }
+    else { previewEl.style.display = 'none'; }
+  });
 </script>
 </body>
 </html>
