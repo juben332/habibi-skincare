@@ -142,7 +142,7 @@
       noProducts.style.display = 'none';
       const delays = ['', 'd1', 'd2', 'd3'];
       grid.innerHTML = list.map((p, i) => `
-        <div class="product-card anim ${delays[i % 4]}" data-category="${p.category || ''}" data-price="${p.price || 0}" style="cursor:pointer" onclick="if(!event.target.closest('button'))window.location.href='product.html?id=${p.id}'">
+        <div class="product-card anim ${delays[i % 4]}" data-category="${p.category || ''}" data-price="${p.price || 0}" data-product-id="${p.id}" style="cursor:pointer">
           ${p.badge ? `<div class="product-card__badge badge-${p.badge}">${badgeLabel(p.badge)}</div>` : ''}
           <div class="product-card__img-wrap">
             ${p.image ? `<img src="${p.image}" alt="${p.name}" loading="lazy"
@@ -176,6 +176,15 @@
             </div>
           </div>
         </div>`).join('');
+
+      // Make cards clickable (navigate to product page, skip buttons)
+      grid.querySelectorAll('.product-card[data-product-id]').forEach(card => {
+        card.addEventListener('click', e => {
+          if (!e.target.closest('button') && !e.target.closest('a')) {
+            window.location.href = 'product.html?id=' + card.dataset.productId;
+          }
+        });
+      });
 
       // Re-trigger scroll animations for newly added cards
       if (window.initScrollAnim) window.initScrollAnim();
