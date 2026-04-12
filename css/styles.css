@@ -707,7 +707,7 @@ p { color: var(--muted); line-height: 1.8; }
 }
 .about-hero__img {
   position: absolute; right: 0; top: 0; width: 45%; height: 100%;
-  background: url('https://images.unsplash.com/photo-1612817288484-6f916006741a?w=900&auto=format&fit=crop&q=80') center/cover;
+  background: url('https://res.cloudinary.com/dxazm18iv/image/upload/v1776013927/llkqlk8vrdhbv5ebcdje.png') center/cover;
   clip-path: polygon(12% 0%, 100% 0%, 100% 100%, 0% 100%);
 }
 .about-hero__img::before { content:''; position:absolute; inset:0; background:rgba(44,24,16,0.15); }
