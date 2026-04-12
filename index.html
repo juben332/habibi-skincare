@@ -16,7 +16,7 @@
 <body>
 
   <!-- ═══ NAVIGATION ═══════════════════════════════════════════ -->
-  <nav class="nav nav--transparent" id="nav">
+  <nav class="nav nav--scrolled" id="nav">
     <div class="nav__inner">
       <a href="index.html" class="nav__logo"><img src="images/logo.png" alt="Habibi Skincare Logo" class="nav__logo-img">Habibi<span>.</span></a>
 
@@ -57,48 +57,18 @@
   </div>
 
   <!-- ═══ HERO ══════════════════════════════════════════════════ -->
-  <section class="hero">
-    <div class="hero__bg"></div>
-    <div class="hero__overlay"></div>
-    <div class="hero__pattern"></div>
-
-    <div class="hero__inner">
-      <!-- Text side -->
-      <div class="hero__content">
-        <span class="eyebrow">Est. 2024 · Davao City, Philippines</span>
-        <h1 class="hero__title">Radiance<br><em>Rooted in Nature</em></h1>
-        <p class="hero__sub">Premium natural skincare crafted for timeless beauty — inspired by the rich traditions of Middle Eastern self-care rituals.</p>
-        <div class="hero__actions">
+  <section class="about-hero">
+    <div class="about-hero__img" id="homeHeroImg"></div>
+    <div class="container" style="position:relative;z-index:2">
+      <div style="max-width:580px">
+        <span class="eyebrow" style="margin-bottom:18px">Est. 2024 · Davao City, Philippines</span>
+        <h1 style="margin-bottom:24px">Radiance<br><em style="font-style:italic;color:var(--rose)">Rooted in Nature</em></h1>
+        <p style="font-size:1.05rem;color:var(--charcoal);margin-bottom:36px;line-height:1.75;max-width:460px">Premium natural skincare crafted for timeless beauty — inspired by the rich traditions of Middle Eastern self-care rituals.</p>
+        <div style="display:flex;gap:16px;flex-wrap:wrap">
           <a href="shop.html" class="btn btn-primary btn-lg">Shop Now</a>
-          <a href="#routine" class="btn btn-outline btn-lg">Discover Your Routine</a>
+          <a href="#routine" class="btn btn-outline-dark btn-lg">Discover Your Routine</a>
         </div>
       </div>
-
-      <!-- Product visual side -->
-      <div class="hero__visual">
-        <div class="hero__product-ring">
-          <div class="hero__product-ring-inner">
-            <img id="heroProductImg" src="" alt="Featured Product">
-          </div>
-          <div class="hero__ring-deco"></div>
-        </div>
-        <div class="hero__product-info" id="heroProductInfo">
-          <span class="hero__product-cat" id="heroProductCat"></span>
-          <span class="hero__product-title" id="heroProductTitle">Loading...</span>
-          <span class="hero__product-price" id="heroProductPrice"></span>
-          <a href="shop.html" class="hero__product-link" id="heroProductLink">
-            View Product <i class="fas fa-arrow-right"></i>
-          </a>
-        </div>
-        <div class="hero__dot hero__dot--1"></div>
-        <div class="hero__dot hero__dot--2"></div>
-        <div class="hero__dot hero__dot--3"></div>
-      </div>
-    </div>
-
-    <div class="hero__scroll">
-      <span>Scroll</span>
-      <i class="fas fa-chevron-down"></i>
     </div>
   </section>
 
@@ -501,27 +471,18 @@
     try {
       const snap = await getDocs(query(collection(db, 'products'), limit(12)));
       const products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      // Prefer a product with a Cloudinary image, otherwise take first with any image
-      const featured = products.find(p => p.image && p.image.includes('cloudinary.com'))
-                    || products.find(p => p.image);
-      if (featured) {
-        const img = document.getElementById('heroProductImg');
-        img.src = featured.image;
-        img.onload = () => img.classList.add('img-ready');
-        img.onerror = () => img.parentElement.style.background = 'linear-gradient(145deg,#5c1e2e,#3d1a22)';
+      const withImg = products.filter(p => p.image && p.image.includes('cloudinary.com'));
+      const allWithImg = products.filter(p => p.image);
 
-        const cap = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
-        document.getElementById('heroProductCat').textContent   = cap(featured.category || '');
-        document.getElementById('heroProductTitle').textContent = featured.name || '';
-        document.getElementById('heroProductPrice').textContent = '₱' + (featured.price || 0).toLocaleString();
-        const link = document.getElementById('heroProductLink');
-        link.href = 'product.html?id=' + featured.id;
-        document.getElementById('heroProductInfo').classList.add('show');
+      // Hero — first Cloudinary product image as diagonal panel background
+      const heroProduct = withImg[0] || allWithImg[0];
+      if (heroProduct) {
+        const panel = document.getElementById('homeHeroImg');
+        panel.style.backgroundImage = `url('${heroProduct.image}')`;
       }
 
-      // Brand-story section — use 2nd product with a cloudinary image
-      const withImg = products.filter(p => p.image && p.image.includes('cloudinary.com'));
-      const storyProduct = withImg[1] || withImg[0] || products.find(p => p.image);
+      // Brand-story section — second Cloudinary product
+      const storyProduct = withImg[1] || withImg[0] || allWithImg[0];
       if (storyProduct) {
         const si = document.getElementById('storyImg');
         si.src = storyProduct.image;
