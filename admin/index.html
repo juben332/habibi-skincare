@@ -75,7 +75,7 @@
           <div class="stat-card__icon"><i class="fas fa-peso-sign"></i></div>
           <div class="stat-card__label">Total Revenue</div>
           <div class="stat-card__value" id="statRevenue">—</div>
-          <div class="stat-card__change"><i class="fas fa-arrow-up"></i> All time</div>
+          <div class="stat-card__change"><i class="fas fa-check-circle"></i> Delivered orders only</div>
         </div>
         <div class="stat-card">
           <div class="stat-card__icon"><i class="fas fa-envelope"></i></div>
@@ -192,7 +192,9 @@
       // Stats
       const orderDocs = orders.docs.map(d => ({ id: d.id, ...d.data() }));
       const pending   = orderDocs.filter(o => o.status === 'pending').length;
-      const revenue   = orderDocs.reduce((s, o) => s + (o.total || 0), 0);
+      const revenue   = orderDocs
+        .filter(o => o.status === 'delivered')
+        .reduce((s, o) => s + (o.total || 0), 0);
 
       document.getElementById('statProducts').textContent = products.size;
       document.getElementById('statOrders').textContent   = orders.size;
