@@ -200,6 +200,16 @@
 
   let allProducts = [], deleteTargetId = null;
 
+  async function logActivity(action, detail) {
+    try {
+      await addDoc(collection(db, 'activityLog'), {
+        action, detail,
+        adminEmail: auth.currentUser?.email || 'admin',
+        timestamp: serverTimestamp()
+      });
+    } catch (_) {}
+  }
+
   // Auth guard — admin only
   onAuthStateChanged(auth, user => {
     if (!user) { window.location.href = '../login.html'; return; }
@@ -324,10 +334,12 @@
     try {
       if (id) {
         await updateDoc(doc(db, 'products', id), data);
+        await logActivity(`Product edited: ${data.name}`, `Price: ₱${data.price.toLocaleString()} | Stock: ${data.stock} | Category: ${data.category}`);
         showToast('Product updated successfully!', 'success');
       } else {
         data.createdAt = serverTimestamp();
         await addDoc(collection(db, 'products'), data);
+        await logActivity(`Product added: ${data.name}`, `Price: ₱${data.price.toLocaleString()} | Stock: ${data.stock} | Category: ${data.category}`);
         showToast('Product added successfully!', 'success');
       }
       closeModal();
@@ -350,7 +362,9 @@
   document.getElementById('confirmDelete').addEventListener('click', async () => {
     if (!deleteTargetId) return;
     try {
+      const product = allProducts.find(p => p.id === deleteTargetId);
       await deleteDoc(doc(db, 'products', deleteTargetId));
+      await logActivity(`Product deleted: ${product?.name || deleteTargetId}`, `Category: ${product?.category || '—'} | Price: ₱${(product?.price||0).toLocaleString()}`);
       deleteModal.classList.remove('open');
       showToast('Product deleted.', 'info');
       await loadProducts();

@@ -130,6 +130,29 @@
         </div>
       </div>
 
+      <!-- Activity Log -->
+      <div class="panel" style="margin-top:20px">
+        <div class="panel__head">
+          <div class="panel__title">Activity Log</div>
+          <span style="font-size:0.78rem;color:var(--a-muted)">Recent admin actions</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Action</th>
+                <th>Detail</th>
+                <th>Admin</th>
+                <th>Date & Time</th>
+              </tr>
+            </thead>
+            <tbody id="activityLogBody">
+              <tr class="loading-row"><td colspan="4"><span class="spinner"></span> Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <!-- Top Products -->
       <div class="panel" style="margin-top:20px">
         <div class="panel__head">
@@ -161,7 +184,7 @@
 <script type="module">
   import { auth, db, isAdmin } from '../js/firebase-config.js';
   import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { collection, getDocs, query, orderBy, limit, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { collection, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   // Auth guard — admin only
   onAuthStateChanged(auth, user => {
@@ -183,10 +206,11 @@
 
   async function loadDashboard() {
     try {
-      const [products, orders, subs] = await Promise.all([
+      const [products, orders, subs, logs] = await Promise.all([
         getDocs(collection(db, 'products')),
         getDocs(collection(db, 'orders')),
-        getDocs(collection(db, 'subscribers'))
+        getDocs(collection(db, 'subscribers')),
+        getDocs(query(collection(db, 'activityLog'), orderBy('timestamp', 'desc'), limit(20)))
       ]);
 
       // Stats
@@ -221,6 +245,24 @@
           <td>${s.email}</td>
           <td style="color:var(--a-muted);font-size:0.8rem">${s.subscribedAt ? new Date(s.subscribedAt.seconds*1000).toLocaleDateString() : '—'}</td>
         </tr>`).join('') : '<tr><td colspan="2" style="text-align:center;padding:32px;color:var(--a-muted)">No subscribers yet</td></tr>';
+
+      // Activity Log
+      const logDocs = logs.docs.map(d => d.data());
+      const logBody = document.getElementById('activityLogBody');
+      logBody.innerHTML = logDocs.length ? logDocs.map(l => {
+        const ts = l.timestamp?.seconds ? new Date(l.timestamp.seconds * 1000) : null;
+        const dateStr = ts ? ts.toLocaleDateString('en-PH', { month:'short', day:'numeric', year:'numeric' }) : '—';
+        const timeStr = ts ? ts.toLocaleTimeString('en-PH', { hour:'2-digit', minute:'2-digit' }) : '';
+        const isDelete = l.action?.toLowerCase().includes('deleted');
+        const isAdd    = l.action?.toLowerCase().includes('added');
+        const color    = isDelete ? '#e74c3c' : isAdd ? '#2ecc71' : 'var(--a-pink)';
+        return `<tr>
+          <td style="font-weight:600;color:${color}">${l.action || '—'}</td>
+          <td style="color:var(--a-muted);font-size:0.8rem">${l.detail || '—'}</td>
+          <td style="font-size:0.78rem;color:var(--a-muted)">${l.adminEmail || '—'}</td>
+          <td style="font-size:0.8rem;color:var(--a-muted)">${dateStr}<br><span style="font-size:0.75rem">${timeStr}</span></td>
+        </tr>`;
+      }).join('') : '<tr><td colspan="4" style="text-align:center;padding:32px;color:var(--a-muted)">No activity yet</td></tr>';
 
       // Products
       const productDocs = products.docs.map(d => ({ id: d.id, ...d.data() })).slice(0,8);

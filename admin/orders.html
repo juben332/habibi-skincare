@@ -124,9 +124,19 @@
 <script type="module">
   import { auth, db, isAdmin } from '../js/firebase-config.js';
   import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { collection, getDocs, updateDoc, doc, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { collection, getDocs, updateDoc, addDoc, doc, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   let allOrders = [], currentOrderId = null, activeStatus = '';
+
+  async function logActivity(action, detail) {
+    try {
+      await addDoc(collection(db, 'activityLog'), {
+        action, detail,
+        adminEmail: auth.currentUser?.email || 'admin',
+        timestamp: serverTimestamp()
+      });
+    } catch (_) {}
+  }
 
   // Auth guard — admin only
   onAuthStateChanged(auth, user => {
@@ -252,7 +262,13 @@
     try {
       await updateDoc(doc(db, 'orders', currentOrderId), { status: newStatus, updatedAt: new Date() });
       const order = allOrders.find(o => o.id === currentOrderId);
-      if (order) order.status = newStatus;
+      if (order) {
+        await logActivity(
+          `Order #${currentOrderId.slice(-6).toUpperCase()} → ${capitalize(newStatus)}`,
+          `Customer: ${order.customer?.name || 'Guest'} | Total: ₱${(order.total||0).toLocaleString()} | Payment: ${order.paymentMethod || 'COD'}`
+        );
+        order.status = newStatus;
+      }
       orderModal.classList.remove('open');
       showToast(`Order status updated to ${capitalize(newStatus)}!`, 'success');
       renderOrders();
