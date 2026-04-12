@@ -120,7 +120,7 @@
     }
 
     function renderProducts() {
-      let list = allProducts.filter(p => p.inStock !== false);
+      let list = [...allProducts];
 
       if (activeCategory !== 'all') {
         list = list.filter(p => p.category === activeCategory);
