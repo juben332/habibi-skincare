@@ -160,7 +160,7 @@
           </div>
           <div class="product-card__body">
             <span class="product-card__cat">${p.category ? p.category.charAt(0).toUpperCase() + p.category.slice(1) : ''}</span>
-            <h3 class="product-card__name"><a href="shop.html">${p.name}</a></h3>
+            <h3 class="product-card__name"><a href="product.html?id=${p.id}">${p.name}</a></h3>
             <p class="product-card__benefit">${p.benefit||''}</p>
             <div class="product-card__foot">
               <span class="product-card__price">₱${(p.price||0).toLocaleString()}</span>

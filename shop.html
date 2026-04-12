@@ -161,7 +161,7 @@
           </div>
           <div class="product-card__body">
             <span class="product-card__cat">${capitalize(p.category || '')}</span>
-            <h3 class="product-card__name"><a href="product.html">${p.name}</a></h3>
+            <h3 class="product-card__name"><a href="product.html?id=${p.id}">${p.name}</a></h3>
             <p class="product-card__benefit">${p.benefit || ''}</p>
             ${p.inStock === false
               ? `<p style="font-size:0.75rem;color:#c0392b;font-weight:500;margin:0 0 6px"><i class="fas fa-times-circle" style="margin-right:3px"></i>Out of stock</p>`

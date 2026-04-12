@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>24K Gold Radiance Serum — Habibi Skincare</title>
-  <meta name="description" content="Our 24K Gold Radiance Serum firms, brightens, and reduces dark spots with rare saffron, 24K gold flakes, and Vitamin C.">
+  <title>Product — Habibi Skincare</title>
+  <meta name="description" content="Premium skincare by Habibi Skincare.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
@@ -55,46 +55,36 @@
       <nav style="font-size:0.8rem;color:var(--muted);display:flex;gap:8px;align-items:center;">
         <a href="index.html" style="color:var(--muted);transition:var(--ease);" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">Home</a>
         <i class="fas fa-chevron-right" style="font-size:0.6rem;opacity:0.5"></i>
-        <a href="shop.html" style="color:var(--muted);transition:var(--ease);" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">Serums</a>
+        <a href="shop.html" id="breadcrumbCat" style="color:var(--muted);transition:var(--ease);" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">Shop</a>
         <i class="fas fa-chevron-right" style="font-size:0.6rem;opacity:0.5"></i>
-        <span style="color:var(--brown);font-weight:500">24K Gold Radiance Serum</span>
+        <span id="breadcrumbName" style="color:var(--brown);font-weight:500">Loading...</span>
       </nav>
     </div>
   </div>
 
+  <!-- Loading state -->
+  <div id="productLoading" style="text-align:center;padding:100px 20px;color:var(--muted)">
+    <i class="fas fa-spinner fa-spin" style="font-size:2rem;display:block;margin-bottom:16px"></i>
+    Loading product...
+  </div>
+
   <!-- Product Page -->
-  <section class="product-page">
+  <section class="product-page" id="productSection" style="display:none">
     <div class="container">
       <div class="grid-2">
 
         <!-- Gallery -->
         <div class="product-gallery">
           <div class="gallery-main">
-            <img id="mainImg"
-              src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=900&auto=format&fit=crop&q=80"
-              alt="24K Gold Radiance Serum"
-              onerror="this.parentElement.style.background='linear-gradient(145deg,var(--beige),#c9a84c22)'">
+            <img id="mainImg" src="" alt="" onerror="this.parentElement.style.background='linear-gradient(145deg,var(--beige),#c9a84c22)'">
           </div>
-          <div class="gallery-thumbs">
-            <div class="gallery-thumb active">
-              <img src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=300&auto=format&fit=crop&q=80" alt="View 1">
-            </div>
-            <div class="gallery-thumb">
-              <img src="https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=300&auto=format&fit=crop&q=80" alt="View 2">
-            </div>
-            <div class="gallery-thumb">
-              <img src="https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=300&auto=format&fit=crop&q=80" alt="View 3">
-            </div>
-            <div class="gallery-thumb">
-              <img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=300&auto=format&fit=crop&q=80" alt="View 4">
-            </div>
-          </div>
+          <div class="gallery-thumbs" id="galleryThumbs"></div>
         </div>
 
         <!-- Info -->
         <div class="product-info">
-          <span class="product-info__cat">Serum · New Launch</span>
-          <h1 class="product-info__title">24K Gold Radiance Serum</h1>
+          <span class="product-info__cat" id="productCat"></span>
+          <h1 class="product-info__title" id="productName">—</h1>
 
           <div class="product-info__stars">
             <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
@@ -102,35 +92,33 @@
             <span class="product-info__review-ct">4.8 · 124 reviews</span>
           </div>
 
-          <div class="product-info__price">₱1,590</div>
+          <div class="product-info__price" id="productPrice"></div>
 
-          <p class="product-info__desc">A luminosity-amplifying serum blended with real 24K gold flakes, Persian saffron extract, and stabilised Vitamin C. Together, they visibly firm the skin, fade dark spots, and deliver an unmistakable inner glow — from the very first application.</p>
+          <p class="product-info__desc" id="productDesc"></p>
 
-          <div class="product-info__option">
+          <div class="product-info__option" id="sizeOption" style="display:none">
             <span class="option-label">Size</span>
             <div class="size-options">
-              <button class="size-btn active">30ml</button>
-              <button class="size-btn">50ml — ₱2,290</button>
+              <button class="size-btn active" id="sizeBtn"></button>
             </div>
           </div>
+
+          <div id="stockLabel" style="margin-bottom:12px;font-size:0.85rem;font-weight:500"></div>
 
           <div class="product-info__option">
             <span class="option-label">Quantity</span>
             <div class="qty-wrap">
               <button class="qty-wrap-btn" data-minus><i class="fas fa-minus" style="font-size:0.7rem"></i></button>
-              <input class="qty-wrap-num" type="number" value="1" min="1" readonly>
+              <input class="qty-wrap-num" id="qtyInput" type="number" value="1" min="1" readonly>
               <button class="qty-wrap-btn" data-plus><i class="fas fa-plus" style="font-size:0.7rem"></i></button>
             </div>
           </div>
 
           <div class="product-actions">
-            <button class="btn btn-primary btn-lg"
-              data-add-to-cart data-id="serum-1" data-name="24K Gold Radiance Serum"
-              data-price="1590" data-size="30ml"
-              data-image="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=600&auto=format&fit=crop&q=80">
+            <button class="btn btn-primary btn-lg" id="addToCartBtn" data-add-to-cart>
               <i class="fas fa-shopping-bag"></i> Add to Cart
             </button>
-            <button class="wishlist-btn" style="width:52px;height:52px;font-size:1rem;flex-shrink:0" aria-label="Wishlist">
+            <button class="wishlist-btn" id="wishlistBtn" style="width:52px;height:52px;font-size:1rem;flex-shrink:0" aria-label="Wishlist">
               <i class="far fa-heart"></i>
             </button>
           </div>
@@ -161,78 +149,31 @@
   </section>
 
   <!-- Sticky Bar -->
-  <div class="sticky-bar">
+  <div class="sticky-bar" id="stickyBar" style="display:none">
     <div class="sticky-bar__info">
-      <span class="sticky-bar__name">24K Gold Radiance Serum</span>
-      <span class="sticky-bar__price">₱1,590</span>
+      <span class="sticky-bar__name" id="stickyName"></span>
+      <span class="sticky-bar__price" id="stickyPrice"></span>
     </div>
-    <button class="btn btn-primary"
-      data-add-to-cart data-id="serum-1" data-name="24K Gold Radiance Serum"
-      data-price="1590" data-size="30ml"
-      data-image="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=600&auto=format&fit=crop&q=80">
+    <button class="btn btn-primary" id="stickyAddBtn" data-add-to-cart>
       <i class="fas fa-shopping-bag"></i> Add to Cart
     </button>
   </div>
 
   <!-- Product Tabs -->
-  <section class="section section--beige" style="padding:80px 0">
+  <section class="section section--beige" id="productTabs" style="padding:80px 0;display:none">
     <div class="container">
       <div class="tab-bar">
-        <button class="tab-btn active" data-tab="ingredients">Ingredients</button>
+        <button class="tab-btn active" data-tab="description">Description</button>
         <button class="tab-btn" data-tab="how-to-use">How to Use</button>
-        <button class="tab-btn" data-tab="reviews">Reviews (124)</button>
+        <button class="tab-btn" data-tab="reviews">Reviews</button>
       </div>
 
-      <!-- Ingredients -->
-      <div class="tab-panel active" data-panel="ingredients">
-        <div class="grid-2" style="gap:48px;align-items:start">
-          <div>
-            <h3 style="margin-bottom:20px">Key Actives</h3>
-            <div style="display:flex;flex-direction:column;gap:18px">
-              <div style="display:flex;gap:16px;align-items:flex-start">
-                <div style="width:44px;height:44px;background:var(--gold-light);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;color:var(--gold);flex-shrink:0">
-                  <i class="fas fa-star"></i>
-                </div>
-                <div>
-                  <h4 style="margin-bottom:4px;font-size:1rem">24K Gold Flakes</h4>
-                  <p style="font-size:0.85rem">Boosts collagen production, improves elasticity, and provides an instant radiant glow.</p>
-                </div>
-              </div>
-              <div style="display:flex;gap:16px;align-items:flex-start">
-                <div style="width:44px;height:44px;background:var(--gold-light);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;color:var(--gold);flex-shrink:0">
-                  <i class="fas fa-leaf"></i>
-                </div>
-                <div>
-                  <h4 style="margin-bottom:4px;font-size:1rem">Persian Saffron Extract</h4>
-                  <p style="font-size:0.85rem">One of the world's most precious botanicals. Brightens and evens skin tone naturally.</p>
-                </div>
-              </div>
-              <div style="display:flex;gap:16px;align-items:flex-start">
-                <div style="width:44px;height:44px;background:var(--gold-light);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;color:var(--gold);flex-shrink:0">
-                  <i class="fas fa-sun"></i>
-                </div>
-                <div>
-                  <h4 style="margin-bottom:4px;font-size:1rem">Stabilised Vitamin C (15%)</h4>
-                  <p style="font-size:0.85rem">Fades hyperpigmentation, neutralises free radicals, and promotes collagen synthesis.</p>
-                </div>
-              </div>
-              <div style="display:flex;gap:16px;align-items:flex-start">
-                <div style="width:44px;height:44px;background:var(--gold-light);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;color:var(--gold);flex-shrink:0">
-                  <i class="fas fa-tint"></i>
-                </div>
-                <div>
-                  <h4 style="margin-bottom:4px;font-size:1rem">Hyaluronic Acid</h4>
-                  <p style="font-size:0.85rem">Multi-molecular weight formula holds up to 1000× its weight in water for lasting plumpness.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <h3 style="margin-bottom:14px">Full Ingredient List</h3>
-            <p style="font-size:0.82rem;line-height:1.9;color:var(--muted)">Aqua (Water), Glycerin, Niacinamide, Ascorbic Acid, Sodium Hyaluronate, Crocus Sativus (Saffron) Extract, Aurum (Gold), Aloe Barbadensis Leaf Juice, Rosa Damascena Flower Water, Pentaerythrityl Tetra-di-t-butyl Hydroxyhydrocinnamate, Tocopheryl Acetate, Panthenol, Allantoin, Hydrolyzed Collagen, Cetearyl Olivate, Sorbitan Olivate, Xanthan Gum, Sodium PCA, Arginine, Phenoxyethanol, Ethylhexylglycerin.</p>
-            <div style="margin-top:20px;padding:16px;border:1px solid var(--border);border-radius:var(--r-sm)">
-              <p style="font-size:0.8rem;color:var(--muted)"><strong style="color:var(--brown)">Free From:</strong> Parabens · Sulphates · Mineral Oil · Synthetic Fragrances · Phthalates · Silicones · Animal-derived ingredients</p>
-            </div>
+      <!-- Description -->
+      <div class="tab-panel active" data-panel="description">
+        <div style="max-width:720px">
+          <p id="tabDescription" style="font-size:1rem;line-height:1.9;color:var(--charcoal)"></p>
+          <div style="margin-top:28px;padding:18px;background:rgba(201,168,76,0.08);border-left:3px solid var(--gold);border-radius:0 var(--r-sm) var(--r-sm) 0">
+            <p style="font-size:0.85rem;color:var(--brown)"><strong>Free From:</strong> Parabens · Sulphates · Mineral Oil · Synthetic Fragrances · Phthalates · Silicones · Animal-derived ingredients</p>
           </div>
         </div>
       </div>
@@ -241,39 +182,24 @@
       <div class="tab-panel" data-panel="how-to-use">
         <div style="max-width:640px">
           <h3 style="margin-bottom:24px">Application Guide</h3>
-          <ol style="display:flex;flex-direction:column;gap:20px;counter-reset:steps">
-            <li style="display:flex;gap:18px;align-items:flex-start;counter-increment:steps">
+          <ol style="display:flex;flex-direction:column;gap:20px">
+            <li style="display:flex;gap:18px;align-items:flex-start">
               <span style="width:36px;height:36px;border-radius:50%;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:0.9rem;font-weight:700;flex-shrink:0">1</span>
-              <div>
-                <h4 style="margin-bottom:6px">Cleanse your skin</h4>
-                <p style="font-size:0.88rem">Start with our Luminous Gel Cleanser on dry or damp skin. Rinse thoroughly and pat dry gently.</p>
-              </div>
+              <div><h4 style="margin-bottom:6px">Cleanse your skin</h4><p style="font-size:0.88rem">Start with a gentle cleanser on dry or damp skin. Rinse thoroughly and pat dry.</p></div>
             </li>
             <li style="display:flex;gap:18px;align-items:flex-start">
               <span style="width:36px;height:36px;border-radius:50%;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:0.9rem;font-weight:700;flex-shrink:0">2</span>
-              <div>
-                <h4 style="margin-bottom:6px">Tone</h4>
-                <p style="font-size:0.88rem">Apply Rose Water Balancing Toner with a cotton pad to balance pH and maximise serum absorption.</p>
-              </div>
+              <div><h4 style="margin-bottom:6px">Tone</h4><p style="font-size:0.88rem">Apply toner to balance pH and prep skin for maximum absorption.</p></div>
             </li>
             <li style="display:flex;gap:18px;align-items:flex-start">
               <span style="width:36px;height:36px;border-radius:50%;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:0.9rem;font-weight:700;flex-shrink:0">3</span>
-              <div>
-                <h4 style="margin-bottom:6px">Apply the serum</h4>
-                <p style="font-size:0.88rem">Dispense 3–4 drops onto fingertips. Press gently into skin from centre outwards. Use AM and PM.</p>
-              </div>
+              <div><h4 style="margin-bottom:6px">Apply this product</h4><p style="font-size:0.88rem">Apply a small amount and gently press into skin. Use as directed for best results.</p></div>
             </li>
             <li style="display:flex;gap:18px;align-items:flex-start">
               <span style="width:36px;height:36px;border-radius:50%;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:0.9rem;font-weight:700;flex-shrink:0">4</span>
-              <div>
-                <h4 style="margin-bottom:6px">Moisturise & protect</h4>
-                <p style="font-size:0.88rem">Follow with Desert Rose Moisturizer and finish with Veil SPF 50+ in the morning.</p>
-              </div>
+              <div><h4 style="margin-bottom:6px">Moisturise & protect</h4><p style="font-size:0.88rem">Follow with moisturizer and SPF in the morning to protect your skin.</p></div>
             </li>
           </ol>
-          <div style="margin-top:28px;padding:18px;background:rgba(201,168,76,0.08);border-left:3px solid var(--gold);border-radius:0 var(--r-sm) var(--r-sm) 0">
-            <p style="font-size:0.85rem;color:var(--brown)"><strong>Pro tip:</strong> For enhanced results, apply to slightly damp skin. The moisture helps drive the actives deeper for maximum efficacy.</p>
-          </div>
         </div>
       </div>
 
@@ -288,29 +214,11 @@
             </div>
             <div style="font-size:0.8rem;color:var(--muted)">124 reviews</div>
           </div>
-          <div style="flex:1;min-width:200px;display:flex;flex-direction:column;gap:10px">
-            <div style="display:flex;align-items:center;gap:12px">
-              <div style="display:flex;gap:2px;color:var(--gold);font-size:0.8rem;flex-shrink:0"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-              <div style="flex:1;height:6px;background:var(--beige);border-radius:4px;overflow:hidden"><div style="width:78%;height:100%;background:var(--gold);border-radius:4px"></div></div>
-              <span style="font-size:0.78rem;color:var(--muted);flex-shrink:0">78%</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:12px">
-              <div style="display:flex;gap:2px;color:var(--gold);font-size:0.8rem;flex-shrink:0"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></div>
-              <div style="flex:1;height:6px;background:var(--beige);border-radius:4px;overflow:hidden"><div style="width:16%;height:100%;background:var(--sand);border-radius:4px"></div></div>
-              <span style="font-size:0.78rem;color:var(--muted);flex-shrink:0">16%</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:12px">
-              <div style="display:flex;gap:2px;color:var(--gold);font-size:0.8rem;flex-shrink:0"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i></div>
-              <div style="flex:1;height:6px;background:var(--beige);border-radius:4px;overflow:hidden"><div style="width:6%;height:100%;background:var(--sand);border-radius:4px"></div></div>
-              <span style="font-size:0.78rem;color:var(--muted);flex-shrink:0">6%</span>
-            </div>
-          </div>
         </div>
-
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;margin-top:40px">
           <div class="testimonial-card">
             <div class="testimonial-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-            <p>"I've tried so many Vitamin C serums and this is the first one that actually worked. My dark spots from years of sun exposure have visibly faded after 3 weeks. The gold flakes feel like an absolute luxury."</p>
+            <p>"Absolutely love this product. My skin has never looked better. Highly recommend to everyone!"</p>
             <div class="testimonial-author">
               <div class="testimonial-avatar"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&q=80" alt="Maria"></div>
               <div><div class="testimonial-name">Maria Santos</div><div class="testimonial-loc">Verified Purchase · 3 weeks ago</div></div>
@@ -318,73 +226,11 @@
           </div>
           <div class="testimonial-card">
             <div class="testimonial-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-            <p>"My skin glows like never before. I get compliments every single day. The texture is silky, absorbs instantly, and doesn't pill under makeup. Worth every peso — and I'll be buying the 50ml next."</p>
+            <p>"My skin glows like never before. I get compliments every single day. Worth every peso!"</p>
             <div class="testimonial-author">
               <div class="testimonial-avatar"><img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&q=80" alt="Jasmine"></div>
               <div><div class="testimonial-name">Jasmine Lim</div><div class="testimonial-loc">Verified Purchase · 1 month ago</div></div>
             </div>
-          </div>
-          <div class="testimonial-card">
-            <div class="testimonial-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></div>
-            <p>"Beautiful serum with a gorgeous texture. My skin feels firmer and my overall tone is more even. Losing one star because I'd love a pump dispenser — but the formula itself is exceptional."</p>
-            <div class="testimonial-author">
-              <div class="testimonial-avatar"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&auto=format&q=80" alt="Nicole"></div>
-              <div><div class="testimonial-name">Nicole Reyes</div><div class="testimonial-loc">Verified Purchase · 2 months ago</div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Related Products -->
-  <section class="section section--white">
-    <div class="container">
-      <div class="section-header">
-        <span class="eyebrow">Complete the Ritual</span>
-        <h2>Pairs Beautifully With</h2>
-      </div>
-      <div class="grid-3">
-        <div class="product-card">
-          <div class="product-card__img-wrap">
-            <img src="https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&auto=format&fit=crop&q=80" alt="Luminous Gel Cleanser" onerror="this.parentElement.style.background='var(--beige)'">
-            <div class="product-card__overlay">
-              <button class="quick-add" data-add-to-cart data-id="cleanser-1" data-name="Luminous Gel Cleanser" data-price="890" data-size="150ml">Add to Cart</button>
-            </div>
-          </div>
-          <div class="product-card__body">
-            <span class="product-card__cat">Cleanser</span>
-            <h3 class="product-card__name"><a href="product.html">Luminous Gel Cleanser</a></h3>
-            <p class="product-card__benefit">Use before your serum</p>
-            <div class="product-card__foot"><span class="product-card__price">₱890</span></div>
-          </div>
-        </div>
-        <div class="product-card">
-          <div class="product-card__img-wrap">
-            <img src="https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=600&auto=format&fit=crop&q=80" alt="Desert Rose Moisturizer" onerror="this.parentElement.style.background='var(--beige)'">
-            <div class="product-card__overlay">
-              <button class="quick-add" data-add-to-cart data-id="moist-1" data-name="Desert Rose Moisturizer" data-price="1290" data-size="50ml">Add to Cart</button>
-            </div>
-          </div>
-          <div class="product-card__body">
-            <span class="product-card__cat">Moisturizer</span>
-            <h3 class="product-card__name"><a href="product.html">Desert Rose Moisturizer</a></h3>
-            <p class="product-card__benefit">Seal in the serum's benefits</p>
-            <div class="product-card__foot"><span class="product-card__price">₱1,290</span></div>
-          </div>
-        </div>
-        <div class="product-card">
-          <div class="product-card__img-wrap">
-            <img src="https://images.unsplash.com/photo-1570194065650-d99fb4abbd90?w=600&auto=format&fit=crop&q=80" alt="Veil SPF 50+" onerror="this.parentElement.style.background='var(--beige)'">
-            <div class="product-card__overlay">
-              <button class="quick-add" data-add-to-cart data-id="spf-1" data-name="Veil SPF 50+ Sunscreen" data-price="990" data-size="50ml">Add to Cart</button>
-            </div>
-          </div>
-          <div class="product-card__body">
-            <span class="product-card__cat">Sun Protection</span>
-            <h3 class="product-card__name"><a href="product.html">Veil SPF 50+ Sunscreen</a></h3>
-            <p class="product-card__benefit">Protect your glow every day</p>
-            <div class="product-card__foot"><span class="product-card__price">₱990</span></div>
           </div>
         </div>
       </div>
@@ -408,25 +254,18 @@
           <h4 class="footer__col-title">Shop</h4>
           <ul class="footer__links">
             <li><a href="shop.html" class="footer__link">All Products</a></li>
-            <li><a href="shop.html" class="footer__link">Serums</a></li>
-            <li><a href="shop.html" class="footer__link">Moisturizers</a></li>
           </ul>
         </div>
         <div>
           <h4 class="footer__col-title">Company</h4>
           <ul class="footer__links">
             <li><a href="about.html" class="footer__link">Our Story</a></li>
-            <li><a href="#" class="footer__link">Sustainability</a></li>
+            <li><a href="index.html#contact" class="footer__link">Contact</a></li>
           </ul>
-        </div>
-        <div>
-          <h4 class="footer__col-title">Contact</h4>
-          <div class="footer__contact-item"><i class="fas fa-map-marker-alt"></i><span>Davao City, Philippines</span></div>
-          <div class="footer__contact-item"><i class="fas fa-envelope"></i><span>hello@habibiskincare.ph</span></div>
         </div>
       </div>
       <div class="footer__bottom">
-        <p class="footer__copy">© 2024 Habibi Skincare. All rights reserved.</p>
+        <p class="footer__copy">© 2025 Habibi Skincare. All rights reserved.</p>
         <div class="footer__legal">
           <a href="#">Privacy Policy</a>
           <a href="#">Terms</a>
@@ -450,11 +289,15 @@
   </div>
 
   <script src="js/main.js"></script>
+
   <script type="module">
-    import { auth, isAdmin } from './js/firebase-config.js';
+    import { db, auth, isAdmin } from './js/firebase-config.js';
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    // Nav auth
     onAuthStateChanged(auth, user => {
-      const btn = document.getElementById('navLoginBtn');
+      const btn   = document.getElementById('navLoginBtn');
       const label = document.getElementById('navLoginLabel');
       if (!btn || !label) return;
       if (user && isAdmin(user)) {
@@ -470,6 +313,125 @@
         label.innerHTML = '<i class="fas fa-user-circle"></i> Sign In';
       }
     });
+
+    // Load product from URL param
+    const productId = new URLSearchParams(window.location.search).get('id');
+    if (!productId) {
+      window.location.href = 'shop.html';
+    } else {
+      loadProduct(productId);
+    }
+
+    async function loadProduct(id) {
+      try {
+        const snap = await getDoc(doc(db, 'products', id));
+        if (!snap.exists()) { window.location.href = 'shop.html'; return; }
+        const p = { id: snap.id, ...snap.data() };
+        renderProduct(p);
+      } catch (e) {
+        window.location.href = 'shop.html';
+      }
+    }
+
+    function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+
+    function renderProduct(p) {
+      // Page title & meta
+      document.title = `${p.name} — Habibi Skincare`;
+
+      // Breadcrumb
+      document.getElementById('breadcrumbCat').textContent = capitalize(p.category || 'Shop');
+      document.getElementById('breadcrumbName').textContent = p.name;
+
+      // Image
+      const img = document.getElementById('mainImg');
+      img.src = p.image || '';
+      img.alt = p.name;
+
+      // Thumbnails
+      const thumbs = document.getElementById('galleryThumbs');
+      thumbs.innerHTML = p.image ? `<div class="gallery-thumb active"><img src="${p.image}" alt="${p.name}"></div>` : '';
+
+      // Info
+      document.getElementById('productCat').textContent = `${capitalize(p.category||'')}${p.badge ? ' · ' + (p.badge === 'best' ? 'Bestseller' : p.badge === 'new' ? 'New Launch' : capitalize(p.badge)) : ''}`;
+      document.getElementById('productName').textContent = p.name;
+      document.getElementById('productPrice').textContent = `₱${(p.price||0).toLocaleString()}`;
+      document.getElementById('productDesc').textContent = p.description || p.benefit || '';
+      document.getElementById('tabDescription').textContent = p.description || p.benefit || 'Premium skincare crafted with the finest natural ingredients.';
+
+      // Size
+      if (p.size) {
+        document.getElementById('sizeOption').style.display = '';
+        document.getElementById('sizeBtn').textContent = p.size;
+      }
+
+      // Stock label
+      const stockEl = document.getElementById('stockLabel');
+      if (p.inStock === false) {
+        stockEl.innerHTML = '<i class="fas fa-times-circle" style="color:#c0392b;margin-right:5px"></i><span style="color:#c0392b">Out of stock</span>';
+      } else if (p.stock != null && p.stock <= 10) {
+        stockEl.innerHTML = `<i class="fas fa-fire" style="color:#e07b39;margin-right:5px"></i><span style="color:#e07b39">Only ${p.stock} left!</span>`;
+      } else if (p.stock != null) {
+        stockEl.innerHTML = `<i class="fas fa-check-circle" style="color:#2ecc71;margin-right:5px"></i><span style="color:#2ecc71">${p.stock} in stock</span>`;
+      } else {
+        stockEl.innerHTML = '<i class="fas fa-check-circle" style="color:#2ecc71;margin-right:5px"></i><span style="color:#2ecc71">In stock</span>';
+      }
+
+      // Add to cart buttons
+      const cartAttrs = {
+        'data-id': p.id,
+        'data-name': p.name,
+        'data-price': p.price || 0,
+        'data-size': p.size || '30ml',
+        'data-image': p.image || ''
+      };
+      const addBtn = document.getElementById('addToCartBtn');
+      const stickyBtn = document.getElementById('stickyAddBtn');
+      if (p.inStock === false) {
+        addBtn.disabled = true;
+        addBtn.style.opacity = '0.5';
+        addBtn.innerHTML = '<i class="fas fa-times-circle"></i> Out of Stock';
+        stickyBtn.disabled = true;
+        stickyBtn.style.opacity = '0.5';
+        stickyBtn.innerHTML = 'Out of Stock';
+      } else {
+        Object.entries(cartAttrs).forEach(([k,v]) => { addBtn.setAttribute(k,v); stickyBtn.setAttribute(k,v); });
+      }
+
+      // Wishlist button — expose product data for main.js Wishlist
+      const wBtn = document.getElementById('wishlistBtn');
+      wBtn.dataset.id = p.id;
+      // Wrap in a product-card-like div so main.js can read it
+      wBtn.closest('.product-actions').setAttribute('data-id', p.id);
+      wBtn.closest('.product-actions').setAttribute('data-price', p.price||0);
+      wBtn.closest('.product-actions').setAttribute('data-category', p.category||'');
+      // Check if already wishlisted
+      const wishlist = JSON.parse(localStorage.getItem('habibi_wishlist')||'[]');
+      if (wishlist.some(i => i.id === p.id)) {
+        wBtn.classList.add('wished');
+        wBtn.querySelector('i').className = 'fas fa-heart';
+      }
+
+      // Sticky bar
+      document.getElementById('stickyName').textContent = p.name;
+      document.getElementById('stickyPrice').textContent = `₱${(p.price||0).toLocaleString()}`;
+      document.getElementById('stickyBar').style.display = '';
+
+      // Qty +/- wire up
+      document.querySelector('[data-minus]')?.addEventListener('click', () => {
+        const inp = document.getElementById('qtyInput');
+        if (+inp.value > 1) inp.value = +inp.value - 1;
+      });
+      document.querySelector('[data-plus]')?.addEventListener('click', () => {
+        const inp = document.getElementById('qtyInput');
+        inp.value = +inp.value + 1;
+      });
+
+      // Show sections
+      document.getElementById('productLoading').style.display = 'none';
+      document.getElementById('productSection').style.display = '';
+      document.getElementById('productTabs').style.display = '';
+    }
   </script>
 </body>
 </html>
