@@ -417,16 +417,6 @@
       document.getElementById('stickyPrice').textContent = `₱${(p.price||0).toLocaleString()}`;
       document.getElementById('stickyBar').style.display = '';
 
-      // Qty +/- wire up
-      document.querySelector('[data-minus]')?.addEventListener('click', () => {
-        const inp = document.getElementById('qtyInput');
-        if (+inp.value > 1) inp.value = +inp.value - 1;
-      });
-      document.querySelector('[data-plus]')?.addEventListener('click', () => {
-        const inp = document.getElementById('qtyInput');
-        inp.value = +inp.value + 1;
-      });
-
       // Show sections
       document.getElementById('productLoading').style.display = 'none';
       document.getElementById('productSection').style.display = '';
