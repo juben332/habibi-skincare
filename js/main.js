@@ -98,6 +98,12 @@ const CartUI = {
     const subtotalEl = document.querySelector('.cart-subtotal strong');
     if (!container) return;
 
+    // Update header item count
+    const headTitle = document.querySelector('.cart-sidebar__head h3');
+    if (headTitle) headTitle.innerHTML = Cart.items.length
+      ? `Your Cart <span style="font-size:0.75rem;font-family:var(--sans);font-weight:600;color:var(--muted);margin-left:6px">${Cart.count} item${Cart.count !== 1 ? 's' : ''}</span>`
+      : 'Your Cart';
+
     if (!Cart.items.length) {
       container.innerHTML = `
         <div class="cart-empty">
@@ -112,7 +118,7 @@ const CartUI = {
             onerror="this.style.background='var(--beige)';this.removeAttribute('src')">
           <div class="cart-item__info">
             <div class="cart-item__name">${item.name}</div>
-            <div class="cart-item__size">${item.size}</div>
+            <div class="cart-item__size" style="color:var(--muted);font-size:0.74rem;margin-bottom:10px">${item.size}</div>
             <div class="cart-item__controls">
               <div class="cart-item__qty">
                 <button class="qty-btn" onclick="Cart.setQty('${item.id}','${item.size}',${item.qty - 1})"
@@ -125,12 +131,12 @@ const CartUI = {
                 </button>
               </div>
               <button class="cart-item__remove" onclick="Cart.remove('${item.id}','${item.size}')">
-                <i class="fas fa-times"></i> Remove
+                <i class="fas fa-trash-alt"></i>
               </button>
             </div>
           </div>
           <div class="cart-item__price">
-            <span style="font-size:0.78rem;color:var(--muted);display:block;text-align:right">₱${item.price.toLocaleString()} each</span>
+            <span style="font-size:0.74rem;color:var(--muted);display:block;text-align:right;margin-bottom:2px">₱${item.price.toLocaleString()} each</span>
             ₱${(item.price * item.qty).toLocaleString()}
           </div>
         </div>`).join('');
@@ -287,6 +293,12 @@ async function requireAuth(action) {
 
 // ─── Cart Events ────────────────────────────────────────────
 function initCartEvents() {
+  // Inject drag handle for mobile bottom-sheet
+  const sidebar = document.querySelector('.cart-sidebar');
+  if (sidebar && !sidebar.querySelector('.cart-drag-handle')) {
+    sidebar.insertAdjacentHTML('afterbegin', '<div class="cart-drag-handle"><span></span></div>');
+  }
+
   document.querySelector('.cart-overlay')?.addEventListener('click', CartUI.close);
   document.querySelector('.cart-close')?.addEventListener('click', CartUI.close);
   document.querySelectorAll('[data-cart-open]').forEach(el => el.addEventListener('click', CartUI.open));
