@@ -697,6 +697,123 @@ function initCheckout() {
   document.querySelector('.cart-checkout')?.addEventListener('click', openCheckoutModal);
 }
 
+// ─── Search Overlay ─────────────────────────────────────────
+function initSearch() {
+  // Build overlay DOM
+  const overlay = document.createElement('div');
+  overlay.id = 'searchOverlay';
+  overlay.className = 'search-overlay';
+  overlay.innerHTML = `
+    <div class="search-overlay__backdrop"></div>
+    <div class="search-overlay__box">
+      <div class="search-overlay__header">
+        <div class="search-overlay__input-wrap">
+          <i class="fas fa-search search-overlay__icon"></i>
+          <input type="text" id="searchInput" class="search-overlay__input"
+            placeholder="Search products, categories..." autocomplete="off">
+          <button class="search-overlay__clear" id="searchClear" aria-label="Clear">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <button class="search-overlay__close" id="searchClose">Cancel</button>
+      </div>
+      <div id="searchResults" class="search-overlay__results">
+        <div class="search-empty">
+          <i class="fas fa-search"></i>
+          <p>Type to search products…</p>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  let cachedProducts = null;
+
+  async function fetchProducts() {
+    if (cachedProducts) return;
+    try {
+      const { db } = await import('./firebase-config.js');
+      const { collection, getDocs } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      const snap = await getDocs(collection(db, 'products'));
+      cachedProducts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    } catch (_) { cachedProducts = []; }
+  }
+
+  function openSearch() {
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => document.getElementById('searchInput').focus(), 50);
+    fetchProducts();
+  }
+
+  function closeSearch() {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+    const input = document.getElementById('searchInput');
+    if (input) input.value = '';
+    document.getElementById('searchClear')?.classList.remove('visible');
+    document.getElementById('searchResults').innerHTML =
+      '<div class="search-empty"><i class="fas fa-search"></i><p>Type to search products…</p></div>';
+  }
+
+  function renderResults(q) {
+    const el = document.getElementById('searchResults');
+    if (!q.trim()) {
+      el.innerHTML = '<div class="search-empty"><i class="fas fa-search"></i><p>Type to search products…</p></div>';
+      return;
+    }
+    const term = q.toLowerCase();
+    const hits = (cachedProducts || []).filter(p =>
+      (p.name || '').toLowerCase().includes(term) ||
+      (p.category || '').toLowerCase().includes(term) ||
+      (p.benefit || '').toLowerCase().includes(term)
+    );
+    if (!hits.length) {
+      el.innerHTML = `<div class="search-empty"><i class="fas fa-box-open"></i><p>No results for "<strong>${q}</strong>"</p></div>`;
+      return;
+    }
+    el.innerHTML = hits.map(p => `
+      <a href="product.html?id=${p.id}" class="search-result-item">
+        <div class="search-result-img">
+          ${p.image ? `<img src="${p.image}" alt="${p.name}" onerror="this.onerror=null;this.style.display='none'">` : ''}
+        </div>
+        <div class="search-result-info">
+          <span class="search-result-cat">${p.category || ''}</span>
+          <div class="search-result-name">${p.name}</div>
+          <div class="search-result-benefit">${p.benefit || ''}</div>
+        </div>
+        <span class="search-result-price">₱${(p.price || 0).toLocaleString()}</span>
+      </a>`).join('');
+    el.querySelectorAll('.search-result-item').forEach(a => a.addEventListener('click', closeSearch));
+  }
+
+  // Wire up buttons
+  document.querySelectorAll('[aria-label="Search"]').forEach(btn =>
+    btn.addEventListener('click', openSearch));
+  overlay.querySelector('.search-overlay__backdrop').addEventListener('click', closeSearch);
+  document.getElementById('searchClose').addEventListener('click', closeSearch);
+
+  const input = document.getElementById('searchInput');
+  const clearBtn = document.getElementById('searchClear');
+
+  input.addEventListener('input', async () => {
+    const val = input.value;
+    clearBtn.classList.toggle('visible', val.length > 0);
+    await fetchProducts();
+    renderResults(val);
+  });
+
+  clearBtn.addEventListener('click', () => {
+    input.value = '';
+    clearBtn.classList.remove('visible');
+    renderResults('');
+    input.focus();
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeSearch();
+  });
+}
+
 // ─── Smooth anchor links ─────────────────────────────────────
 function initAnchorLinks() {
   document.querySelectorAll('a[href^="#"]').forEach(a => {
@@ -725,5 +842,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initStickyBar();
   initNewsletter();
   initCheckout();
+  initSearch();
   initAnchorLinks();
 });
