@@ -174,7 +174,7 @@ function initParallax() {
 }
 
 // ─── Auth Guard ──────────────────────────────────────────────
-let _currentUser = undefined; // undefined = not yet resolved
+let _currentUser = undefined;
 
 async function initAuthState() {
   try {
@@ -184,10 +184,49 @@ async function initAuthState() {
   } catch (_) { _currentUser = null; }
 }
 
+function showAuthPrompt(action) {
+  let el = document.getElementById('authPrompt');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'authPrompt';
+    el.className = 'auth-prompt';
+    el.innerHTML = `
+      <div class="auth-prompt__backdrop"></div>
+      <div class="auth-prompt__card">
+        <div class="auth-prompt__icon"><i class="fas fa-lock"></i></div>
+        <h3 class="auth-prompt__title">Sign In to Continue</h3>
+        <p class="auth-prompt__msg"></p>
+        <a href="account.html" class="btn btn-primary auth-prompt__btn">
+          <i class="fas fa-user-circle"></i> Sign In / Register
+        </a>
+        <button class="auth-prompt__cancel">Maybe Later</button>
+      </div>`;
+    document.body.appendChild(el);
+    el.querySelector('.auth-prompt__backdrop').addEventListener('click', closeAuthPrompt);
+    el.querySelector('.auth-prompt__cancel').addEventListener('click', closeAuthPrompt);
+  }
+  const labels = {
+    'cart':     'You need to be signed in to add items to your cart.',
+    'wishlist': 'You need to be signed in to save items to your wishlist.',
+    'checkout': 'You need to be signed in to place an order.'
+  };
+  el.querySelector('.auth-prompt__msg').textContent = labels[action] || 'Please sign in to continue.';
+  requestAnimationFrame(() => {
+    el.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  });
+}
+
+function closeAuthPrompt() {
+  const el = document.getElementById('authPrompt');
+  if (!el) return;
+  el.classList.remove('open');
+  setTimeout(() => { document.body.style.overflow = ''; }, 300);
+}
+
 function requireAuth(action) {
   if (_currentUser) return true;
-  showToast(`<i class="fas fa-user-circle"></i> Please sign in to ${action}`);
-  setTimeout(() => { window.location.href = 'account.html'; }, 1400);
+  showAuthPrompt(action);
   return false;
 }
 
@@ -200,7 +239,7 @@ function initCartEvents() {
   document.addEventListener('click', e => {
     const btn = e.target.closest('[data-add-to-cart]');
     if (!btn) return;
-    if (!requireAuth('add items to cart')) return;
+    if (!requireAuth('cart')) return;
     Cart.add({
       id: btn.dataset.id,
       name: btn.dataset.name,
@@ -253,7 +292,7 @@ function initWishlist() {
   document.addEventListener('click', e => {
     const btn = e.target.closest('.wishlist-btn');
     if (!btn) return;
-    if (!requireAuth('add items to your wishlist')) return;
+    if (!requireAuth('wishlist')) return;
 
     const card = btn.closest('.product-card');
     const product = {
