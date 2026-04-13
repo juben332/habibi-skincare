@@ -178,7 +178,7 @@ let _currentUser = undefined;
 
 async function initAuthState() {
   try {
-    const { auth } = await import('./firebase-config.js');
+    const { auth } = await import('./js/firebase-config.js');
     const { onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
     onAuthStateChanged(auth, user => {
       _currentUser = user || null;
@@ -477,7 +477,7 @@ function initNewsletter() {
       btn.disabled = true;
 
       try {
-        const { db } = await import('./firebase-config.js');
+        const { db } = await import('./js/firebase-config.js');
         const { collection, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
         await addDoc(collection(db, 'subscribers'), { email, subscribedAt: serverTimestamp() });
       } catch (_) { /* Firebase not configured yet — still show success UI */ }
@@ -663,7 +663,7 @@ function createCheckoutModal() {
     };
 
     try {
-      const { db, auth } = await import('./firebase-config.js');
+      const { db, auth } = await import('./js/firebase-config.js');
       const { collection, addDoc, updateDoc, doc, serverTimestamp, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
       order.createdAt = serverTimestamp();
       // Attach customer user ID if logged in
@@ -747,7 +747,7 @@ function openCheckoutModal() {
   if (!Cart.items.length) return;
   createCheckoutModal();
   // Pre-fill from Firebase auth if logged in
-  import('./firebase-config.js').then(({ auth }) => {
+  import('./js/firebase-config.js').then(({ auth }) => {
     const user = auth.currentUser;
     if (user) {
       const nameEl  = document.getElementById('coName');
@@ -814,7 +814,7 @@ function initSearch() {
   async function fetchProducts() {
     if (cachedProducts) return;
     try {
-      const { db } = await import('./firebase-config.js');
+      const { db } = await import('./js/firebase-config.js');
       const { collection, getDocs } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
       const snap = await getDocs(collection(db, 'products'));
       cachedProducts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
