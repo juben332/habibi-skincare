@@ -175,6 +175,8 @@ function initParallax() {
 
 // ─── Auth Guard ──────────────────────────────────────────────
 let _currentUser = undefined;
+let _authResolve;
+const _authReady = new Promise(resolve => { _authResolve = resolve; });
 
 async function initAuthState() {
   try {
@@ -182,9 +184,10 @@ async function initAuthState() {
     const { onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
     onAuthStateChanged(auth, user => {
       _currentUser = user || null;
+      _authResolve();
       updateMobileAccountBtn(user);
     });
-  } catch (_) { _currentUser = null; }
+  } catch (_) { _currentUser = null; _authResolve(); }
 }
 
 function updateMobileAccountBtn(user) {
@@ -245,7 +248,8 @@ function closeAuthPrompt() {
   setTimeout(() => { document.body.style.overflow = ''; }, 300);
 }
 
-function requireAuth(action) {
+async function requireAuth(action) {
+  if (_currentUser === undefined) await _authReady;
   if (_currentUser) return true;
   showAuthPrompt(action);
   return false;
@@ -257,10 +261,10 @@ function initCartEvents() {
   document.querySelector('.cart-close')?.addEventListener('click', CartUI.close);
   document.querySelectorAll('[data-cart-open]').forEach(el => el.addEventListener('click', CartUI.open));
 
-  document.addEventListener('click', e => {
+  document.addEventListener('click', async e => {
     const btn = e.target.closest('[data-add-to-cart]');
     if (!btn) return;
-    if (!requireAuth('cart')) return;
+    if (!await requireAuth('cart')) return;
     Cart.add({
       id: btn.dataset.id,
       name: btn.dataset.name,
@@ -310,10 +314,10 @@ function initWishlist() {
 
   Wishlist.updateBadges();
 
-  document.addEventListener('click', e => {
+  document.addEventListener('click', async e => {
     const btn = e.target.closest('.wishlist-btn');
     if (!btn) return;
-    if (!requireAuth('wishlist')) return;
+    if (!await requireAuth('wishlist')) return;
 
     const card = btn.closest('.product-card');
     const product = {
@@ -774,8 +778,8 @@ function closeCheckoutModal() {
 }
 
 function initCheckout() {
-  document.querySelector('.cart-checkout')?.addEventListener('click', () => {
-    if (!requireAuth('checkout')) return;
+  document.querySelector('.cart-checkout')?.addEventListener('click', async () => {
+    if (!await requireAuth('checkout')) return;
     openCheckoutModal();
   });
 }
