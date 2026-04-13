@@ -20,7 +20,7 @@ function getFirebase() {
 
 // ─── Page Loader ────────────────────────────────────────────
 const _loaderStart = Date.now();
-const _minLoaderMs = 1800; // minimum display time in ms
+const _minLoaderMs = 1500; // minimum display time in ms
 
 window.addEventListener('load', () => {
   const loader = document.getElementById('pageLoader');
