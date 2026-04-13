@@ -195,6 +195,15 @@ tbody tr:hover td { background: rgba(212,104,122,0.03); }
 /* ── Bulk Selection ────────────────────────────────────────── */
 tr.row-selected td { background: rgba(212,104,122,0.06); }
 
+/* ── Activity Log Filter Tabs ──────────────────────────────── */
+.log-tab {
+  padding: 5px 14px; border-radius: 100px; border: 1.5px solid var(--a-border);
+  background: transparent; font-size: 0.78rem; font-weight: 600;
+  color: var(--a-muted); cursor: pointer; transition: all 0.18s;
+}
+.log-tab:hover { border-color: var(--a-pink); color: var(--a-pink); }
+.log-tab.active { background: var(--a-pink); border-color: var(--a-pink); color: #fff; }
+
 /* ── Action Buttons ────────────────────────────────────────── */
 .action-btns { display: flex; gap: 6px; }
 .btn-icon {

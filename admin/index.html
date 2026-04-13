@@ -153,12 +153,25 @@
       <div class="panel" style="margin-top:20px">
         <div class="panel__head">
           <div class="panel__title">Activity Log</div>
-          <span style="font-size:0.78rem;color:var(--a-muted)">Recent admin actions</span>
+          <span style="font-size:0.78rem;color:var(--a-muted)" id="logCount">Recent admin actions</span>
+        </div>
+        <!-- Filter tabs -->
+        <div style="display:flex;gap:8px;padding:0 20px 16px;flex-wrap:wrap" id="logFilterTabs">
+          <button class="log-tab active" data-cat="">All</button>
+          <button class="log-tab" data-cat="order-pending">Pending</button>
+          <button class="log-tab" data-cat="order-processing">Processing</button>
+          <button class="log-tab" data-cat="order-shipped">Shipped</button>
+          <button class="log-tab" data-cat="order-delivered">Delivered</button>
+          <button class="log-tab" data-cat="order-cancelled">Cancelled</button>
+          <button class="log-tab" data-cat="product">Products</button>
+          <button class="log-tab" data-cat="stock">Stock</button>
+          <button class="log-tab" data-cat="bulk">Bulk</button>
         </div>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
+                <th style="width:120px">Type</th>
                 <th>Action</th>
                 <th>Detail</th>
                 <th>Admin</th>
@@ -166,7 +179,7 @@
               </tr>
             </thead>
             <tbody id="activityLogBody">
-              <tr class="loading-row"><td colspan="4"><span class="spinner"></span> Loading...</td></tr>
+              <tr class="loading-row"><td colspan="5"><span class="spinner"></span> Loading...</td></tr>
             </tbody>
           </table>
         </div>
@@ -468,21 +481,65 @@
         </tr>`).join('') : '<tr><td colspan="2" style="text-align:center;padding:32px;color:var(--a-muted)">No subscribers yet</td></tr>';
 
       // Activity Log
-      const logDocs = logs.docs.map(d => d.data());
-      document.getElementById('activityLogBody').innerHTML = logDocs.length ? logDocs.map(l => {
-        const ts = l.timestamp?.seconds ? new Date(l.timestamp.seconds * 1000) : null;
-        const dateStr = ts ? ts.toLocaleDateString('en-PH', { month:'short', day:'numeric', year:'numeric' }) : '—';
-        const timeStr = ts ? ts.toLocaleTimeString('en-PH', { hour:'2-digit', minute:'2-digit' }) : '';
-        const isDelete = l.action?.toLowerCase().includes('deleted');
-        const isAdd    = l.action?.toLowerCase().includes('added');
-        const color    = isDelete ? '#e74c3c' : isAdd ? '#2ecc71' : 'var(--a-pink)';
-        return `<tr>
-          <td style="font-weight:600;color:${color}">${l.action || '—'}</td>
-          <td style="color:var(--a-muted);font-size:0.8rem">${l.detail || '—'}</td>
-          <td style="font-size:0.78rem;color:var(--a-muted)">${l.adminEmail || '—'}</td>
-          <td style="font-size:0.8rem;color:var(--a-muted)">${dateStr}<br><span style="font-size:0.75rem">${timeStr}</span></td>
-        </tr>`;
-      }).join('') : '<tr><td colspan="4" style="text-align:center;padding:32px;color:var(--a-muted)">No activity yet</td></tr>';
+      const allLogDocs = logs.docs.map(d => d.data());
+      let activeLogCat = '';
+
+      function getLogCategory(l) {
+        if (l.category) return l.category; // use saved category if available
+        const a = (l.action || '').toLowerCase();
+        if (a.includes('bulk')) return 'bulk';
+        if (a.includes('→ pending'))    return 'order-pending';
+        if (a.includes('→ processing')) return 'order-processing';
+        if (a.includes('→ shipped'))    return 'order-shipped';
+        if (a.includes('→ delivered'))  return 'order-delivered';
+        if (a.includes('→ cancelled'))  return 'order-cancelled';
+        if (a.includes('stock updated')) return 'stock';
+        if (a.includes('product added') || a.includes('product edited') || a.includes('product deleted')) return 'product';
+        return 'other';
+      }
+
+      const LOG_BADGE = {
+        'order-pending':    { label: 'Pending',    bg: 'rgba(230,81,0,0.12)',    color: '#E65100' },
+        'order-processing': { label: 'Processing', bg: 'rgba(2,119,189,0.12)',   color: '#0277BD' },
+        'order-shipped':    { label: 'Shipped',    bg: 'rgba(212,104,122,0.15)', color: 'var(--a-pink)' },
+        'order-delivered':  { label: 'Delivered',  bg: 'rgba(46,125,50,0.12)',   color: '#2E7D32' },
+        'order-cancelled':  { label: 'Cancelled',  bg: 'rgba(198,40,40,0.12)',   color: '#C62828' },
+        'product':          { label: 'Product',    bg: 'rgba(123,31,162,0.12)',  color: '#7B1FA2' },
+        'stock':            { label: 'Stock',      bg: 'rgba(0,121,107,0.12)',   color: '#00796B' },
+        'bulk':             { label: 'Bulk',       bg: 'rgba(69,90,100,0.12)',   color: '#455A64' },
+        'other':            { label: 'Action',     bg: 'rgba(212,104,122,0.1)',  color: 'var(--a-pink)' },
+      };
+
+      function renderActivityLog() {
+        const filtered = activeLogCat ? allLogDocs.filter(l => getLogCategory(l) === activeLogCat) : allLogDocs;
+        document.getElementById('logCount').textContent = `${filtered.length} of ${allLogDocs.length} entries`;
+        document.getElementById('activityLogBody').innerHTML = filtered.length ? filtered.map(l => {
+          const ts = l.timestamp?.seconds ? new Date(l.timestamp.seconds * 1000) : null;
+          const dateStr = ts ? ts.toLocaleDateString('en-PH', { month:'short', day:'numeric', year:'numeric' }) : '—';
+          const timeStr = ts ? ts.toLocaleTimeString('en-PH', { hour:'2-digit', minute:'2-digit' }) : '';
+          const cat = getLogCategory(l);
+          const badge = LOG_BADGE[cat] || LOG_BADGE['other'];
+          return `<tr>
+            <td><span style="display:inline-block;padding:3px 10px;border-radius:100px;font-size:0.72rem;font-weight:700;background:${badge.bg};color:${badge.color}">${badge.label}</span></td>
+            <td style="font-weight:600;font-size:0.85rem;color:var(--a-text)">${l.action || '—'}</td>
+            <td style="color:var(--a-muted);font-size:0.8rem">${l.detail || '—'}</td>
+            <td style="font-size:0.78rem;color:var(--a-muted)">${l.adminEmail || '—'}</td>
+            <td style="font-size:0.8rem;color:var(--a-muted);white-space:nowrap">${dateStr}<br><span style="font-size:0.75rem">${timeStr}</span></td>
+          </tr>`;
+        }).join('') : `<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--a-muted)">No ${activeLogCat ? badge?.label || activeLogCat : ''} activity yet</td></tr>`;
+      }
+
+      renderActivityLog();
+
+      // Filter tab clicks
+      document.querySelectorAll('.log-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.log-tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          activeLogCat = tab.dataset.cat;
+          renderActivityLog();
+        });
+      });
 
       // Low Stock Alerts — products with stock 0-5
       const alerts = productDocs.filter(p => (p.stock ?? 0) <= 5).sort((a,b) => (a.stock??0) - (b.stock??0));

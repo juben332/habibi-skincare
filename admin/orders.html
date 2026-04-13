@@ -152,10 +152,15 @@
   let allOrders = [], currentOrderId = null, activeStatus = '';
   let selectedIds = new Set();
 
-  async function logActivity(action, detail) {
+  function getOrderCategory(status) {
+    const map = { pending:'order-pending', processing:'order-processing', shipped:'order-shipped', delivered:'order-delivered', cancelled:'order-cancelled' };
+    return map[status] || 'other';
+  }
+
+  async function logActivity(action, detail, category = 'other') {
     try {
       await addDoc(collection(db, 'activityLog'), {
-        action, detail,
+        action, detail, category,
         adminEmail: auth.currentUser?.email || 'admin',
         timestamp: serverTimestamp()
       });
@@ -294,7 +299,7 @@
         await updateDoc(doc(db, 'orders', id), { status: newStatus, updatedAt: new Date() });
         const o = allOrders.find(o => o.id === id);
         if (o) {
-          await logActivity(`Bulk: Order #${id.slice(-6).toUpperCase()} → ${capitalize(newStatus)}`, `Customer: ${o.customer?.name || 'Guest'}`);
+          await logActivity(`Bulk: Order #${id.slice(-6).toUpperCase()} → ${capitalize(newStatus)}`, `Customer: ${o.customer?.name || 'Guest'}`, 'bulk');
           o.status = newStatus;
         }
         done++;
@@ -370,7 +375,8 @@
       if (order) {
         await logActivity(
           `Order #${currentOrderId.slice(-6).toUpperCase()} → ${capitalize(newStatus)}`,
-          `Customer: ${order.customer?.name || 'Guest'} | Total: ₱${(order.total||0).toLocaleString()} | Payment: ${order.paymentMethod || 'COD'}`
+          `Customer: ${order.customer?.name || 'Guest'} | Total: ₱${(order.total||0).toLocaleString()} | Payment: ${order.paymentMethod || 'COD'}`,
+          getOrderCategory(newStatus)
         );
         order.status = newStatus;
       }

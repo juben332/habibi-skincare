@@ -210,10 +210,10 @@
 
   let allProducts = [], deleteTargetId = null;
 
-  async function logActivity(action, detail) {
+  async function logActivity(action, detail, category = 'product') {
     try {
       await addDoc(collection(db, 'activityLog'), {
-        action, detail,
+        action, detail, category,
         adminEmail: auth.currentUser?.email || 'admin',
         timestamp: serverTimestamp()
       });
@@ -456,7 +456,7 @@
     product.inStock = newStock > 0;
     try {
       await updateDoc(doc(db, 'products', id), { stock: newStock, inStock: newStock > 0, updatedAt: serverTimestamp() });
-      await logActivity(`Stock updated: ${product.name}`, `Stock: ${oldStock} → ${newStock}`);
+      await logActivity(`Stock updated: ${product.name}`, `Stock: ${oldStock} → ${newStock}`, 'stock');
       showToast(`Stock updated to ${newStock}`, 'success');
       // Update badge color in DOM
       const row = valEl?.closest('tr');
