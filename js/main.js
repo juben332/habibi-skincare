@@ -7,6 +7,17 @@
 // Capture script URL immediately (only works during sync execution)
 const _mainScriptSrc = document.currentScript?.src;
 
+// Cached firebase-config importer — resolves path unambiguously from script URL
+let _fbCache = null;
+function getFirebase() {
+  if (_fbCache) return _fbCache;
+  const configUrl = _mainScriptSrc
+    ? new URL('./firebase-config.js', _mainScriptSrc).href
+    : location.origin + '/js/firebase-config.js';
+  _fbCache = import(configUrl);
+  return _fbCache;
+}
+
 // ─── Cart ───────────────────────────────────────────────────
 const Cart = {
   items: JSON.parse(localStorage.getItem('habibi_cart') || '[]'),
@@ -184,10 +195,7 @@ const _authReady = new Promise(resolve => { _authResolve = resolve; });
 async function initAuthState() {
   try {
     // Build absolute URL so path resolution is unambiguous regardless of browser
-    const configUrl = _mainScriptSrc
-      ? new URL('./firebase-config.js', _mainScriptSrc).href
-      : location.origin + '/js/firebase-config.js';
-    const { auth } = await import(configUrl);
+    const { auth } = await getFirebase();
     const { onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
     onAuthStateChanged(auth, user => {
       _currentUser = user || null;
@@ -488,7 +496,7 @@ function initNewsletter() {
       btn.disabled = true;
 
       try {
-        const { db } = await import('./js/firebase-config.js');
+        const { db } = await getFirebase();
         const { collection, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
         await addDoc(collection(db, 'subscribers'), { email, subscribedAt: serverTimestamp() });
       } catch (_) { /* Firebase not configured yet — still show success UI */ }
@@ -674,7 +682,7 @@ function createCheckoutModal() {
     };
 
     try {
-      const { db, auth } = await import('./js/firebase-config.js');
+      const { db, auth } = await getFirebase();
       const { collection, addDoc, updateDoc, doc, serverTimestamp, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
       order.createdAt = serverTimestamp();
       // Attach customer user ID if logged in
@@ -758,7 +766,7 @@ function openCheckoutModal() {
   if (!Cart.items.length) return;
   createCheckoutModal();
   // Pre-fill from Firebase auth if logged in
-  import('./js/firebase-config.js').then(({ auth }) => {
+  getFirebase().then(({ auth }) => {
     const user = auth.currentUser;
     if (user) {
       const nameEl  = document.getElementById('coName');
@@ -825,7 +833,7 @@ function initSearch() {
   async function fetchProducts() {
     if (cachedProducts) return;
     try {
-      const { db } = await import('./js/firebase-config.js');
+      const { db } = await getFirebase();
       const { collection, getDocs } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
       const snap = await getDocs(collection(db, 'products'));
       cachedProducts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
