@@ -4,6 +4,9 @@
 
 'use strict';
 
+// Capture script URL immediately (only works during sync execution)
+const _mainScriptSrc = document.currentScript?.src;
+
 // ─── Cart ───────────────────────────────────────────────────
 const Cart = {
   items: JSON.parse(localStorage.getItem('habibi_cart') || '[]'),
@@ -180,14 +183,18 @@ const _authReady = new Promise(resolve => { _authResolve = resolve; });
 
 async function initAuthState() {
   try {
-    const { auth } = await import('./firebase-config.js');
+    // Build absolute URL so path resolution is unambiguous regardless of browser
+    const configUrl = _mainScriptSrc
+      ? new URL('./firebase-config.js', _mainScriptSrc).href
+      : location.origin + '/js/firebase-config.js';
+    const { auth } = await import(configUrl);
     const { onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
     onAuthStateChanged(auth, user => {
       _currentUser = user || null;
       _authResolve();
       updateMobileAccountBtn(user);
     });
-  } catch (_) { _currentUser = null; _authResolve(); }
+  } catch (e) { _currentUser = null; _authResolve(); }
 }
 
 function updateMobileAccountBtn(user) {
