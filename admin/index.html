@@ -53,6 +53,9 @@
           <i class="fas fa-bell" style="animation:bellRing 1s ease infinite"></i>
           <span id="pendingAlertText">0 pending orders</span>
         </div>
+        <button class="topbar__btn topbar__btn--ghost" id="soundBtn" title="Click to enable notification sound" style="gap:6px">
+          <i class="fas fa-bell-slash" id="soundIcon"></i> <span id="soundLabel">Enable Sound</span>
+        </button>
         <a href="products.html" class="topbar__btn topbar__btn--primary">
           <i class="fas fa-plus"></i> Add Product
         </a>
@@ -257,29 +260,58 @@
   import { collection, getDocs, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   let lastPendingCount = null; // null = first load (no sound yet)
+  let audioCtx = null;
+  let soundEnabled = false;
 
-  // ── Notification sound (Web Audio API — no file needed) ──────
+  // ── Notification sound (Web Audio API) ───────────────────────
   function playOrderSound() {
+    if (!soundEnabled || !audioCtx) return;
     try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
       const notes = [
         { freq: 523.25, t: 0,    dur: 0.18 },  // C5
         { freq: 659.25, t: 0.18, dur: 0.18 },  // E5
         { freq: 783.99, t: 0.36, dur: 0.35 },  // G5
       ];
       notes.forEach(({ freq, t, dur }) => {
-        const osc  = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain); gain.connect(ctx.destination);
+        const osc  = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
         osc.type = 'sine'; osc.frequency.value = freq;
-        gain.gain.setValueAtTime(0, ctx.currentTime + t);
-        gain.gain.linearRampToValueAtTime(0.28, ctx.currentTime + t + 0.01);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + dur);
-        osc.start(ctx.currentTime + t);
-        osc.stop(ctx.currentTime + t + dur + 0.05);
+        gain.gain.setValueAtTime(0, audioCtx.currentTime + t);
+        gain.gain.linearRampToValueAtTime(0.28, audioCtx.currentTime + t + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + t + dur);
+        osc.start(audioCtx.currentTime + t);
+        osc.stop(audioCtx.currentTime + t + dur + 0.05);
       });
     } catch (e) {}
   }
+
+  // ── Enable Sound button ───────────────────────────────────────
+  document.getElementById('soundBtn').addEventListener('click', () => {
+    if (soundEnabled) {
+      // Toggle off
+      soundEnabled = false;
+      document.getElementById('soundIcon').className  = 'fas fa-bell-slash';
+      document.getElementById('soundLabel').textContent = 'Enable Sound';
+      document.getElementById('soundBtn').style.color  = '';
+      return;
+    }
+    // First click — unlock AudioContext (requires user gesture)
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      audioCtx.resume().then(() => {
+        soundEnabled = true;
+        document.getElementById('soundIcon').className   = 'fas fa-bell';
+        document.getElementById('soundLabel').textContent = 'Sound On';
+        document.getElementById('soundBtn').style.color  = 'var(--a-pink)';
+        // Play a short test chime to confirm it's working
+        playOrderSound();
+      });
+    } catch (e) {
+      alert('Audio not supported in this browser.');
+    }
+  });
 
   // ── Visual toast alert ───────────────────────────────────────
   function showOrderToast(count) {
