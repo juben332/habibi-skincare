@@ -786,7 +786,7 @@ function initSearch() {
     el.querySelectorAll('.search-result-item').forEach(a => a.addEventListener('click', closeSearch));
   }
 
-  // Wire up buttons
+  // Wire up buttons — nav search icons + mobile menu search button
   document.querySelectorAll('[aria-label="Search"]').forEach(btn =>
     btn.addEventListener('click', openSearch));
   overlay.querySelector('.search-overlay__backdrop').addEventListener('click', closeSearch);

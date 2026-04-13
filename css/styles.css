@@ -195,6 +195,7 @@ p { color: var(--muted); line-height: 1.8; }
 .wishlist-count.visible { display: flex; }
 
 .nav__hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+.nav__mobile-search { display: none; }
 .nav__hamburger span { display: block; width: 22px; height: 2px; background: #fff; border-radius: 2px; transition: var(--ease); }
 .nav--scrolled .nav__hamburger span { background: var(--charcoal); }
 .nav__hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
@@ -871,6 +872,9 @@ p { color: var(--muted); line-height: 1.8; }
 @media (max-width: 768px) {
   .nav__links { display: none; }
   .nav__hamburger { display: flex; }
+  .nav__search-btn { display: none; }
+  .nav__login-btn { display: none; }
+  .nav__mobile-search { display: flex !important; align-items: center; gap: 10px; background: var(--beige); border: none; border-radius: 10px; padding: 14px 20px; font-family: var(--serif); font-size: 1.2rem; color: var(--brown); cursor: pointer; width: 100%; margin-bottom: 8px; }
   .grid-2 { grid-template-columns: 1fr; gap: 36px; }
   .grid-3, .grid-4 { grid-template-columns: repeat(2,1fr); }
   .brand-story__badge { right: 14px; bottom: 14px; }
