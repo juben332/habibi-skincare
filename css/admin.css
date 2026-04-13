@@ -195,6 +195,23 @@ tbody tr:hover td { background: rgba(212,104,122,0.03); }
 /* ── Bulk Selection ────────────────────────────────────────── */
 tr.row-selected td { background: rgba(212,104,122,0.06); }
 
+/* ── Date Divider Row ──────────────────────────────────────── */
+tr.date-divider-row td {
+  background: var(--a-bg);
+  padding: 8px 16px;
+  border-top: 2px solid var(--a-border);
+}
+.date-divider-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--a-pink);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
 /* ── Activity Log Filter Tabs ──────────────────────────────── */
 .log-tab {
   padding: 5px 14px; border-radius: 100px; border: 1.5px solid var(--a-border);
