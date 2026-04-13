@@ -180,8 +180,29 @@ async function initAuthState() {
   try {
     const { auth } = await import('./firebase-config.js');
     const { onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-    onAuthStateChanged(auth, user => { _currentUser = user || null; });
+    onAuthStateChanged(auth, user => {
+      _currentUser = user || null;
+      updateMobileAccountBtn(user);
+    });
   } catch (_) { _currentUser = null; }
+}
+
+function updateMobileAccountBtn(user) {
+  const label  = document.getElementById('mobileAccountLabel');
+  const avatar = document.getElementById('mobileAccountAvatar');
+  if (!label || !avatar) return;
+  if (user) {
+    const name = user.displayName ? user.displayName.split(' ')[0] : 'Account';
+    label.textContent = name;
+    if (user.photoURL) {
+      avatar.innerHTML = `<img src="${user.photoURL}" alt="${name}">`;
+    } else {
+      avatar.innerHTML = `<span style="font-family:var(--serif);font-size:1.2rem;font-weight:700">${name[0].toUpperCase()}</span>`;
+    }
+  } else {
+    label.textContent = 'My Account';
+    avatar.innerHTML = '<i class="fas fa-user"></i>';
+  }
 }
 
 function showAuthPrompt(action) {
