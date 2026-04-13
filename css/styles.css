@@ -932,26 +932,134 @@ p { color: var(--muted); line-height: 1.8; }
   .routine__num { flex-shrink: 0; margin: 0; width: 60px; height: 60px; }
 }
 @media (max-width: 768px) {
+  /* Nav */
   .nav__links { display: none; }
   .nav__hamburger { display: flex; }
   .nav__search-btn { display: none; }
   .nav__login-btn { display: none; }
   .nav__mobile-search { display: flex !important; align-items: center; gap: 10px; background: var(--beige); border: none; border-radius: 10px; padding: 14px 20px; font-family: var(--serif); font-size: 1.2rem; color: var(--brown); cursor: pointer; width: 100%; margin-bottom: 8px; }
+
+  /* Grids */
   .grid-2 { grid-template-columns: 1fr; gap: 36px; }
   .grid-3, .grid-4 { grid-template-columns: repeat(2,1fr); }
-  .brand-story__badge { right: 14px; bottom: 14px; }
+
+  /* Hero */
+  .about-hero { padding: 100px 0 56px; min-height: unset; }
   .hero__actions { flex-direction: column; align-items: flex-start; }
-  .newsletter__form { flex-direction: column; }
-  .footer__top { grid-template-columns: 1fr; gap: 28px; }
+  .about-hero__img { display: none; }
+
+  /* Buttons */
+  .btn-lg { padding: 14px 28px; font-size: 0.9rem; }
+
+  /* Brand story — fix specificity so gap is mobile-friendly */
+  .brand-story { padding: 80px 0; }
+  .brand-story .grid-2 { gap: 36px; }
+  .brand-story__badge { right: 14px; bottom: 14px; }
+
+  /* Section header */
+  .section-header { margin-bottom: 40px; }
+
+  /* Shop */
+  .shop-hero { padding: 110px 0 52px; }
+  .shop-filters__inner { gap: 10px; }
+  .filter-tabs { gap: 6px; }
+  .filter-tab { padding: 7px 14px; font-size: 0.76rem; }
+
+  /* Product page */
+  .product-page { padding: 100px 0 60px; }
   .product-page .grid-2 { grid-template-columns: 1fr; }
   .product-gallery { position: static; }
-  .about-hero__img { display: none; }
-  .sticky-bar { padding: 14px 20px; }
+  .product-actions { flex-direction: column; gap: 10px; }
+  .product-actions .btn { width: 100%; justify-content: center; }
+
+  /* Tab bar — horizontal scroll instead of wrap */
+  .tab-bar { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; padding-bottom: 2px; }
+  .tab-btn { white-space: nowrap; flex-shrink: 0; padding: 12px 18px; }
+
+  /* Newsletter */
+  .newsletter__form { flex-direction: column; }
+
+  /* Footer */
+  .footer__top { grid-template-columns: 1fr; gap: 28px; }
+  .footer__bottom { flex-direction: column; align-items: flex-start; gap: 8px; }
+
+  /* Sticky bar */
+  .sticky-bar { padding: 12px 16px; gap: 10px; }
+  .sticky-bar__name { font-size: 0.85rem; }
+
+  /* Cart */
+  .cart-sidebar { width: 100vw; }
+
+  /* Testimonials */
+  .testimonial-card { padding: 28px 22px; }
 }
+
 @media (max-width: 480px) {
-  :root { --pad: 0 18px; }
+  :root {
+    --pad: 0 18px;
+    --section: 64px 0;
+  }
+
+  /* Nav */
+  .nav { padding: 0 16px; }
+  .nav__logo { font-size: 1.3rem; }
+  .nav__logo-img { height: 30px; }
+
+  /* Grids */
   .grid-3, .grid-4 { grid-template-columns: 1fr; }
+
+  /* Hero */
   .hero { min-height: 100svh; }
-  .nav { padding: 0 18px; }
+  .about-hero { padding: 88px 0 48px; }
+
+  /* Typography — keep readable but smaller */
+  h1 { font-size: clamp(1.9rem, 9vw, 2.6rem); }
+  h2 { font-size: clamp(1.5rem, 7vw, 2rem); }
+
+  /* Buttons */
   .btn { padding: 12px 22px; }
+  .btn-lg { padding: 13px 24px; font-size: 0.88rem; }
+
+  /* Brand story */
+  .brand-story { padding: 64px 0; }
+  .brand-story__badge { display: none; }
+
+  /* Section header */
+  .section-header { margin-bottom: 32px; }
+
+  /* Shop */
+  .shop-hero { padding: 88px 0 44px; }
+  .shop-filters__inner { flex-direction: column; align-items: flex-start; }
+  .filter-tabs { width: 100%; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; }
+  .filter-tab { flex-shrink: 0; }
+
+  /* Product page */
+  .product-page { padding: 88px 0 48px; }
+  .product-info__price { font-size: 1.7rem; }
+  .size-options { flex-wrap: wrap; }
+  .tab-btn { padding: 10px 14px; font-size: 0.82rem; }
+
+  /* Benefits section */
+  .benefit-card { padding: 28px 18px; }
+
+  /* Testimonial */
+  .testimonial-card { padding: 24px 18px; }
+
+  /* Newsletter */
+  .newsletter { padding: 64px 0; }
+
+  /* Footer */
+  .footer { padding: 56px 0 24px; }
+  .footer__legal { flex-wrap: wrap; gap: 12px; }
+
+  /* Cart */
+  .cart-sidebar__items { padding: 16px 20px; }
+  .cart-sidebar__foot { padding: 16px 20px; }
+  .cart-sidebar__head { padding: 20px 20px; }
+  .cart-item__img { width: 60px; height: 60px; }
+
+  /* Sticky bar */
+  .sticky-bar { padding: 10px 14px; }
+  .sticky-bar__name { font-size: 0.8rem; }
+  .sticky-bar__price { font-size: 0.92rem; }
 }
