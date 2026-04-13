@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subscribers — Habibi Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar__brand">
+      <img src="../images/logo.png" alt="Logo" class="sidebar__brand-logo" onerror="this.style.display='none'">
+      <div class="sidebar__brand-name">Habibi<span>.</span></div>
+    </div>
+    <nav class="sidebar__nav">
+      <div class="sidebar__section">Main</div>
+      <a href="index.html" class="sidebar__link"><i class="fas fa-th-large"></i> Dashboard</a>
+      <a href="products.html" class="sidebar__link"><i class="fas fa-box-open"></i> Products</a>
+      <a href="orders.html" class="sidebar__link"><i class="fas fa-receipt"></i> Orders</a>
+      <div class="sidebar__section">Marketing</div>
+      <a href="subscribers.html" class="sidebar__link active"><i class="fas fa-envelope"></i> Subscribers</a>
+      <div class="sidebar__section">Settings</div>
+      <a href="../index.html" class="sidebar__link" target="_blank"><i class="fas fa-external-link-alt"></i> View Website</a>
+    </nav>
+    <div class="sidebar__footer">
+      <div class="sidebar__user">
+        <div class="sidebar__user-avatar" id="userAvatar">A</div>
+        <div>
+          <div class="sidebar__user-name" id="userEmail">Admin</div>
+          <div class="sidebar__user-role">Administrator</div>
+        </div>
+      </div>
+      <button class="sidebar__logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="admin-main">
+    <header class="topbar">
+      <div class="topbar__title">Subscribers</div>
+      <div class="topbar__right">
+        <span style="font-size:0.82rem;color:var(--a-muted)" id="dateDisplay"></span>
+        <button class="topbar__btn topbar__btn--ghost" id="exportBtn"><i class="fas fa-download"></i> Export CSV</button>
+      </div>
+    </header>
+
+    <div class="admin-content">
+
+      <!-- Stats row -->
+      <div class="stats-grid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr));margin-bottom:24px">
+        <div class="stat-card">
+          <div class="stat-card__icon"><i class="fas fa-users"></i></div>
+          <div class="stat-card__label">Total Subscribers</div>
+          <div class="stat-card__value" id="statTotal">—</div>
+          <div class="stat-card__change"><i class="fas fa-envelope"></i> Newsletter list</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon"><i class="fas fa-calendar-day"></i></div>
+          <div class="stat-card__label">This Month</div>
+          <div class="stat-card__value" id="statThisMonth">—</div>
+          <div class="stat-card__change"><i class="fas fa-arrow-up"></i> New sign-ups</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel__head">
+          <div class="panel__title">All Subscribers <span id="subCount" style="font-size:0.8rem;color:var(--a-muted);font-family:var(--sans);font-weight:400"></span></div>
+          <div class="toolbar" style="margin:0">
+            <div class="search-wrap" style="min-width:200px">
+              <i class="fas fa-search"></i>
+              <input type="text" class="search-input" id="searchInput" placeholder="Search by email...">
+            </div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Email</th>
+                <th>Subscribed On</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="subsBody">
+              <tr class="loading-row"><td colspan="4"><span class="spinner"></span> Loading subscribers...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <span id="paginationInfo">Showing 0 subscribers</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-backdrop" id="deleteModal">
+  <div class="modal" style="max-width:400px">
+    <div class="modal__head">
+      <h3 class="modal__title">Remove Subscriber</h3>
+      <button class="modal__close" id="closeDelete"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal__body">
+      <p style="color:var(--a-muted)">Remove <strong id="deleteSubEmail" style="color:var(--a-text)"></strong> from the newsletter list?</p>
+    </div>
+    <div class="modal__foot">
+      <button class="btn btn-secondary" id="cancelDelete">Cancel</button>
+      <button class="btn btn-danger" id="confirmDelete"><i class="fas fa-trash"></i> Remove</button>
+    </div>
+  </div>
+</div>
+
+<div class="a-toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg"></span></div>
+
+<script type="module">
+  import { auth, db, isAdmin } from '../js/firebase-config.js';
+  import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  let allSubs = [], deleteTargetId = null;
+
+  onAuthStateChanged(auth, user => {
+    if (!user) { window.location.href = '../login.html'; return; }
+    if (!isAdmin(user)) { window.location.href = '../login.html?error=unauthorized'; return; }
+    document.getElementById('userEmail').textContent = user.email;
+    document.getElementById('userAvatar').textContent = user.email[0].toUpperCase();
+    loadSubs();
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => { await signOut(auth); window.location.href = '../login.html'; });
+  document.getElementById('dateDisplay').textContent = new Date().toLocaleDateString('en-PH', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+  async function loadSubs() {
+    try {
+      const snap = await getDocs(collection(db, 'subscribers'));
+      allSubs = snap.docs
+        .map(d => ({ id: d.id, ...d.data() }))
+        .sort((a, b) => (b.subscribedAt?.seconds || 0) - (a.subscribedAt?.seconds || 0));
+      const now = new Date();
+      const thisMonth = allSubs.filter(s => {
+        if (!s.subscribedAt?.seconds) return false;
+        const d = new Date(s.subscribedAt.seconds * 1000);
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      }).length;
+      document.getElementById('statTotal').textContent     = allSubs.length;
+      document.getElementById('statThisMonth').textContent = thisMonth;
+      renderSubs(allSubs);
+    } catch (e) {
+      console.error('Failed to load subscribers:', e);
+      document.getElementById('statTotal').textContent     = '0';
+      document.getElementById('statThisMonth').textContent = '0';
+      renderSubs([]);
+    }
+  }
+
+  function renderSubs(subs) {
+    document.getElementById('subCount').textContent = `(${subs.length})`;
+    document.getElementById('paginationInfo').textContent = `Showing ${subs.length} subscriber${subs.length !== 1 ? 's' : ''}`;
+    const body = document.getElementById('subsBody');
+    if (!subs.length) {
+      body.innerHTML = `<tr><td colspan="4"><div class="empty-state"><i class="fas fa-envelope-open"></i><h3>No subscribers yet</h3><p>Subscribers who sign up on the website will appear here.</p></div></td></tr>`;
+      return;
+    }
+    body.innerHTML = subs.map((s, i) => {
+      const date = s.subscribedAt?.seconds ? new Date(s.subscribedAt.seconds * 1000) : null;
+      const dateStr = date ? date.toLocaleDateString('en-PH', { month:'short', day:'numeric', year:'numeric' }) : '—';
+      const timeStr = date ? date.toLocaleTimeString('en-PH', { hour:'2-digit', minute:'2-digit' }) : '';
+      return `<tr>
+        <td style="color:var(--a-muted);font-size:0.8rem">${i + 1}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:34px;height:34px;border-radius:50%;background:var(--a-pink-light);color:var(--a-pink);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;flex-shrink:0">${s.email[0].toUpperCase()}</div>
+            <div class="table-name">${s.email}</div>
+          </div>
+        </td>
+        <td style="font-size:0.82rem;color:var(--a-muted)">${dateStr}${timeStr ? `<br><span style="font-size:0.75rem">${timeStr}</span>` : ''}</td>
+        <td>
+          <button class="btn-icon del" title="Remove subscriber" onclick="removeSub('${s.id}','${s.email.replace(/'/g,"\\'")}')"><i class="fas fa-trash"></i></button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Search
+  document.getElementById('searchInput').addEventListener('input', () => {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    renderSubs(allSubs.filter(s => s.email.toLowerCase().includes(q)));
+  });
+
+  // Delete
+  const deleteModal = document.getElementById('deleteModal');
+  window.removeSub = (id, email) => {
+    deleteTargetId = id;
+    document.getElementById('deleteSubEmail').textContent = email;
+    deleteModal.classList.add('open');
+  };
+  document.getElementById('closeDelete').addEventListener('click', () => deleteModal.classList.remove('open'));
+  document.getElementById('cancelDelete').addEventListener('click', () => deleteModal.classList.remove('open'));
+  document.getElementById('confirmDelete').addEventListener('click', async () => {
+    if (!deleteTargetId) return;
+    try {
+      await deleteDoc(doc(db, 'subscribers', deleteTargetId));
+      deleteModal.classList.remove('open');
+      showToast('Subscriber removed.', 'info');
+      await loadSubs();
+    } catch (e) { showToast('Error: ' + e.message, 'error'); }
+  });
+
+  // Export CSV
+  document.getElementById('exportBtn').addEventListener('click', () => {
+    if (!allSubs.length) { showToast('No subscribers to export.', 'info'); return; }
+    const rows = [['Email', 'Subscribed On']];
+    allSubs.forEach(s => {
+      const date = s.subscribedAt?.seconds ? new Date(s.subscribedAt.seconds * 1000).toLocaleDateString('en-PH') : '';
+      rows.push([s.email, date]);
+    });
+    const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = `habibi-subscribers-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click(); URL.revokeObjectURL(url);
+    showToast('Exported successfully!', 'success');
+  });
+
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
+    t.className = `a-toast ${type}`;
+    t.innerHTML = `<i class="fas ${icon}"></i> <span>${msg}</span>`;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+</script>
+</body>
+</html>

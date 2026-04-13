@@ -25,7 +25,7 @@
       <a href="products.html" class="sidebar__link active"><i class="fas fa-box-open"></i> Products</a>
       <a href="orders.html" class="sidebar__link"><i class="fas fa-receipt"></i> Orders</a>
       <div class="sidebar__section">Marketing</div>
-      <a href="#" class="sidebar__link"><i class="fas fa-envelope"></i> Subscribers</a>
+      <a href="subscribers.html" class="sidebar__link"><i class="fas fa-envelope"></i> Subscribers</a>
       <div class="sidebar__section">Settings</div>
       <a href="../index.html" class="sidebar__link" target="_blank"><i class="fas fa-external-link-alt"></i> View Website</a>
     </nav>
@@ -242,6 +242,17 @@
     }
   }
 
+  function stockClass(stock) {
+    if (stock == null || stock === 0) return 'stock-out';
+    if (stock <= 5) return 'stock-low';
+    return 'stock-ok';
+  }
+  function stockLabel(stock) {
+    if (stock == null || stock === 0) return 'Out of Stock';
+    if (stock <= 5) return 'Low Stock';
+    return 'In Stock';
+  }
+
   function renderProducts(products) {
     document.getElementById('productCount').textContent = `(${products.length})`;
     document.getElementById('paginationInfo').textContent = `Showing ${products.length} product${products.length !== 1 ? 's' : ''}`;
@@ -250,7 +261,11 @@
       body.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fas fa-box-open"></i><h3>No products yet</h3><p>Click "Add Product" to get started.</p></div></td></tr>`;
       return;
     }
-    body.innerHTML = products.map(p => `
+    body.innerHTML = products.map(p => {
+      const stock = p.stock ?? 0;
+      const sc = stockClass(stock);
+      const sl = stockLabel(stock);
+      return `
       <tr>
         <td>
           <div style="display:flex;align-items:center;gap:12px">
@@ -265,8 +280,12 @@
         <td style="font-weight:700;color:var(--a-pink)">₱${(p.price||0).toLocaleString()}</td>
         <td>${p.badge ? `<span class="badge badge-${p.badge}">${capitalize(p.badge)}</span>` : '<span style="color:var(--a-muted)">—</span>'}</td>
         <td>
-          <span class="badge ${p.inStock !== false ? 'badge-delivered' : 'badge-cancelled'}">${p.inStock !== false ? 'In Stock' : 'Out of Stock'}</span>
-          <div style="font-size:0.78rem;color:var(--a-muted);margin-top:3px">${p.stock != null ? p.stock + ' units' : '—'}</div>
+          <span class="stock-badge ${sc}">${sl}</span>
+          <div class="qty-adjust" style="margin-top:6px">
+            <button class="btn-icon" title="Decrease stock" onclick="adjustStock('${p.id}', -1)"><i class="fas fa-minus"></i></button>
+            <span class="qty-adjust__val" id="stockVal-${p.id}">${stock}</span>
+            <button class="btn-icon" title="Increase stock" onclick="adjustStock('${p.id}', 1)"><i class="fas fa-plus"></i></button>
+          </div>
         </td>
         <td>
           <div class="action-btns">
@@ -274,7 +293,8 @@
             <button class="btn-icon del" title="Delete" onclick="deleteProduct('${p.id}','${p.name.replace(/'/g,"\\'")}')"><i class="fas fa-trash"></i></button>
           </div>
         </td>
-      </tr>`).join('');
+      </tr>`;
+    }).join('');
   }
 
   // Search & filter
@@ -422,6 +442,38 @@
   }
 
   function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+
+  // Quick stock adjust (inline +/-)
+  window.adjustStock = async (id, delta) => {
+    const product = allProducts.find(p => p.id === id);
+    if (!product) return;
+    const oldStock = product.stock ?? 0;
+    const newStock = Math.max(0, oldStock + delta);
+    if (newStock === oldStock) return; // already at 0, no change needed
+    const valEl = document.getElementById(`stockVal-${id}`);
+    if (valEl) valEl.textContent = newStock;
+    product.stock = newStock;
+    product.inStock = newStock > 0;
+    try {
+      await updateDoc(doc(db, 'products', id), { stock: newStock, inStock: newStock > 0, updatedAt: serverTimestamp() });
+      await logActivity(`Stock updated: ${product.name}`, `Stock: ${oldStock} → ${newStock}`);
+      showToast(`Stock updated to ${newStock}`, 'success');
+      // Update badge color in DOM
+      const row = valEl?.closest('tr');
+      if (row) {
+        const badge = row.querySelector('.stock-badge');
+        if (badge) {
+          badge.className = `stock-badge ${stockClass(newStock)}`;
+          badge.textContent = stockLabel(newStock);
+        }
+      }
+    } catch (e) {
+      showToast('Error updating stock: ' + e.message, 'error');
+      // Revert local state
+      product.stock = oldStock;
+      if (valEl) valEl.textContent = oldStock;
+    }
+  };
 
   // Cloudinary image upload
   document.getElementById('imgUpload').addEventListener('change', async (e) => {
