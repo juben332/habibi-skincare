@@ -192,6 +192,9 @@ tbody tr:hover td { background: rgba(212,104,122,0.03); }
 .badge-delivered { background: rgba(46,125,50,0.1);  color: var(--a-success); }
 .badge-cancelled { background: rgba(198,40,40,0.1);  color: var(--a-danger); }
 
+/* ── Bulk Selection ────────────────────────────────────────── */
+tr.row-selected td { background: rgba(212,104,122,0.06); }
+
 /* ── Action Buttons ────────────────────────────────────────── */
 .action-btns { display: flex; gap: 6px; }
 .btn-icon {
