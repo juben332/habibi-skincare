@@ -19,11 +19,18 @@ function getFirebase() {
 }
 
 // ─── Page Loader ────────────────────────────────────────────
+const _loaderStart = Date.now();
+const _minLoaderMs = 1800; // minimum display time in ms
+
 window.addEventListener('load', () => {
   const loader = document.getElementById('pageLoader');
   if (!loader) return;
-  loader.classList.add('loader-hidden');
-  setTimeout(() => loader.remove(), 500);
+  const elapsed = Date.now() - _loaderStart;
+  const wait = Math.max(0, _minLoaderMs - elapsed);
+  setTimeout(() => {
+    loader.classList.add('loader-hidden');
+    setTimeout(() => loader.remove(), 500);
+  }, wait);
 });
 
 // ─── Cart ───────────────────────────────────────────────────
