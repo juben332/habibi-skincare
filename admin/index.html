@@ -49,9 +49,10 @@
       <div class="topbar__title">Dashboard</div>
       <div class="topbar__right">
         <span style="font-size:0.82rem;color:var(--a-muted)" id="dateDisplay"></span>
-        <button class="topbar__btn topbar__btn--ghost" id="notifBtn" title="Enable order notifications" style="gap:6px">
-          <i class="fas fa-bell-slash" id="notifIcon"></i> Notifications
-        </button>
+        <div id="pendingAlert" style="display:none;align-items:center;gap:8px;background:rgba(230,81,0,0.1);border:1px solid rgba(230,81,0,0.3);color:#E65100;padding:7px 14px;border-radius:100px;font-size:0.82rem;font-weight:600">
+          <i class="fas fa-bell" style="animation:bellRing 1s ease infinite"></i>
+          <span id="pendingAlertText">0 pending orders</span>
+        </div>
         <a href="products.html" class="topbar__btn topbar__btn--primary">
           <i class="fas fa-plus"></i> Add Product
         </a>
@@ -220,10 +221,93 @@
   </div>
 </div>
 
+<style>
+  @keyframes bellRing {
+    0%,100% { transform: rotate(0); }
+    20%      { transform: rotate(-15deg); }
+    40%      { transform: rotate(15deg); }
+    60%      { transform: rotate(-10deg); }
+    80%      { transform: rotate(10deg); }
+  }
+  .order-toast {
+    position: fixed; top: 76px; right: 28px; z-index: 9999;
+    background: #fff; border-left: 4px solid #E65100;
+    border-radius: 12px; padding: 16px 20px; min-width: 280px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    display: flex; align-items: center; gap: 14px;
+    animation: toastIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes toastIn {
+    from { opacity:0; transform: translateX(60px); }
+    to   { opacity:1; transform: translateX(0); }
+  }
+  .order-toast__icon {
+    width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+    background: rgba(230,81,0,0.1); color: #E65100;
+    display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+  }
+  .order-toast__title { font-weight: 700; font-size: 0.9rem; color: #2D0F17; }
+  .order-toast__sub   { font-size: 0.78rem; color: #8A606A; margin-top: 2px; }
+  .order-toast__close { margin-left: auto; background: none; border: none; cursor: pointer; color: #8A606A; font-size: 1rem; padding: 4px; }
+</style>
+
 <script type="module">
   import { auth, db, isAdmin } from '../js/firebase-config.js';
   import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { collection, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { collection, getDocs, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  let lastPendingCount = null; // null = first load (no sound yet)
+
+  // ── Notification sound (Web Audio API — no file needed) ──────
+  function playOrderSound() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const notes = [
+        { freq: 523.25, t: 0,    dur: 0.18 },  // C5
+        { freq: 659.25, t: 0.18, dur: 0.18 },  // E5
+        { freq: 783.99, t: 0.36, dur: 0.35 },  // G5
+      ];
+      notes.forEach(({ freq, t, dur }) => {
+        const osc  = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.type = 'sine'; osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0, ctx.currentTime + t);
+        gain.gain.linearRampToValueAtTime(0.28, ctx.currentTime + t + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + dur);
+        osc.start(ctx.currentTime + t);
+        osc.stop(ctx.currentTime + t + dur + 0.05);
+      });
+    } catch (e) {}
+  }
+
+  // ── Visual toast alert ───────────────────────────────────────
+  function showOrderToast(count) {
+    document.querySelectorAll('.order-toast').forEach(el => el.remove());
+    const toast = document.createElement('div');
+    toast.className = 'order-toast';
+    toast.innerHTML = `
+      <div class="order-toast__icon"><i class="fas fa-bell"></i></div>
+      <div>
+        <div class="order-toast__title">New Order Received!</div>
+        <div class="order-toast__sub">${count} pending order${count > 1 ? 's' : ''} waiting for action</div>
+      </div>
+      <button class="order-toast__close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast?.remove(), 6000);
+  }
+
+  // ── Topbar pending badge ─────────────────────────────────────
+  function updatePendingBadge(count) {
+    const el   = document.getElementById('pendingAlert');
+    const text = document.getElementById('pendingAlertText');
+    if (count > 0) {
+      el.style.display = 'flex';
+      text.textContent = `${count} pending order${count > 1 ? 's' : ''}`;
+    } else {
+      el.style.display = 'none';
+    }
+  }
 
   // Auth guard — admin only
   onAuthStateChanged(auth, user => {
@@ -232,6 +316,7 @@
     document.getElementById('userEmail').textContent = user.email;
     document.getElementById('userAvatar').textContent = user.email[0].toUpperCase();
     loadDashboard();
+    initOrdersListener();
   });
 
   // Logout
@@ -242,6 +327,40 @@
 
   // Date
   document.getElementById('dateDisplay').textContent = new Date().toLocaleDateString('en-PH', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+  // ── Real-time orders listener ────────────────────────────────
+  function initOrdersListener() {
+    onSnapshot(collection(db, 'orders'), snap => {
+      const orders  = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const pending = orders.filter(o => o.status === 'pending').length;
+
+      // Update sidebar badge + stat card
+      document.getElementById('pendingCount').textContent  = pending;
+      document.getElementById('statOrders').textContent    = orders.length;
+      document.getElementById('statPending').textContent   = pending;
+      updatePendingBadge(pending);
+
+      // Play sound + toast only when NEW pending orders arrive (not on first load)
+      if (lastPendingCount !== null && pending > lastPendingCount) {
+        playOrderSound();
+        showOrderToast(pending);
+      }
+      lastPendingCount = pending;
+
+      // Refresh recent orders table
+      const recent = orders.sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0)).slice(0,5);
+      const body = document.getElementById('recentOrdersBody');
+      if (body) {
+        body.innerHTML = recent.length ? recent.map(o => `
+          <tr>
+            <td><div class="table-name">#${o.id.slice(-6).toUpperCase()}</div><div class="table-sub">${o.items?.length||0} item(s)</div></td>
+            <td><div class="table-name">${o.customer?.name||'Guest'}</div><div class="table-sub">${o.customer?.email||''}</div></td>
+            <td style="font-weight:700">₱${(o.total||0).toLocaleString()}</td>
+            <td><span class="badge badge-${o.status||'pending'}">${capitalize(o.status||'pending')}</span></td>
+          </tr>`).join('') : '<tr><td colspan="4" style="text-align:center;padding:32px;color:var(--a-muted)">No orders yet</td></tr>';
+      }
+    });
+  }
 
   function stockClass(stock) {
     if (stock == null || stock === 0) return 'stock-out';
@@ -263,41 +382,26 @@
 
   async function loadDashboard() {
     try {
-      const [products, orders, subs, logs] = await Promise.all([
+      const [products, subs, logs] = await Promise.all([
         getDocs(collection(db, 'products')),
-        getDocs(collection(db, 'orders')),
         getDocs(collection(db, 'subscribers')),
         getDocs(query(collection(db, 'activityLog'), orderBy('timestamp', 'desc'), limit(20)))
       ]);
 
       // Stats
-      const orderDocs   = orders.docs.map(d => ({ id: d.id, ...d.data() }));
       const productDocs = products.docs.map(d => ({ id: d.id, ...d.data() }));
-      const pending     = orderDocs.filter(o => o.status === 'pending').length;
-      const revenue     = orderDocs.filter(o => o.status === 'delivered').reduce((s, o) => s + (o.total || 0), 0);
+      const revenue     = (await getDocs(collection(db, 'orders'))).docs
+        .map(d => d.data()).filter(o => o.status === 'delivered').reduce((s, o) => s + (o.total || 0), 0);
       const inStock     = productDocs.filter(p => (p.stock ?? 0) > 0).length;
       const lowStock    = productDocs.filter(p => (p.stock ?? 0) > 0 && (p.stock ?? 0) <= 5).length;
       const outOfStock  = productDocs.filter(p => (p.stock ?? 0) === 0).length;
 
       document.getElementById('statProducts').textContent   = products.size;
       document.getElementById('statInStock').textContent    = inStock;
-      document.getElementById('statOrders').textContent     = orders.size;
-      document.getElementById('statPending').textContent    = pending;
       document.getElementById('statRevenue').textContent    = '₱' + revenue.toLocaleString();
       document.getElementById('statSubs').textContent       = subs.size;
       document.getElementById('statLowStock').textContent   = lowStock;
       document.getElementById('statOutOfStock').textContent = outOfStock;
-      document.getElementById('pendingCount').textContent   = pending;
-
-      // Recent orders (last 5)
-      const recent = orderDocs.sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0)).slice(0,5);
-      document.getElementById('recentOrdersBody').innerHTML = recent.length ? recent.map(o => `
-        <tr>
-          <td><div class="table-name">#${o.id.slice(-6).toUpperCase()}</div><div class="table-sub">${o.items?.length || 0} item(s)</div></td>
-          <td><div class="table-name">${o.customer?.name || 'Guest'}</div><div class="table-sub">${o.customer?.email || ''}</div></td>
-          <td style="font-weight:700">₱${(o.total||0).toLocaleString()}</td>
-          <td><span class="badge badge-${o.status||'pending'}">${capitalize(o.status||'pending')}</span></td>
-        </tr>`).join('') : '<tr><td colspan="4" style="text-align:center;padding:32px;color:var(--a-muted)">No orders yet</td></tr>';
 
       // Subscribers
       const subDocs = subs.docs.map(d => d.data()).slice(0,6);
