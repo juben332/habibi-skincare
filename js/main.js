@@ -180,7 +180,7 @@ const _authReady = new Promise(resolve => { _authResolve = resolve; });
 
 async function initAuthState() {
   try {
-    const { auth } = await import('./js/firebase-config.js');
+    const { auth } = await import('./firebase-config.js');
     const { onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
     onAuthStateChanged(auth, user => {
       _currentUser = user || null;
