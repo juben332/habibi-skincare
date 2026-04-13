@@ -871,7 +871,13 @@ function initSearch() {
 
   // Wire up buttons — nav search icons + mobile menu search button
   document.querySelectorAll('[aria-label="Search"]').forEach(btn =>
-    btn.addEventListener('click', openSearch));
+    btn.addEventListener('click', () => {
+      // Close mobile menu first if it's open
+      document.getElementById('mobileMenu')?.classList.remove('open');
+      document.querySelector('.nav__hamburger')?.classList.remove('open');
+      document.body.style.overflow = '';
+      openSearch();
+    }));
   overlay.querySelector('.search-overlay__backdrop').addEventListener('click', closeSearch);
   document.getElementById('searchClose').addEventListener('click', closeSearch);
 
