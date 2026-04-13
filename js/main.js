@@ -18,6 +18,14 @@ function getFirebase() {
   return _fbCache;
 }
 
+// ─── Page Loader ────────────────────────────────────────────
+window.addEventListener('load', () => {
+  const loader = document.getElementById('pageLoader');
+  if (!loader) return;
+  loader.classList.add('loader-hidden');
+  setTimeout(() => loader.remove(), 500);
+});
+
 // ─── Cart ───────────────────────────────────────────────────
 const Cart = {
   items: JSON.parse(localStorage.getItem('habibi_cart') || '[]'),
