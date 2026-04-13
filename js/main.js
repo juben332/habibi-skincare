@@ -173,6 +173,24 @@ function initParallax() {
   }, { passive: true });
 }
 
+// ─── Auth Guard ──────────────────────────────────────────────
+let _currentUser = undefined; // undefined = not yet resolved
+
+async function initAuthState() {
+  try {
+    const { auth } = await import('./firebase-config.js');
+    const { onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    onAuthStateChanged(auth, user => { _currentUser = user || null; });
+  } catch (_) { _currentUser = null; }
+}
+
+function requireAuth(action) {
+  if (_currentUser) return true;
+  showToast(`<i class="fas fa-user-circle"></i> Please sign in to ${action}`);
+  setTimeout(() => { window.location.href = 'account.html'; }, 1400);
+  return false;
+}
+
 // ─── Cart Events ────────────────────────────────────────────
 function initCartEvents() {
   document.querySelector('.cart-overlay')?.addEventListener('click', CartUI.close);
@@ -182,6 +200,7 @@ function initCartEvents() {
   document.addEventListener('click', e => {
     const btn = e.target.closest('[data-add-to-cart]');
     if (!btn) return;
+    if (!requireAuth('add items to cart')) return;
     Cart.add({
       id: btn.dataset.id,
       name: btn.dataset.name,
@@ -234,6 +253,7 @@ function initWishlist() {
   document.addEventListener('click', e => {
     const btn = e.target.closest('.wishlist-btn');
     if (!btn) return;
+    if (!requireAuth('add items to your wishlist')) return;
 
     const card = btn.closest('.product-card');
     const product = {
@@ -694,7 +714,10 @@ function closeCheckoutModal() {
 }
 
 function initCheckout() {
-  document.querySelector('.cart-checkout')?.addEventListener('click', openCheckoutModal);
+  document.querySelector('.cart-checkout')?.addEventListener('click', () => {
+    if (!requireAuth('checkout')) return;
+    openCheckoutModal();
+  });
 }
 
 // ─── Search Overlay ─────────────────────────────────────────
@@ -826,6 +849,7 @@ function initAnchorLinks() {
 
 // ─── Init ────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  initAuthState();
   Cart.updateBadges();
   CartUI.render();
   initNav();
