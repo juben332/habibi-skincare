@@ -86,8 +86,8 @@
       background: #fafafa; outline: none; transition: all 0.2s;
     }
     .a-field input:focus { border-color: var(--gold); background: #fff; box-shadow: 0 0 0 4px rgba(212,104,122,0.08); }
-    .a-field--pw { position: relative; }
-    .a-field--pw input { padding-right: 44px; }
+    .pw-input-wrap { position: relative; }
+    .pw-input-wrap input { padding-right: 44px; }
     .pw-toggle {
       position: absolute; right: 13px; top: 50%; transform: translateY(-50%);
       background: none; border: none; cursor: pointer; color: var(--muted);
@@ -375,10 +375,12 @@
         <div class="or-divider"><span>or</span></div>
         <form id="signinForm">
           <div class="a-field"><label>Email</label><input type="email" id="siEmail" placeholder="you@email.com" required autocomplete="email"></div>
-          <div class="a-field a-field--pw">
+          <div class="a-field">
             <label>Password</label>
-            <input type="password" id="siPassword" placeholder="Your password" required autocomplete="current-password">
-            <button type="button" class="pw-toggle" data-target="siPassword" aria-label="Show password"><i class="far fa-eye"></i></button>
+            <div class="pw-input-wrap">
+              <input type="password" id="siPassword" placeholder="Your password" required autocomplete="current-password">
+              <button type="button" class="pw-toggle" data-target="siPassword" aria-label="Show password"><i class="far fa-eye"></i></button>
+            </div>
           </div>
           <button type="submit" class="a-btn" id="siBtn"><i class="fas fa-sign-in-alt"></i> Sign In</button>
         </form>
@@ -397,10 +399,12 @@
         <form id="signupForm">
           <div class="a-field"><label>Full Name</label><input type="text" id="suName" placeholder="Juan dela Cruz" required autocomplete="name"></div>
           <div class="a-field"><label>Email</label><input type="email" id="suEmail" placeholder="you@email.com" required autocomplete="email"></div>
-          <div class="a-field a-field--pw">
+          <div class="a-field">
             <label>Password</label>
-            <input type="password" id="suPassword" placeholder="At least 6 characters" required autocomplete="new-password" minlength="6">
-            <button type="button" class="pw-toggle" data-target="suPassword" aria-label="Show password"><i class="far fa-eye"></i></button>
+            <div class="pw-input-wrap">
+              <input type="password" id="suPassword" placeholder="At least 6 characters" required autocomplete="new-password" minlength="6">
+              <button type="button" class="pw-toggle" data-target="suPassword" aria-label="Show password"><i class="far fa-eye"></i></button>
+            </div>
           </div>
           <button type="submit" class="a-btn" id="suBtn"><i class="fas fa-user-plus"></i> Create Account</button>
         </form>
