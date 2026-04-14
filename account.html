@@ -289,6 +289,90 @@
     .orders-empty i { font-size: 2.4rem; display: block; margin-bottom: 14px; opacity: 0.25; }
     .orders-empty p { margin-bottom: 16px; font-size: 0.9rem; }
     .orders-loading { text-align: center; padding: 40px; color: var(--muted); font-size: 0.88rem; }
+    .order-card { cursor: pointer; }
+
+    /* ── Order Detail Modal ── */
+    .order-modal-overlay {
+      position: fixed; inset: 0; background: rgba(30,10,14,0.55);
+      backdrop-filter: blur(4px); z-index: 1100;
+      display: flex; align-items: flex-end; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .order-modal-overlay.open { opacity: 1; pointer-events: all; }
+    .order-modal {
+      background: #fff; border-radius: 28px 28px 0 0;
+      width: 100%; max-width: 560px; max-height: 88vh;
+      overflow-y: auto; padding: 0;
+      transform: translateY(40px); transition: transform 0.3s cubic-bezier(0.32,0.72,0,1);
+    }
+    .order-modal-overlay.open .order-modal { transform: translateY(0); }
+    .order-modal__drag { width: 40px; height: 4px; background: var(--border); border-radius: 4px; margin: 14px auto 0; }
+    .order-modal__head {
+      padding: 20px 24px 16px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    .order-modal__id { font-family: var(--serif); font-size: 1.1rem; font-weight: 700; color: var(--brown); }
+    .order-modal__close {
+      margin-left: auto; width: 32px; height: 32px; border-radius: 50%;
+      border: none; background: var(--cream); cursor: pointer; color: var(--muted);
+      display: flex; align-items: center; justify-content: center; font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    .order-modal__close:hover { background: var(--border); color: var(--brown); }
+
+    /* Status timeline */
+    .order-timeline { display: flex; align-items: center; padding: 20px 24px; gap: 0; }
+    .ot-step { display: flex; flex-direction: column; align-items: center; flex: 1; position: relative; }
+    .ot-step:not(:last-child)::after {
+      content: ''; position: absolute; top: 14px; left: 50%; width: 100%;
+      height: 2px; background: var(--border); z-index: 0;
+    }
+    .ot-step.done:not(:last-child)::after { background: var(--gold); }
+    .ot-dot {
+      width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border);
+      background: #fff; display: flex; align-items: center; justify-content: center;
+      font-size: 0.72rem; color: var(--muted); position: relative; z-index: 1;
+      transition: all 0.2s;
+    }
+    .ot-step.done .ot-dot { background: var(--gold); border-color: var(--gold); color: #fff; }
+    .ot-step.current .ot-dot { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 0 4px rgba(212,104,122,0.15); }
+    .ot-label { font-size: 0.62rem; font-weight: 600; color: var(--muted); margin-top: 6px; text-align: center; letter-spacing: 0.04em; text-transform: uppercase; }
+    .ot-step.done .ot-label, .ot-step.current .ot-label { color: var(--brown); }
+
+    /* Items list */
+    .order-modal__items { padding: 8px 24px 4px; }
+    .order-modal__item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px 0; border-bottom: 1px solid var(--cream);
+    }
+    .order-modal__item:last-child { border-bottom: none; }
+    .order-modal__item-img {
+      width: 56px; height: 56px; border-radius: 10px; object-fit: cover;
+      background: var(--beige); flex-shrink: 0; border: 1px solid var(--border);
+    }
+    .order-modal__item-name { font-size: 0.88rem; font-weight: 600; color: var(--brown); margin-bottom: 3px; }
+    .order-modal__item-meta { font-size: 0.76rem; color: var(--muted); }
+    .order-modal__item-price { margin-left: auto; font-size: 0.88rem; font-weight: 700; color: var(--brown); white-space: nowrap; }
+
+    /* Summary */
+    .order-modal__summary {
+      margin: 0 24px; padding: 16px; background: var(--cream);
+      border-radius: 14px; margin-bottom: 16px;
+    }
+    .order-modal__row { display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 8px; }
+    .order-modal__row:last-child { margin-bottom: 0; }
+    .order-modal__row span:first-child { color: var(--muted); }
+    .order-modal__row span:last-child { font-weight: 600; color: var(--brown); }
+    .order-modal__total { font-size: 1rem !important; }
+    .order-modal__total span:last-child { font-family: var(--serif); font-size: 1.1rem; color: var(--brown); }
+
+    .order-modal__footer { padding: 0 24px 32px; }
+
+    @media (min-width: 600px) {
+      .order-modal-overlay { align-items: center; }
+      .order-modal { border-radius: 24px; max-height: 85vh; }
+      .order-modal__drag { display: none; }
+    }
 
     @media (max-width: 600px) {
       .account-wrap { padding: 80px 14px 50px; }
@@ -496,6 +580,29 @@
     </div>
   </div>
 
+  <!-- Order Detail Modal -->
+  <div class="order-modal-overlay" id="orderModal">
+    <div class="order-modal" id="orderModalBox">
+      <div class="order-modal__drag"></div>
+      <div class="order-modal__head">
+        <div>
+          <div class="order-modal__id" id="modalOrderId">#------</div>
+          <div style="font-size:0.76rem;color:var(--muted);margin-top:2px" id="modalOrderDate"></div>
+        </div>
+        <span class="order-status" id="modalOrderStatus"></span>
+        <button class="order-modal__close" id="orderModalClose"><i class="fas fa-times"></i></button>
+      </div>
+      <!-- Status timeline -->
+      <div class="order-timeline" id="orderTimeline"></div>
+      <!-- Items -->
+      <div class="order-modal__items" id="modalOrderItems"></div>
+      <!-- Summary -->
+      <div class="order-modal__summary" id="modalOrderSummary"></div>
+      <!-- Footer info -->
+      <div class="order-modal__footer" id="modalOrderFooter"></div>
+    </div>
+  </div>
+
   <!-- Cart Sidebar -->
   <div class="cart-overlay"></div>
   <div class="cart-sidebar">
@@ -674,7 +781,7 @@
           const itemsSummary = (o.items || []).map(i => `${i.name} ×${i.qty}`).join(' · ') || 'No items';
           const st = o.status || 'pending';
           return `
-            <div class="order-card status-${st}">
+            <div class="order-card status-${st}" data-order-id="${o.id}">
               <div class="order-card-head">
                 <span class="order-id">#${o.id.slice(-6).toUpperCase()}</span>
                 <span class="order-status status-${st}">${st.charAt(0).toUpperCase()+st.slice(1)}</span>
@@ -684,6 +791,9 @@
               <div class="order-footer">
                 <span class="order-total">₱${(o.total || 0).toLocaleString()}</span>
                 <span class="order-pay">${o.paymentMethod || 'COD'}</span>
+              </div>
+              <div style="font-size:0.72rem;color:var(--muted);text-align:right;margin-top:-4px">
+                <i class="fas fa-chevron-right" style="font-size:0.65rem;margin-right:3px"></i>View details
               </div>
             </div>`;
         }
@@ -703,8 +813,103 @@
             btn.innerHTML = expanded
               ? '<i class="fas fa-chevron-up"></i> Show Less'
               : '<i class="fas fa-chevron-down"></i> Show More Orders';
+            attachCardClicks();
           });
         }
+
+        // ── Order detail modal ──
+        const modal    = document.getElementById('orderModal');
+        const modalBox = document.getElementById('orderModalBox');
+
+        function openOrderModal(o) {
+          const st   = o.status || 'pending';
+          const date = o.createdAt?.toDate ? o.createdAt.toDate().toLocaleDateString('en-PH', { month:'long', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—';
+
+          document.getElementById('modalOrderId').textContent   = '#' + o.id.slice(-6).toUpperCase();
+          document.getElementById('modalOrderDate').textContent = date;
+          const statusEl = document.getElementById('modalOrderStatus');
+          statusEl.textContent  = st.charAt(0).toUpperCase() + st.slice(1);
+          statusEl.className    = `order-status status-${st}`;
+
+          // Timeline
+          const steps = ['pending','processing','shipped','delivered'];
+          const cancelledIdx = st === 'cancelled' ? 0 : -1;
+          const currentIdx   = steps.indexOf(st);
+          document.getElementById('orderTimeline').innerHTML = (st === 'cancelled'
+            ? [{ key:'cancelled', label:'Cancelled', icon:'fa-times' }]
+            : steps.map((s,i) => ({
+                key: s, label: s.charAt(0).toUpperCase()+s.slice(1),
+                icon: s==='pending'?'fa-clock':s==='processing'?'fa-box':s==='shipped'?'fa-truck':'fa-check',
+                done: i < currentIdx, current: i === currentIdx
+              }))
+          ).map(step => `
+            <div class="ot-step ${step.done?'done':''} ${step.current?'current':''}">
+              <div class="ot-dot"><i class="fas ${step.icon}"></i></div>
+              <div class="ot-label">${step.label}</div>
+            </div>`).join('');
+
+          // Items
+          const items = o.items || [];
+          document.getElementById('modalOrderItems').innerHTML = items.length
+            ? items.map(item => `
+                <div class="order-modal__item">
+                  ${item.image
+                    ? `<img src="${item.image}" class="order-modal__item-img" alt="${item.name}" onerror="this.style.display='none'">`
+                    : `<div class="order-modal__item-img" style="display:flex;align-items:center;justify-content:center;color:var(--border)"><i class="fas fa-box"></i></div>`}
+                  <div style="flex:1;min-width:0">
+                    <div class="order-modal__item-name">${item.name}</div>
+                    <div class="order-modal__item-meta">${item.size || ''} &nbsp;·&nbsp; Qty: ${item.qty}</div>
+                  </div>
+                  <div class="order-modal__item-price">₱${((item.price||0) * (item.qty||1)).toLocaleString()}</div>
+                </div>`).join('')
+            : '<div style="padding:20px 0;color:var(--muted);font-size:0.85rem;text-align:center">No item details available.</div>';
+
+          // Summary
+          const subtotal = items.reduce((s,i) => s + (i.price||0)*(i.qty||1), 0);
+          document.getElementById('modalOrderSummary').innerHTML = `
+            <div class="order-modal__row"><span>Subtotal</span><span>₱${subtotal.toLocaleString()}</span></div>
+            <div class="order-modal__row"><span>Shipping</span><span>${o.shipping ? '₱'+o.shipping.toLocaleString() : 'Free'}</span></div>
+            <div class="order-modal__row order-modal__total" style="border-top:1px solid var(--border);padding-top:10px;margin-top:4px">
+              <span style="font-weight:700;color:var(--brown)">Total</span>
+              <span>₱${(o.total||0).toLocaleString()}</span>
+            </div>`;
+
+          // Footer
+          const addr = o.address;
+          document.getElementById('modalOrderFooter').innerHTML = `
+            ${addr ? `<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:14px">
+              <i class="fas fa-map-marker-alt" style="color:var(--gold);margin-top:3px;flex-shrink:0"></i>
+              <div style="font-size:0.82rem;color:var(--charcoal);line-height:1.6">
+                ${[addr.name,addr.street,addr.city,addr.province,addr.zip].filter(Boolean).join(', ')}
+              </div>
+            </div>` : ''}
+            <div style="display:flex;gap:10px;align-items:center">
+              <i class="fas fa-credit-card" style="color:var(--gold)"></i>
+              <span style="font-size:0.82rem;color:var(--charcoal)">${o.paymentMethod || 'Cash on Delivery'}</span>
+            </div>`;
+
+          modal.classList.add('open');
+          document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+          modal.classList.remove('open');
+          document.body.style.overflow = '';
+        }
+
+        document.getElementById('orderModalClose').addEventListener('click', closeModal);
+        modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+        function attachCardClicks() {
+          document.querySelectorAll('.order-card[data-order-id]').forEach(card => {
+            card.addEventListener('click', () => {
+              const o = orders.find(x => x.id === card.dataset.orderId);
+              if (o) openOrderModal(o);
+            });
+          });
+        }
+        attachCardClicks();
       } catch(e) {
         container.innerHTML = '<div class="orders-empty"><i class="fas fa-exclamation-circle"></i><p>Could not load orders.</p></div>';
       }
