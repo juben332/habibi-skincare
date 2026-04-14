@@ -193,10 +193,30 @@
 
     renderWishlist();
 
-    // Only re-render when an item is added back; removals just toggle the icon (card stays visible)
+    // Handle wishlist changes without full re-render
     window.addEventListener('wishlistUpdated', e => {
-      const { added } = e.detail || {};
-      if (added) renderWishlist();
+      const { added, id } = e.detail || {};
+      if (added) {
+        // Item was re-added — full re-render to show the new card
+        renderWishlist();
+      } else if (id) {
+        // Item was removed — pull just that card out of the DOM
+        const card = document.querySelector(`#wishlistGrid [data-id="${id}"]`);
+        if (card) {
+          card.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+          card.style.opacity = '0';
+          card.style.transform = 'scale(0.88)';
+          setTimeout(() => {
+            card.remove();
+            // Show empty state if no cards remain
+            const remaining = document.querySelectorAll('#wishlistGrid .product-card');
+            if (!remaining.length) {
+              document.getElementById('wishlistGrid').innerHTML = '';
+              document.getElementById('wishlistEmpty').style.display = 'block';
+            }
+          }, 260);
+        }
+      }
     });
   </script>
   <script type="module">
