@@ -86,6 +86,14 @@
       background: #fafafa; outline: none; transition: all 0.2s;
     }
     .a-field input:focus { border-color: var(--gold); background: #fff; box-shadow: 0 0 0 4px rgba(212,104,122,0.08); }
+    .a-field--pw { position: relative; }
+    .a-field--pw input { padding-right: 44px; }
+    .pw-toggle {
+      position: absolute; right: 13px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer; color: var(--muted);
+      font-size: 0.9rem; padding: 4px; line-height: 1; transition: color 0.2s;
+    }
+    .pw-toggle:hover { color: var(--brown); }
 
     .a-btn {
       width: 100%; padding: 13px; background: var(--gold); color: #fff;
@@ -367,7 +375,11 @@
         <div class="or-divider"><span>or</span></div>
         <form id="signinForm">
           <div class="a-field"><label>Email</label><input type="email" id="siEmail" placeholder="you@email.com" required autocomplete="email"></div>
-          <div class="a-field"><label>Password</label><input type="password" id="siPassword" placeholder="Your password" required autocomplete="current-password"></div>
+          <div class="a-field a-field--pw">
+            <label>Password</label>
+            <input type="password" id="siPassword" placeholder="Your password" required autocomplete="current-password">
+            <button type="button" class="pw-toggle" data-target="siPassword" aria-label="Show password"><i class="far fa-eye"></i></button>
+          </div>
           <button type="submit" class="a-btn" id="siBtn"><i class="fas fa-sign-in-alt"></i> Sign In</button>
         </form>
         <p style="text-align:center;margin-top:14px;font-size:0.82rem;color:var(--muted)">
@@ -385,7 +397,11 @@
         <form id="signupForm">
           <div class="a-field"><label>Full Name</label><input type="text" id="suName" placeholder="Juan dela Cruz" required autocomplete="name"></div>
           <div class="a-field"><label>Email</label><input type="email" id="suEmail" placeholder="you@email.com" required autocomplete="email"></div>
-          <div class="a-field"><label>Password</label><input type="password" id="suPassword" placeholder="At least 6 characters" required autocomplete="new-password" minlength="6"></div>
+          <div class="a-field a-field--pw">
+            <label>Password</label>
+            <input type="password" id="suPassword" placeholder="At least 6 characters" required autocomplete="new-password" minlength="6">
+            <button type="button" class="pw-toggle" data-target="suPassword" aria-label="Show password"><i class="far fa-eye"></i></button>
+          </div>
           <button type="submit" class="a-btn" id="suBtn"><i class="fas fa-user-plus"></i> Create Account</button>
         </form>
         <p style="text-align:center;margin-top:14px;font-size:0.82rem;color:var(--muted)">
@@ -509,6 +525,21 @@
       document.getElementById('authError').classList.add('show');
     }
     function hideError() { document.getElementById('authError').classList.remove('show'); }
+
+    // Password show/hide toggles
+    document.querySelectorAll('.pw-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const input = document.getElementById(btn.dataset.target);
+        const icon  = btn.querySelector('i');
+        if (input.type === 'password') {
+          input.type = 'text';
+          icon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+          input.type = 'password';
+          icon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+      });
+    });
 
     // Tab switching
     document.querySelectorAll('.auth-tab').forEach(tab => {
