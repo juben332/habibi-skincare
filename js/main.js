@@ -390,7 +390,7 @@ function initWishlist() {
       icon.classList.toggle('far', !added);
     }
     Wishlist.updateBadges();
-    window.dispatchEvent(new CustomEvent('wishlistUpdated', { detail: { added } }));
+    window.dispatchEvent(new CustomEvent('wishlistUpdated', { detail: { added, id: product.id } }));
     showToast(added
       ? '<i class="fas fa-heart"></i> Added to wishlist'
       : '<i class="far fa-heart"></i> Removed from wishlist');
