@@ -124,9 +124,15 @@
       margin-bottom: 20px;
     }
     .account-profile__banner {
-      height: 90px;
+      height: 100px;
       background: linear-gradient(120deg, var(--brown) 0%, #c0525e 50%, var(--gold) 100%);
       position: relative;
+      overflow: hidden;
+    }
+    .account-profile__banner-pattern {
+      position: absolute; inset: 0;
+      background-image: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.07) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.05) 0%, transparent 40%);
     }
     .account-profile__body {
       padding: 0 28px 24px;
@@ -164,23 +170,52 @@
       display: flex; align-items: center; gap: 6px;
     }
     .btn-ghost:hover { border-color: var(--gold); color: var(--gold); background: var(--cream); }
+    .btn-ghost--danger:hover { border-color: #c53030; color: #c53030; background: #fff5f5; }
+
+    .member-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 0.74rem; font-weight: 700;
+      background: linear-gradient(120deg, var(--gold-light), var(--beige));
+      color: var(--gold); padding: 3px 10px; border-radius: 100px;
+      border: 1px solid var(--beige);
+    }
 
     /* Stats row */
     .account-stats {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 14px;
       margin-bottom: 20px;
     }
     .account-stat {
       background: #fff;
       border-radius: 16px;
-      padding: 18px 20px;
+      padding: 16px 18px;
       box-shadow: 0 2px 12px rgba(61,26,34,0.06);
       border: 1px solid rgba(212,104,122,0.08);
+      display: flex; align-items: center; gap: 14px;
     }
-    .account-stat__label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 6px; }
-    .account-stat__value { font-family: var(--serif); font-size: 1.5rem; color: var(--brown); }
+    .account-stat__icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.95rem; flex-shrink: 0;
+    }
+    .account-stat__label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 3px; }
+    .account-stat__value { font-family: var(--serif); font-size: 1.2rem; color: var(--brown); line-height: 1; }
+
+    /* Shop CTA */
+    .shop-cta-card {
+      background: linear-gradient(120deg, var(--brown) 0%, #c0525e 100%);
+      border-radius: 20px;
+      padding: 24px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .shop-cta-card__text { color: #fff; }
 
     /* Orders panel */
     .orders-panel {
@@ -248,15 +283,22 @@
     .orders-loading { text-align: center; padding: 40px; color: var(--muted); font-size: 0.88rem; }
 
     @media (max-width: 600px) {
-      .account-wrap { padding: 90px 14px 50px; }
-      .auth-card { padding: 32px 22px; }
-      .account-profile__body { padding: 0 18px 20px; gap: 14px; }
-      .account-profile__banner { height: 70px; }
-      .account-profile-actions { flex-direction: column; width: 100%; }
-      .account-profile-actions .btn-ghost { justify-content: center; }
+      .account-wrap { padding: 80px 14px 50px; }
+      .auth-card { padding: 28px 20px; }
+      .account-profile__body { padding: 0 16px 20px; gap: 12px; }
+      .account-profile__banner { height: 75px; }
+      .account-profile-actions { flex-direction: row; flex-wrap: wrap; width: 100%; }
+      .account-profile-actions .btn-ghost { flex: 1; justify-content: center; font-size: 0.78rem; padding: 8px 10px; }
       .orders-panel { padding: 20px 16px; }
-      .order-card { padding: 14px 16px; }
-      .order-date { margin-left: 0; width: 100%; }
+      .order-card { padding: 12px 14px; }
+      .order-date { font-size: 0.72rem; }
+      .account-stats { grid-template-columns: 1fr; gap: 10px; }
+      .shop-cta-card { padding: 20px; }
+      .shop-cta-card .btn { width: 100%; justify-content: center; }
+    }
+    @media (max-width: 400px) {
+      .auth-card { padding: 24px 16px; }
+      .account-wrap { padding: 76px 10px 40px; }
     }
   </style>
 </head>
@@ -360,57 +402,75 @@
 
       <!-- Profile card -->
       <div class="account-profile">
-        <div class="account-profile__banner"></div>
+        <div class="account-profile__banner">
+          <div class="account-profile__banner-pattern"></div>
+        </div>
         <div class="account-profile__body">
           <div class="account-avatar-wrap" id="avatarWrap"></div>
           <div class="account-profile-info">
             <h3 id="acName">Loading...</h3>
             <p id="acEmail"></p>
+            <p id="acMemberBadge" style="display:none;margin-top:6px">
+              <span class="member-badge"><i class="fas fa-star"></i> <span id="statMemberSince"></span></span>
+            </p>
           </div>
           <div class="account-profile-actions">
             <a href="shop.html" class="btn-ghost"><i class="fas fa-shopping-bag"></i> Shop</a>
-            <button class="btn-ghost" id="signOutBtn"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+            <button class="btn-ghost btn-ghost--danger" id="signOutBtn"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
           </div>
         </div>
       </div>
 
-      <!-- Stats -->
+      <!-- Stats row -->
       <div class="account-stats">
         <div class="account-stat">
-          <div class="account-stat__label">Total Orders</div>
-          <div class="account-stat__value" id="statOrderCount">—</div>
+          <div class="account-stat__icon" style="background:rgba(212,104,122,0.12);color:var(--gold)"><i class="fas fa-box"></i></div>
+          <div>
+            <div class="account-stat__label">Total Orders</div>
+            <div class="account-stat__value" id="statOrderCount">—</div>
+          </div>
         </div>
         <div class="account-stat">
-          <div class="account-stat__label">Total Spent</div>
-          <div class="account-stat__value" id="statTotalSpent">—</div>
+          <div class="account-stat__icon" style="background:rgba(46,125,50,0.1);color:#2e7d32"><i class="fas fa-peso-sign"></i></div>
+          <div>
+            <div class="account-stat__label">Total Spent</div>
+            <div class="account-stat__value" id="statTotalSpent">—</div>
+          </div>
         </div>
         <div class="account-stat">
-          <div class="account-stat__label">Member Since</div>
-          <div class="account-stat__value" id="statMemberSince">—</div>
+          <div class="account-stat__icon" style="background:rgba(2,119,189,0.1);color:#0277BD"><i class="fas fa-clock-rotate-left"></i></div>
+          <div>
+            <div class="account-stat__label">Last Order</div>
+            <div class="account-stat__value" id="statLastOrder">—</div>
+          </div>
         </div>
       </div>
 
       <!-- Orders -->
       <div class="orders-panel">
         <div class="orders-panel__head">
-          <h3><i class="fas fa-box" style="color:var(--gold);margin-right:8px;font-size:0.95rem"></i>My Orders</h3>
+          <h3><i class="fas fa-receipt" style="color:var(--gold);margin-right:8px;font-size:0.95rem"></i>My Orders</h3>
+          <span id="orderCountBadge" style="font-size:0.78rem;color:var(--muted)"></span>
         </div>
         <div id="ordersContainer">
           <div class="orders-loading"><i class="fas fa-spinner fa-spin"></i> Loading your orders...</div>
         </div>
+        <div id="showMoreWrap" style="display:none;text-align:center;margin-top:16px">
+          <button id="showMoreBtn" class="btn-ghost" style="padding:10px 28px;font-size:0.84rem">
+            <i class="fas fa-chevron-down"></i> Show More Orders
+          </button>
+        </div>
       </div>
 
-      <!-- Products -->
-      <div class="orders-panel">
-        <div class="orders-panel__head">
-          <h3><i class="fas fa-sparkles" style="color:var(--gold);margin-right:8px;font-size:0.95rem"></i>Our Products</h3>
-          <a href="shop.html" class="btn-ghost" style="font-size:0.8rem"><i class="fas fa-arrow-right"></i> View All</a>
+      <!-- Shop CTA -->
+      <div class="shop-cta-card">
+        <div class="shop-cta-card__text">
+          <div style="font-family:var(--serif);font-size:1.1rem;color:var(--brown);margin-bottom:4px">Discover our skincare collection</div>
+          <div style="font-size:0.84rem;color:var(--muted)">Natural ingredients crafted for radiant skin</div>
         </div>
-        <div id="acProductsGrid" class="grid-3" style="row-gap:28px;">
-          <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">
-            <i class="fas fa-spinner fa-spin" style="font-size:1.4rem;display:block;margin-bottom:10px"></i>Loading products...
-          </div>
-        </div>
+        <a href="shop.html" class="btn btn-primary" style="white-space:nowrap;padding:11px 24px;font-size:0.88rem">
+          <i class="fas fa-arrow-right"></i> Shop Now
+        </a>
       </div>
 
     </div>
@@ -419,14 +479,14 @@
   <!-- Cart Sidebar -->
   <div class="cart-overlay"></div>
   <div class="cart-sidebar">
-    <div class="cart-sidebar__header">
+    <div class="cart-sidebar__head">
       <h3>Your Cart</h3>
       <button class="cart-close"><i class="fas fa-times"></i></button>
     </div>
     <div class="cart-sidebar__items"></div>
-    <div class="cart-sidebar__footer">
+    <div class="cart-sidebar__foot">
       <div class="cart-subtotal"><span>Subtotal</span><strong>₱0</strong></div>
-      <button class="cart-checkout btn btn-primary" style="width:100%">Checkout</button>
+      <button class="cart-checkout">Checkout</button>
     </div>
   </div>
 
@@ -527,111 +587,89 @@
           ? `<img src="${user.photoURL}" class="account-avatar" alt="Avatar">`
           : `<div class="account-avatar-placeholder"><i class="fas fa-user"></i></div>`;
 
-        // Member since
+        // Member since badge
         const created = user.metadata?.creationTime;
         if (created) {
           const d = new Date(created);
           document.getElementById('statMemberSince').textContent =
-            d.toLocaleDateString('en-PH', { month: 'short', year: 'numeric' });
+            'Member since ' + d.toLocaleDateString('en-PH', { month: 'short', year: 'numeric' });
+          document.getElementById('acMemberBadge').style.display = 'block';
         }
 
         // Load orders
         await loadOrders(user);
-        await loadProducts();
       } else {
         authSection.style.display = 'block';
         accountSection.style.display = 'none';
       }
     });
 
+    const ORDERS_LIMIT = 5;
+
     async function loadOrders(user) {
       const container = document.getElementById('ordersContainer');
       try {
-        const q = query(
-          collection(db, 'orders'),
-          where('userId', '==', user.uid)
-        );
+        const q = query(collection(db, 'orders'), where('userId', '==', user.uid));
         const snap = await getDocs(q);
+        const orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
         // Stats
-        const orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        document.getElementById('statOrderCount').textContent = orders.length;
+        document.getElementById('statOrderCount').textContent = orders.length || '0';
         const spent = orders.reduce((s, o) => s + (o.total || 0), 0);
-        document.getElementById('statTotalSpent').textContent = spent ? `₱${spent.toLocaleString()}` : '₱0';
+        document.getElementById('statTotalSpent').textContent = `₱${spent.toLocaleString()}`;
+        orders.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+        const lastOrder = orders[0];
+        if (lastOrder?.createdAt?.toDate) {
+          document.getElementById('statLastOrder').textContent =
+            lastOrder.createdAt.toDate().toLocaleDateString('en-PH', { month:'short', day:'numeric', year:'numeric' });
+        }
 
-        if (snap.empty) {
+        if (!orders.length) {
           container.innerHTML = `<div class="orders-empty">
             <i class="fas fa-box-open"></i>
-            <p>No orders yet.</p>
-            <a href="shop.html" class="btn btn-primary" style="display:inline-flex;margin-top:4px;padding:10px 24px;font-size:0.88rem">Start Shopping</a>
+            <p>No orders yet. Start shopping!</p>
           </div>`;
           return;
         }
 
-        // Sort newest first
-        orders.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+        document.getElementById('orderCountBadge').textContent = `${orders.length} order${orders.length !== 1 ? 's' : ''}`;
 
-        container.innerHTML = orders.map(o => {
-          const date = o.createdAt?.toDate ? o.createdAt.toDate().toLocaleDateString('en-PH', { year:'numeric', month:'short', day:'numeric' }) : '—';
-          const itemsSummary = (o.items || []).map(i => `${i.name} ×${i.qty}`).join(' · ');
+        function renderOrderCard(o) {
+          const date = o.createdAt?.toDate ? o.createdAt.toDate().toLocaleDateString('en-PH', { month:'short', day:'numeric', year:'numeric' }) : '—';
+          const itemsSummary = (o.items || []).map(i => `${i.name} ×${i.qty}`).join(' · ') || 'No items';
           const st = o.status || 'pending';
           return `
             <div class="order-card status-${st}">
               <div class="order-card-head">
                 <span class="order-id">#${o.id.slice(-6).toUpperCase()}</span>
                 <span class="order-status status-${st}">${st.charAt(0).toUpperCase()+st.slice(1)}</span>
-                <span class="order-date"><i class="fas fa-calendar-alt" style="margin-right:4px;opacity:0.5"></i>${date}</span>
+                <span class="order-date">${date}</span>
               </div>
-              <div class="order-items">${itemsSummary || 'No items'}</div>
+              <div class="order-items">${itemsSummary}</div>
               <div class="order-footer">
                 <span class="order-total">₱${(o.total || 0).toLocaleString()}</span>
                 <span class="order-pay">${o.paymentMethod || 'COD'}</span>
               </div>
             </div>`;
-        }).join('');
+        }
+
+        // Show first 5
+        container.innerHTML = orders.slice(0, ORDERS_LIMIT).map(renderOrderCard).join('');
+
+        // Show More button
+        if (orders.length > ORDERS_LIMIT) {
+          const wrap = document.getElementById('showMoreWrap');
+          const btn  = document.getElementById('showMoreBtn');
+          wrap.style.display = 'block';
+          let showing = ORDERS_LIMIT;
+          btn.addEventListener('click', () => {
+            showing = Math.min(showing + ORDERS_LIMIT, orders.length);
+            container.innerHTML = orders.slice(0, showing).map(renderOrderCard).join('');
+            if (showing >= orders.length) wrap.style.display = 'none';
+          });
+        }
       } catch(e) {
         container.innerHTML = '<div class="orders-empty"><i class="fas fa-exclamation-circle"></i><p>Could not load orders.</p></div>';
-      }
-    }
-
-    async function loadProducts() {
-      const grid = document.getElementById('acProductsGrid');
-      try {
-        const snap = await getDocs(collection(db, 'products'));
-        const products = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(p => p.inStock !== false);
-        if (!products.length) {
-          grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">No products available yet.</div>';
-          return;
-        }
-        function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
-        function badge(b) { return b === 'best' ? 'Bestseller' : b === 'new' ? 'New' : b === 'sale' ? 'Sale' : cap(b); }
-        const delays = ['', 'd1', 'd2'];
-        grid.innerHTML = products.map((p, i) => `
-          <div class="product-card anim ${delays[i % 3]}" data-category="${p.category||''}" data-price="${p.price||0}">
-            ${p.badge ? `<div class="product-card__badge badge-${p.badge}">${badge(p.badge)}</div>` : ''}
-            <div class="product-card__img-wrap">
-              ${p.image
-                ? `<img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.parentElement.style.background='linear-gradient(145deg,var(--beige),var(--sand))'">`
-                : `<div style="height:100%;background:linear-gradient(145deg,var(--beige),var(--sand))"></div>`}
-              <div class="product-card__overlay">
-                <button class="quick-add" data-add-to-cart
-                  data-id="${p.id}" data-name="${p.name}"
-                  data-price="${p.price||0}" data-size="${p.size||'30ml'}"
-                  data-image="${p.image||''}">Add to Cart</button>
-              </div>
-            </div>
-            <div class="product-card__body">
-              <span class="product-card__cat">${cap(p.category||'')}</span>
-              <h3 class="product-card__name"><a href="shop.html">${p.name}</a></h3>
-              <p class="product-card__benefit">${p.benefit||''}</p>
-              <div class="product-card__foot">
-                <span class="product-card__price">₱${(p.price||0).toLocaleString()}</span>
-                <button class="wishlist-btn"><i class="far fa-heart"></i></button>
-              </div>
-            </div>
-          </div>`).join('');
-      } catch(e) {
-        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">Could not load products.</div>';
       }
     }
   </script>
