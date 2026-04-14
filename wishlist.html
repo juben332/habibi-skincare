@@ -193,20 +193,10 @@
 
     renderWishlist();
 
-    // Re-render whenever wishlist changes; animate card out if removing
+    // Only re-render when an item is added back; removals just toggle the icon (card stays visible)
     window.addEventListener('wishlistUpdated', e => {
-      const { added, id } = e.detail || {};
-      if (!added && id) {
-        const card = document.querySelector(`#wishlistGrid [data-id="${id}"]`);
-        if (card) {
-          card.style.transition = 'opacity 0.28s ease, transform 0.28s ease';
-          card.style.opacity = '0';
-          card.style.transform = 'scale(0.88)';
-          setTimeout(renderWishlist, 290);
-          return;
-        }
-      }
-      renderWishlist();
+      const { added } = e.detail || {};
+      if (added) renderWishlist();
     });
   </script>
   <script type="module">
