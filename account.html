@@ -260,11 +260,11 @@
       padding: 4px 12px; border-radius: 100px; font-size: 0.7rem; font-weight: 700;
       letter-spacing: 0.06em; text-transform: uppercase;
     }
-    .status-pending    { background: #fff3e0; color: #e65100; }
-    .status-processing { background: #e3f2fd; color: #1565c0; }
-    .status-shipped    { background: #f3e5f5; color: #6a1b9a; }
-    .status-delivered  { background: #e8f5e9; color: #2e7d32; }
-    .status-cancelled  { background: #ffebee; color: #c62828; }
+    .status-pending    { background: rgba(230,81,0,0.10);  color: #b84900; }
+    .status-processing { background: rgba(21,101,192,0.10); color: #0d5aa7; }
+    .status-shipped    { background: rgba(106,27,154,0.10); color: #5a1585; }
+    .status-delivered  { background: rgba(46,125,50,0.10);  color: #1e6b22; }
+    .status-cancelled  { background: rgba(198,40,40,0.10);  color: #a32020; }
 
     .order-card.status-pending::before    { background: #e65100; }
     .order-card.status-processing::before { background: #1565c0; }
@@ -656,16 +656,18 @@
         // Show first 5
         container.innerHTML = orders.slice(0, ORDERS_LIMIT).map(renderOrderCard).join('');
 
-        // Show More button
+        // Show More / Show Less toggle
         if (orders.length > ORDERS_LIMIT) {
           const wrap = document.getElementById('showMoreWrap');
           const btn  = document.getElementById('showMoreBtn');
           wrap.style.display = 'block';
-          let showing = ORDERS_LIMIT;
+          let expanded = false;
           btn.addEventListener('click', () => {
-            showing = Math.min(showing + ORDERS_LIMIT, orders.length);
-            container.innerHTML = orders.slice(0, showing).map(renderOrderCard).join('');
-            if (showing >= orders.length) wrap.style.display = 'none';
+            expanded = !expanded;
+            container.innerHTML = orders.slice(0, expanded ? orders.length : ORDERS_LIMIT).map(renderOrderCard).join('');
+            btn.innerHTML = expanded
+              ? '<i class="fas fa-chevron-up"></i> Show Less'
+              : '<i class="fas fa-chevron-down"></i> Show More Orders';
           });
         }
       } catch(e) {
