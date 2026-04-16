@@ -69,7 +69,7 @@ const Cart = {
     }
   },
 
-  get count() { return this.items.reduce((s, i) => s + i.qty, 0); },
+  get count() { return this.items.length; },
   get subtotal() { return this.items.reduce((s, i) => s + i.price * i.qty, 0); },
 
   updateBadges() {
@@ -306,7 +306,6 @@ function initCartEvents() {
   document.addEventListener('click', async e => {
     const btn = e.target.closest('[data-add-to-cart]');
     if (!btn) return;
-    if (!await requireAuth('cart')) return;
     Cart.add({
       id: btn.dataset.id,
       name: btn.dataset.name,
@@ -742,7 +741,7 @@ function createCheckoutModal() {
     Cart.save();
     closeCheckoutModal();
     CartUI.close();
-    showToast('<i class="fas fa-check-circle"></i> Order placed! We\'ll contact you soon.');
+    showToast('<i class="fas fa-party-horn"></i> 🎉 Order placed! Thank you — we\'ll be in touch shortly.');
   });
 }
 

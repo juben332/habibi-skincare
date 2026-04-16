@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us — Habibi Skincare</title>
+  <meta name="description" content="Get in touch with Habibi Skincare. We're here to help with orders, skincare advice, and anything else.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .contact-wrap { display: grid; grid-template-columns: 1fr 1.4fr; gap: 56px; align-items: start; }
+    .contact-info-card { background: var(--white); border-radius: var(--r-lg); padding: 40px; box-shadow: var(--sh-sm); border: 1px solid var(--border); }
+    .contact-info-item { display: flex; align-items: flex-start; gap: 16px; padding: 20px 0; border-bottom: 1px solid var(--cream); }
+    .contact-info-item:last-child { border-bottom: none; }
+    .contact-info-icon { width: 44px; height: 44px; background: var(--gold-light); border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 1.1rem; flex-shrink: 0; }
+    .contact-info-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 4px; }
+    .contact-info-value { font-size: 0.9rem; color: var(--brown); font-weight: 500; line-height: 1.5; }
+    .contact-form-card { background: var(--white); border-radius: var(--r-lg); padding: 48px; box-shadow: var(--sh-sm); border: 1px solid var(--border); }
+    .cf-field { margin-bottom: 20px; }
+    .cf-field label { display: block; font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brown); margin-bottom: 8px; }
+    .cf-field input, .cf-field textarea, .cf-field select {
+      width: 100%; padding: 13px 16px; border: 1.5px solid var(--border); border-radius: 12px;
+      font-size: 0.88rem; color: var(--brown); font-family: var(--sans);
+      background: #fafafa; outline: none; transition: all 0.2s; resize: vertical;
+    }
+    .cf-field input:focus, .cf-field textarea:focus, .cf-field select:focus { border-color: var(--gold); background: #fff; box-shadow: 0 0 0 4px rgba(212,104,122,0.08); }
+    .cf-field textarea { min-height: 130px; }
+    .cf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .cf-submit { width: 100%; padding: 15px; background: var(--gold); color: #fff; border: none; border-radius: 12px; font-size: 0.9rem; font-weight: 700; cursor: pointer; font-family: var(--sans); transition: all 0.2s; }
+    .cf-submit:hover { background: var(--brown); transform: translateY(-1px); }
+    .cf-success { display: none; text-align: center; padding: 32px; }
+    .cf-success i { font-size: 2.5rem; color: #2e7d32; display: block; margin-bottom: 12px; }
+    @media (max-width: 768px) {
+      .contact-wrap { grid-template-columns: 1fr; gap: 28px; }
+      .contact-form-card { padding: 28px 20px; }
+      .contact-info-card { padding: 28px 20px; }
+      .cf-row { grid-template-columns: 1fr; gap: 0; }
+    }
+  </style>
+</head>
+<body>
+<div id="pageLoader">
+  <img src="images/logo.png" alt="Habibi Skincare" class="loader-logo">
+  <div class="loader-dots"><span></span><span></span><span></span></div>
+</div>
+
+  <nav class="nav nav--scrolled" id="nav">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__logo"><img src="images/logo.png" alt="Habibi Skincare Logo" class="nav__logo-img">Habibi<span>.</span></a>
+      <ul class="nav__links">
+        <li><a href="shop.html" class="nav__link">Shop</a></li>
+        <li><a href="about.html" class="nav__link">Our Story</a></li>
+        <li><a href="routine.html" class="nav__link">Routine</a></li>
+        <li><a href="contact.html" class="nav__link" style="color:var(--gold)">Contact</a></li>
+      </ul>
+      <div class="nav__actions">
+        <button class="nav__icon nav__search-btn" aria-label="Search"><i class="fas fa-search"></i></button>
+        <a href="wishlist.html" class="nav__icon" aria-label="Wishlist" style="position:relative;text-decoration:none">
+          <i class="far fa-heart"></i>
+          <span class="wishlist-count"></span>
+        </a>
+        <button class="nav__icon" data-cart-open aria-label="Cart">
+          <i class="fas fa-shopping-bag"></i>
+          <span class="cart-count"></span>
+        </button>
+        <a href="account.html" class="nav__login-btn" id="navLoginBtn">
+          <span id="navLoginLabel"><i class="fas fa-user-circle"></i> Sign In</span>
+        </a>
+        <button class="nav__hamburger" aria-label="Menu" id="burger"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="nav__mobile" id="mobileMenu">
+    <button aria-label="Search" class="nav__mobile-search"><i class="fas fa-search"></i> Search Products</button>
+    <a href="shop.html" class="nav__link">Shop</a>
+    <a href="about.html" class="nav__link">Our Story</a>
+    <a href="routine.html" class="nav__link">Routine</a>
+    <a href="contact.html" class="nav__link">Contact</a>
+    <a href="account.html" class="nav__mobile-account" id="mobileAccountLink">
+      <span class="nav__mobile-account__avatar" id="mobileAccountAvatar"><i class="fas fa-user"></i></span>
+      <span id="mobileAccountLabel">My Account</span>
+    </a>
+  </div>
+
+  <!-- Hero -->
+  <div class="shop-hero">
+    <div class="container">
+      <span class="eyebrow" style="justify-content:center"><i class="fas fa-envelope-open-text" style="color:var(--gold);margin-right:6px"></i> Get in Touch</span>
+      <h1>Contact Us</h1>
+      <p style="color:var(--muted);font-size:1.05rem;max-width:480px;margin:0 auto">Questions about your order, skincare advice, or just want to say hi — we're here for you.</p>
+    </div>
+  </div>
+
+  <!-- Contact Section -->
+  <section class="section" style="background:var(--cream)">
+    <div class="container">
+      <div class="contact-wrap">
+
+        <!-- Info -->
+        <div>
+          <div class="contact-info-card">
+            <h3 style="font-family:var(--serif);color:var(--brown);margin-bottom:4px">Our Details</h3>
+            <p style="font-size:0.84rem;color:var(--muted);margin-bottom:8px">Reach us through any of the channels below.</p>
+            <div class="contact-info-item">
+              <div class="contact-info-icon"><i class="fas fa-map-marker-alt"></i></div>
+              <div>
+                <div class="contact-info-label">Address</div>
+                <div class="contact-info-value">Davao City, Davao del Sur<br>Philippines 8000</div>
+              </div>
+            </div>
+            <div class="contact-info-item">
+              <div class="contact-info-icon"><i class="fas fa-envelope"></i></div>
+              <div>
+                <div class="contact-info-label">Email</div>
+                <div class="contact-info-value">hello@habibiskincare.ph</div>
+              </div>
+            </div>
+            <div class="contact-info-item">
+              <div class="contact-info-icon"><i class="fas fa-phone"></i></div>
+              <div>
+                <div class="contact-info-label">Phone</div>
+                <div class="contact-info-value">+63 (82) 000-0000</div>
+              </div>
+            </div>
+            <div class="contact-info-item">
+              <div class="contact-info-icon"><i class="fas fa-clock"></i></div>
+              <div>
+                <div class="contact-info-label">Business Hours</div>
+                <div class="contact-info-value">Monday – Saturday<br>9:00 AM – 6:00 PM PHT</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Socials -->
+          <div style="margin-top:24px;background:var(--white);border-radius:var(--r-lg);padding:28px;box-shadow:var(--sh-xs);border:1px solid var(--border)">
+            <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:16px">Follow Us</div>
+            <div style="display:flex;gap:12px">
+              <a href="#" style="width:44px;height:44px;border-radius:var(--r-sm);background:var(--gold-light);color:var(--gold);display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:1.1rem;transition:all 0.2s" onmouseover="this.style.background='var(--gold)';this.style.color='#fff'" onmouseout="this.style.background='var(--gold-light)';this.style.color='var(--gold)'"><i class="fab fa-instagram"></i></a>
+              <a href="#" style="width:44px;height:44px;border-radius:var(--r-sm);background:var(--gold-light);color:var(--gold);display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:1.1rem;transition:all 0.2s" onmouseover="this.style.background='var(--gold)';this.style.color='#fff'" onmouseout="this.style.background='var(--gold-light)';this.style.color='var(--gold)'"><i class="fab fa-tiktok"></i></a>
+              <a href="#" style="width:44px;height:44px;border-radius:var(--r-sm);background:var(--gold-light);color:var(--gold);display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:1.1rem;transition:all 0.2s" onmouseover="this.style.background='var(--gold)';this.style.color='#fff'" onmouseout="this.style.background='var(--gold-light)';this.style.color='var(--gold)'"><i class="fab fa-facebook-f"></i></a>
+              <a href="#" style="width:44px;height:44px;border-radius:var(--r-sm);background:var(--gold-light);color:var(--gold);display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:1.1rem;transition:all 0.2s" onmouseover="this.style.background='var(--gold)';this.style.color='#fff'" onmouseout="this.style.background='var(--gold-light)';this.style.color='var(--gold)'"><i class="fab fa-pinterest-p"></i></a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form -->
+        <div class="contact-form-card anim">
+          <h3 style="font-family:var(--serif);color:var(--brown);margin-bottom:6px">Send a Message</h3>
+          <p style="font-size:0.84rem;color:var(--muted);margin-bottom:28px">We typically respond within 24 hours on business days.</p>
+
+          <div id="contactFormWrap">
+            <form id="contactForm" onsubmit="handleSubmit(event)">
+              <div class="cf-row">
+                <div class="cf-field">
+                  <label>First Name</label>
+                  <input type="text" placeholder="Juan" required>
+                </div>
+                <div class="cf-field">
+                  <label>Last Name</label>
+                  <input type="text" placeholder="dela Cruz" required>
+                </div>
+              </div>
+              <div class="cf-field">
+                <label>Email</label>
+                <input type="email" placeholder="you@email.com" required>
+              </div>
+              <div class="cf-field">
+                <label>Subject</label>
+                <select>
+                  <option value="">Select a topic...</option>
+                  <option>Order Inquiry</option>
+                  <option>Product Question</option>
+                  <option>Returns & Refunds</option>
+                  <option>Skincare Advice</option>
+                  <option>Partnership / Wholesale</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div class="cf-field">
+                <label>Message</label>
+                <textarea placeholder="Tell us how we can help you..."></textarea>
+              </div>
+              <button type="submit" class="cf-submit" id="cfSubmitBtn">
+                <i class="fas fa-paper-plane" style="margin-right:8px"></i> Send Message
+              </button>
+            </form>
+          </div>
+
+          <div class="cf-success" id="cfSuccess">
+            <i class="fas fa-check-circle"></i>
+            <h3 style="font-family:var(--serif);color:var(--brown);margin-bottom:8px">Message Sent!</h3>
+            <p style="color:var(--muted);font-size:0.9rem">Thank you for reaching out. We'll get back to you within 24 hours.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__top">
+        <div>
+          <div class="footer__logo">Habibi<span>.</span></div>
+          <p class="footer__tagline">Premium natural skincare rooted in nature, inspired by love — crafted in Davao City, Philippines.</p>
+          <div class="footer__socials">
+            <a href="#" class="footer__social"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="footer__social"><i class="fab fa-tiktok"></i></a>
+            <a href="#" class="footer__social"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="footer__social"><i class="fab fa-pinterest-p"></i></a>
+          </div>
+        </div>
+        <div>
+          <h4 class="footer__col-title">Shop</h4>
+          <ul class="footer__links">
+            <li><a href="shop.html" class="footer__link">All Products</a></li>
+            <li><a href="shop.html" class="footer__link">Cleansers</a></li>
+            <li><a href="shop.html" class="footer__link">Serums</a></li>
+            <li><a href="shop.html" class="footer__link">Moisturizers</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="footer__col-title">Company</h4>
+          <ul class="footer__links">
+            <li><a href="about.html" class="footer__link">Our Story</a></li>
+            <li><a href="routine.html" class="footer__link">Routine</a></li>
+            <li><a href="contact.html" class="footer__link">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="footer__col-title">Contact</h4>
+          <div class="footer__contact-item"><i class="fas fa-map-marker-alt"></i><span>Davao City, Philippines 8000</span></div>
+          <div class="footer__contact-item"><i class="fas fa-envelope"></i><span>hello@habibiskincare.ph</span></div>
+          <div class="footer__contact-item"><i class="fas fa-phone"></i><span>+63 (82) 000-0000</span></div>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p class="footer__copy">© 2024 Habibi Skincare. All rights reserved.</p>
+        <div class="footer__legal">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+          <a href="#">Returns</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <div class="cart-overlay"></div>
+  <div class="cart-sidebar">
+    <div class="cart-sidebar__head">
+      <h3>Your Cart</h3>
+      <button class="cart-close"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="cart-sidebar__items"></div>
+    <div class="cart-sidebar__foot">
+      <div class="cart-subtotal"><span>Subtotal</span><strong>₱0</strong></div>
+      <button class="cart-checkout">Proceed to Checkout <i class="fas fa-arrow-right" style="margin-left:8px"></i></button>
+    </div>
+  </div>
+
+  <script>
+    function handleSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('cfSubmitBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:8px"></i> Sending...';
+      setTimeout(() => {
+        document.getElementById('contactForm').style.display = 'none';
+        document.getElementById('cfSuccess').style.display = 'block';
+      }, 1200);
+    }
+  </script>
+  <script src="js/main.js"></script>
+  <script type="module">
+    import { auth, isAdmin } from './js/firebase-config.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    onAuthStateChanged(auth, user => {
+      const btn = document.getElementById('navLoginBtn');
+      const label = document.getElementById('navLoginLabel');
+      if (!btn || !label) return;
+      if (user && isAdmin(user)) {
+        btn.href = 'admin/index.html';
+        label.innerHTML = '<i class="fas fa-shield-alt"></i> Dashboard';
+      } else if (user) {
+        btn.href = 'account.html';
+        label.innerHTML = user.photoURL
+          ? `<img src="${user.photoURL}" class="nav__user-avatar" alt=""> ${(user.displayName||'').split(' ')[0]||'Account'}`
+          : `<i class="fas fa-user-circle"></i> ${(user.displayName||'').split(' ')[0]||'Account'}`;
+      } else {
+        btn.href = 'account.html';
+        label.innerHTML = '<i class="fas fa-user-circle"></i> Sign In';
+      }
+    });
+  </script>
+</body>
+</html>

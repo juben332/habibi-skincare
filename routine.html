@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skincare Routine — Habibi Skincare</title>
+  <meta name="description" content="The Habibi 5-step glow ritual — a simple, effective skincare routine using natural ingredients.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div id="pageLoader">
+  <img src="images/logo.png" alt="Habibi Skincare" class="loader-logo">
+  <div class="loader-dots"><span></span><span></span><span></span></div>
+</div>
+
+  <nav class="nav nav--scrolled" id="nav">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__logo"><img src="images/logo.png" alt="Habibi Skincare Logo" class="nav__logo-img">Habibi<span>.</span></a>
+      <ul class="nav__links">
+        <li><a href="shop.html" class="nav__link">Shop</a></li>
+        <li><a href="about.html" class="nav__link">Our Story</a></li>
+        <li><a href="routine.html" class="nav__link" style="color:var(--gold)">Routine</a></li>
+        <li><a href="contact.html" class="nav__link">Contact</a></li>
+      </ul>
+      <div class="nav__actions">
+        <button class="nav__icon nav__search-btn" aria-label="Search"><i class="fas fa-search"></i></button>
+        <a href="wishlist.html" class="nav__icon" aria-label="Wishlist" style="position:relative;text-decoration:none">
+          <i class="far fa-heart"></i>
+          <span class="wishlist-count"></span>
+        </a>
+        <button class="nav__icon" data-cart-open aria-label="Cart">
+          <i class="fas fa-shopping-bag"></i>
+          <span class="cart-count"></span>
+        </button>
+        <a href="account.html" class="nav__login-btn" id="navLoginBtn">
+          <span id="navLoginLabel"><i class="fas fa-user-circle"></i> Sign In</span>
+        </a>
+        <button class="nav__hamburger" aria-label="Menu" id="burger"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="nav__mobile" id="mobileMenu">
+    <button aria-label="Search" class="nav__mobile-search"><i class="fas fa-search"></i> Search Products</button>
+    <a href="shop.html" class="nav__link">Shop</a>
+    <a href="about.html" class="nav__link">Our Story</a>
+    <a href="routine.html" class="nav__link">Routine</a>
+    <a href="contact.html" class="nav__link">Contact</a>
+    <a href="account.html" class="nav__mobile-account" id="mobileAccountLink">
+      <span class="nav__mobile-account__avatar" id="mobileAccountAvatar"><i class="fas fa-user"></i></span>
+      <span id="mobileAccountLabel">My Account</span>
+    </a>
+  </div>
+
+  <!-- Hero -->
+  <div class="shop-hero">
+    <div class="container">
+      <span class="eyebrow" style="justify-content:center"><i class="fas fa-spa" style="color:var(--gold);margin-right:6px"></i> The Habibi Method</span>
+      <h1>Your Glow Ritual</h1>
+      <p style="color:var(--muted);font-size:1.05rem;max-width:500px;margin:0 auto">Simple, intentional, and deeply effective. A routine you'll actually look forward to every morning and night.</p>
+    </div>
+  </div>
+
+  <!-- Steps -->
+  <section class="section" style="background:var(--cream)">
+    <div class="container">
+      <div class="routine__steps">
+        <div class="routine__connector"></div>
+        <div class="routine__step anim d1">
+          <div class="routine__num">01</div>
+          <div class="routine__icon"><i class="fas fa-tint"></i></div>
+          <h4>Cleanse</h4>
+          <p>Gently dissolve impurities with our gel cleanser, leaving skin fresh and prepped for the next steps.</p>
+        </div>
+        <div class="routine__step anim d2">
+          <div class="routine__num">02</div>
+          <div class="routine__icon"><i class="fas fa-wind"></i></div>
+          <h4>Tone</h4>
+          <p>Balance your skin's pH with rose water toner to enhance absorption of serums and moisturizers.</p>
+        </div>
+        <div class="routine__step anim d3">
+          <div class="routine__num">03</div>
+          <div class="routine__icon"><i class="fas fa-magic"></i></div>
+          <h4>Treat</h4>
+          <p>Apply targeted serums to address dark spots, fine lines, or uneven tone with active botanicals.</p>
+        </div>
+        <div class="routine__step anim d4">
+          <div class="routine__num">04</div>
+          <div class="routine__icon"><i class="fas fa-water"></i></div>
+          <h4>Moisturize</h4>
+          <p>Lock in hydration with our Desert Rose cream for an all-day dewy glow and a plump, soft finish.</p>
+        </div>
+        <div class="routine__step anim d5">
+          <div class="routine__num">05</div>
+          <div class="routine__icon"><i class="fas fa-sun"></i></div>
+          <h4>Protect</h4>
+          <p>Finish with Veil SPF 50+ every morning to shield your glow from UV damage and premature ageing.</p>
+        </div>
+      </div>
+
+      <div class="text-center anim" style="margin-top:56px">
+        <a href="shop.html" class="btn btn-primary btn-lg">Build Your Routine</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- AM / PM split -->
+  <section class="section section--white">
+    <div class="container">
+      <div class="section-header anim">
+        <span class="eyebrow">Morning & Night</span>
+        <h2>AM vs PM Routine</h2>
+        <p>What your skin needs changes with the time of day. Here's how to adapt.</p>
+      </div>
+      <div class="grid-2" style="gap:40px">
+        <div class="anim d1" style="background:linear-gradient(135deg,#fff8f0,#fff3e0);border-radius:var(--r-lg);padding:40px;border:1px solid rgba(230,160,50,0.2)">
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px">
+            <div style="width:52px;height:52px;background:rgba(255,193,7,0.15);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;color:#f59e0b;font-size:1.4rem"><i class="fas fa-sun"></i></div>
+            <div>
+              <div style="font-family:var(--serif);font-size:1.15rem;font-weight:700;color:var(--brown)">Morning Routine</div>
+              <div style="font-size:0.78rem;color:var(--muted)">Protect & energise</div>
+            </div>
+          </div>
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:14px">
+            <li style="display:flex;align-items:flex-start;gap:12px"><span style="width:24px;height:24px;background:rgba(255,193,7,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#f59e0b;font-size:0.72rem;flex-shrink:0;font-weight:700">1</span><div><strong>Cleanser</strong> — rinse or light cleanse</div></li>
+            <li style="display:flex;align-items:flex-start;gap:12px"><span style="width:24px;height:24px;background:rgba(255,193,7,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#f59e0b;font-size:0.72rem;flex-shrink:0;font-weight:700">2</span><div><strong>Toner</strong> — hydrate & prep</div></li>
+            <li style="display:flex;align-items:flex-start;gap:12px"><span style="width:24px;height:24px;background:rgba(255,193,7,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#f59e0b;font-size:0.72rem;flex-shrink:0;font-weight:700">3</span><div><strong>Vitamin C Serum</strong> — brighten & protect</div></li>
+            <li style="display:flex;align-items:flex-start;gap:12px"><span style="width:24px;height:24px;background:rgba(255,193,7,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#f59e0b;font-size:0.72rem;flex-shrink:0;font-weight:700">4</span><div><strong>Moisturizer</strong> — seal hydration</div></li>
+            <li style="display:flex;align-items:flex-start;gap:12px"><span style="width:24px;height:24px;background:rgba(255,193,7,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#f59e0b;font-size:0.72rem;flex-shrink:0;font-weight:700">5</span><div><strong>SPF 50+</strong> — always, non-negotiable</div></li>
+          </ul>
+        </div>
+        <div class="anim d2" style="background:linear-gradient(135deg,#f5f0ff,#ede8ff);border-radius:var(--r-lg);padding:40px;border:1px solid rgba(139,92,246,0.15)">
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px">
+            <div style="width:52px;height:52px;background:rgba(139,92,246,0.12);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;color:#7c3aed;font-size:1.4rem"><i class="fas fa-moon"></i></div>
+            <div>
+              <div style="font-family:var(--serif);font-size:1.15rem;font-weight:700;color:var(--brown)">Night Routine</div>
+              <div style="font-size:0.78rem;color:var(--muted)">Repair & restore</div>
+            </div>
+          </div>
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:14px">
+            <li style="display:flex;align-items:flex-start;gap:12px"><span style="width:24px;height:24px;background:rgba(139,92,246,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#7c3aed;font-size:0.72rem;flex-shrink:0;font-weight:700">1</span><div><strong>Double Cleanse</strong> — oil then foam</div></li>
+            <li style="display:flex;align-items:flex-start;gap:12px"><span style="width:24px;height:24px;background:rgba(139,92,246,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#7c3aed;font-size:0.72rem;flex-shrink:0;font-weight:700">2</span><div><strong>Toner</strong> — soothe & balance</div></li>
+            <li style="display:flex;align-items:flex-start;gap:12px"><span style="width:24px;height:24px;background:rgba(139,92,246,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#7c3aed;font-size:0.72rem;flex-shrink:0;font-weight:700">3</span><div><strong>Retinol or Niacinamide Serum</strong> — treat while you sleep</div></li>
+            <li style="display:flex;align-items:flex-start;gap:12px"><span style="width:24px;height:24px;background:rgba(139,92,246,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#7c3aed;font-size:0.72rem;flex-shrink:0;font-weight:700">4</span><div><strong>Night Cream or Face Oil</strong> — deep repair</div></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="newsletter">
+    <div class="container">
+      <div class="section-header anim">
+        <span class="eyebrow">Ready to Glow?</span>
+        <h2>Shop the Full Routine</h2>
+        <p>Every product in your ritual, in one place. Formulated to work together.</p>
+      </div>
+      <div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap;position:relative;z-index:1" class="anim d1">
+        <a href="shop.html" class="btn btn-primary btn-lg">Shop All Products</a>
+        <a href="about.html" class="btn btn-outline btn-lg">Our Ingredients</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__top">
+        <div>
+          <div class="footer__logo">Habibi<span>.</span></div>
+          <p class="footer__tagline">Premium natural skincare rooted in nature, inspired by love — crafted in Davao City, Philippines.</p>
+          <div class="footer__socials">
+            <a href="#" class="footer__social"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="footer__social"><i class="fab fa-tiktok"></i></a>
+            <a href="#" class="footer__social"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="footer__social"><i class="fab fa-pinterest-p"></i></a>
+          </div>
+        </div>
+        <div>
+          <h4 class="footer__col-title">Shop</h4>
+          <ul class="footer__links">
+            <li><a href="shop.html" class="footer__link">All Products</a></li>
+            <li><a href="shop.html" class="footer__link">Cleansers</a></li>
+            <li><a href="shop.html" class="footer__link">Serums</a></li>
+            <li><a href="shop.html" class="footer__link">Moisturizers</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="footer__col-title">Company</h4>
+          <ul class="footer__links">
+            <li><a href="about.html" class="footer__link">Our Story</a></li>
+            <li><a href="routine.html" class="footer__link">Routine</a></li>
+            <li><a href="contact.html" class="footer__link">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="footer__col-title">Contact</h4>
+          <div class="footer__contact-item"><i class="fas fa-map-marker-alt"></i><span>Davao City, Philippines 8000</span></div>
+          <div class="footer__contact-item"><i class="fas fa-envelope"></i><span>hello@habibiskincare.ph</span></div>
+          <div class="footer__contact-item"><i class="fas fa-phone"></i><span>+63 (82) 000-0000</span></div>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p class="footer__copy">© 2024 Habibi Skincare. All rights reserved.</p>
+        <div class="footer__legal">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+          <a href="#">Returns</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <div class="cart-overlay"></div>
+  <div class="cart-sidebar">
+    <div class="cart-sidebar__head">
+      <h3>Your Cart</h3>
+      <button class="cart-close"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="cart-sidebar__items"></div>
+    <div class="cart-sidebar__foot">
+      <div class="cart-subtotal"><span>Subtotal</span><strong>₱0</strong></div>
+      <button class="cart-checkout">Proceed to Checkout <i class="fas fa-arrow-right" style="margin-left:8px"></i></button>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script type="module">
+    import { auth, isAdmin } from './js/firebase-config.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    onAuthStateChanged(auth, user => {
+      const btn = document.getElementById('navLoginBtn');
+      const label = document.getElementById('navLoginLabel');
+      if (!btn || !label) return;
+      if (user && isAdmin(user)) {
+        btn.href = 'admin/index.html';
+        label.innerHTML = '<i class="fas fa-shield-alt"></i> Dashboard';
+      } else if (user) {
+        btn.href = 'account.html';
+        label.innerHTML = user.photoURL
+          ? `<img src="${user.photoURL}" class="nav__user-avatar" alt=""> ${(user.displayName||'').split(' ')[0]||'Account'}`
+          : `<i class="fas fa-user-circle"></i> ${(user.displayName||'').split(' ')[0]||'Account'}`;
+      } else {
+        btn.href = 'account.html';
+        label.innerHTML = '<i class="fas fa-user-circle"></i> Sign In';
+      }
+    });
+  </script>
+</body>
+</html>
