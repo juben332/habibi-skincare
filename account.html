@@ -366,7 +366,27 @@
     .order-modal__total { font-size: 1rem !important; }
     .order-modal__total span:last-child { font-family: var(--serif); font-size: 1.1rem; color: var(--brown); }
 
-    .order-modal__footer { padding: 0 24px 32px; }
+    .order-modal__footer { padding: 0 24px 16px; }
+    .btn-cancel-order {
+      width: 100%; padding: 12px; border: 1.5px solid rgba(198,40,40,0.35);
+      border-radius: 12px; background: transparent; color: #c62828;
+      font-size: 0.86rem; font-weight: 700; cursor: pointer; font-family: var(--sans);
+      transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-cancel-order:hover { background: rgba(198,40,40,0.06); border-color: #c62828; }
+    .btn-cancel-confirm {
+      flex: 1; padding: 10px; background: #c62828; color: #fff; border: none;
+      border-radius: 10px; font-size: 0.84rem; font-weight: 700; cursor: pointer;
+      font-family: var(--sans); transition: background 0.2s;
+    }
+    .btn-cancel-confirm:hover { background: #a32020; }
+    .btn-cancel-confirm:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-cancel-back {
+      flex: 1; padding: 10px; background: var(--cream); color: var(--brown); border: none;
+      border-radius: 10px; font-size: 0.84rem; font-weight: 600; cursor: pointer;
+      font-family: var(--sans); transition: background 0.2s;
+    }
+    .btn-cancel-back:hover { background: var(--border); }
 
     @media (min-width: 600px) {
       .order-modal-overlay { align-items: center; }
@@ -600,6 +620,27 @@
       <div class="order-modal__summary" id="modalOrderSummary"></div>
       <!-- Footer info -->
       <div class="order-modal__footer" id="modalOrderFooter"></div>
+      <!-- Cancel section (only shown for pending orders) -->
+      <div id="cancelSection" style="display:none;padding:0 24px 28px">
+        <div style="border-top:1px solid var(--cream);padding-top:20px">
+          <div id="cancelConfirm" style="display:none;background:#fff5f5;border:1.5px solid rgba(198,40,40,0.2);border-radius:14px;padding:18px 20px;margin-bottom:14px">
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <i class="fas fa-exclamation-triangle" style="color:#c62828;margin-top:2px;flex-shrink:0"></i>
+              <div>
+                <div style="font-size:0.88rem;font-weight:700;color:#c62828;margin-bottom:4px">Cancel this order?</div>
+                <div style="font-size:0.8rem;color:var(--muted);line-height:1.5">This action cannot be undone. Your order will be marked as cancelled and our team will be notified.</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:14px">
+              <button id="cancelConfirmYes" class="btn-cancel-confirm">Yes, Cancel Order</button>
+              <button id="cancelConfirmNo" class="btn-cancel-back">Keep Order</button>
+            </div>
+          </div>
+          <button id="cancelOrderBtn" class="btn-cancel-order">
+            <i class="fas fa-times-circle"></i> Cancel Order
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -625,7 +666,7 @@
       signInWithPopup, GoogleAuthProvider, signOut, updateProfile
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import {
-      collection, query, where, orderBy, getDocs, limit
+      collection, query, where, getDocs, doc, updateDoc, addDoc, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const authSection    = document.getElementById('authSection');
@@ -888,6 +929,17 @@
               <span style="font-size:0.82rem;color:var(--charcoal)">${o.paymentMethod || 'Cash on Delivery'}</span>
             </div>`;
 
+          // Cancel section — only show for pending orders
+          const cancelSection  = document.getElementById('cancelSection');
+          const cancelConfirm  = document.getElementById('cancelConfirm');
+          const cancelOrderBtn = document.getElementById('cancelOrderBtn');
+          cancelSection.style.display  = st === 'pending' ? 'block' : 'none';
+          cancelConfirm.style.display  = 'none';
+          cancelOrderBtn.style.display = 'flex';
+          cancelOrderBtn.disabled      = false;
+          cancelOrderBtn.innerHTML     = '<i class="fas fa-times-circle"></i> Cancel Order';
+          cancelSection.dataset.orderId = o.id;
+
           modal.classList.add('open');
           document.body.style.overflow = 'hidden';
         }
@@ -895,11 +947,57 @@
         function closeModal() {
           modal.classList.remove('open');
           document.body.style.overflow = '';
+          document.getElementById('cancelConfirm').style.display = 'none';
         }
 
         document.getElementById('orderModalClose').addEventListener('click', closeModal);
         modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
         document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+        // ── Cancel order flow ──────────────────────────────────────
+        document.getElementById('cancelOrderBtn').addEventListener('click', () => {
+          document.getElementById('cancelConfirm').style.display = 'block';
+          document.getElementById('cancelOrderBtn').style.display = 'none';
+        });
+
+        document.getElementById('cancelConfirmNo').addEventListener('click', () => {
+          document.getElementById('cancelConfirm').style.display = 'none';
+          document.getElementById('cancelOrderBtn').style.display = 'flex';
+        });
+
+        document.getElementById('cancelConfirmYes').addEventListener('click', async () => {
+          const btn     = document.getElementById('cancelConfirmYes');
+          const orderId = document.getElementById('cancelSection').dataset.orderId;
+          btn.disabled  = true;
+          btn.textContent = 'Cancelling...';
+          try {
+            // Update order status in Firestore
+            await updateDoc(doc(db, 'orders', orderId), { status: 'cancelled' });
+
+            // Log to activityLog so admin sees it
+            await addDoc(collection(db, 'activityLog'), {
+              action:     'Order Cancelled by Customer',
+              detail:     `Order #${orderId.slice(-6).toUpperCase()} cancelled by customer`,
+              adminEmail: user.email,
+              category:   'order-cancelled',
+              timestamp:  serverTimestamp()
+            });
+
+            // Update local orders array so re-renders are accurate
+            const idx = orders.findIndex(x => x.id === orderId);
+            if (idx !== -1) orders[idx].status = 'cancelled';
+
+            // Re-render grid and close modal
+            container.innerHTML = orders.slice(0, ORDERS_LIMIT).map(renderOrderCard).join('');
+            attachCardClicks();
+            closeModal();
+            window.showToast?.('<i class="fas fa-check-circle"></i> Order cancelled successfully.');
+          } catch (err) {
+            btn.disabled    = false;
+            btn.textContent = 'Yes, Cancel Order';
+            alert('Failed to cancel order. Please try again.');
+          }
+        });
 
         function attachCardClicks() {
           document.querySelectorAll('.order-card[data-order-id]').forEach(card => {
