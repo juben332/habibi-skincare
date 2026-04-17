@@ -22,69 +22,73 @@
     .ofilter-tab:hover { border-color: var(--gold); color: var(--brown); }
     .ofilter-tab.active { background: var(--gold); border-color: var(--gold); color: #fff; }
 
-    /* Order card */
-    .order-item {
-      background: #fff; border-radius: 18px; border: 1.5px solid var(--border);
-      margin-bottom: 14px; overflow: hidden; transition: box-shadow 0.2s, border-color 0.2s;
-      position: relative;
+    /* ── Order card (matches account.html style) ── */
+    .order-card {
+      background: #fff; border: 1.5px solid var(--border); border-radius: 14px;
+      padding: 16px 18px; margin-bottom: 12px; transition: all 0.2s;
+      display: flex; flex-direction: column; gap: 10px;
+      position: relative; overflow: hidden; cursor: pointer;
     }
-    .order-item:hover { box-shadow: 0 4px 20px rgba(61,26,34,0.09); border-color: rgba(212,104,122,0.3); }
-    .order-item__left-bar { position: absolute; left:0; top:0; bottom:0; width:4px; border-radius:4px 0 0 4px; }
-    .order-item__main { padding: 18px 20px 18px 24px; cursor: pointer; }
-    .order-item__head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
-    .order-item__id { font-size: 0.9rem; font-weight: 800; color: var(--brown); letter-spacing: 0.04em; }
-    .order-item__date { font-size: 0.76rem; color: var(--muted); margin-left: auto; }
-    .order-item__products { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
-    .order-item__product-img {
-      width: 48px; height: 48px; border-radius: 10px; object-fit: cover;
-      border: 1px solid var(--border); background: var(--beige); flex-shrink: 0;
+    .order-card::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 4px; border-radius: 4px 0 0 4px;
     }
-    .order-item__product-img-placeholder {
-      width: 48px; height: 48px; border-radius: 10px; background: var(--beige);
-      border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
-      color: var(--border); font-size: 1rem; flex-shrink: 0;
+    .order-card:hover { box-shadow: 0 4px 20px rgba(61,26,34,0.1); border-color: rgba(212,104,122,0.3); transform: translateY(-1px); }
+    .order-card.status-pending::before    { background: #e65100; }
+    .order-card.status-processing::before { background: #1565c0; }
+    .order-card.status-shipped::before    { background: #6a1b9a; }
+    .order-card.status-delivered::before  { background: #2e7d32; }
+    .order-card.status-cancelled::before  { background: #c62828; }
+    .order-card-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .order-id   { font-size: 0.82rem; font-weight: 800; color: var(--brown); letter-spacing: 0.04em; font-family: var(--sans); }
+    .order-date { font-size: 0.78rem; color: var(--muted); margin-left: auto; }
+    .order-status {
+      padding: 4px 12px; border-radius: 100px; font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
     }
-    .order-item__foot { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
-    .order-item__total { font-family: var(--serif); font-size: 1rem; font-weight: 700; color: var(--brown); }
-    .order-item__pay { font-size: 0.76rem; color: var(--muted); background: var(--cream); padding: 3px 10px; border-radius: 100px; }
-    .order-item__view { font-size: 0.75rem; color: var(--gold); font-weight: 600; }
+    .status-pending    { background: rgba(230,81,0,0.10);  color: #b84900; }
+    .status-processing { background: rgba(21,101,192,0.10); color: #0d5aa7; }
+    .status-shipped    { background: rgba(106,27,154,0.10); color: #5a1585; }
+    .status-delivered  { background: rgba(46,125,50,0.10);  color: #1e6b22; }
+    .status-cancelled  { background: rgba(198,40,40,0.10);  color: #a32020; }
+    .order-items  { font-size: 0.84rem; color: var(--charcoal); padding-left: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .order-footer { display: flex; align-items: center; justify-content: space-between; padding-left: 4px; }
+    .order-total  { font-size: 0.88rem; font-weight: 700; color: var(--brown); }
+    .order-pay    { font-size: 0.76rem; color: var(--muted); background: var(--cream); padding: 3px 10px; border-radius: 100px; }
+    .order-hint   { font-size: 0.72rem; color: var(--muted); text-align: right; }
 
-    /* Action bar */
-    .order-item__actions { padding: 0 20px 16px 24px; display: flex; gap: 10px; flex-wrap: wrap; }
-
-    /* Status colors */
-    .bar-pending    { background: #e65100; }
-    .bar-processing { background: #1565c0; }
-    .bar-shipped    { background: #6a1b9a; }
-    .bar-delivered  { background: #2e7d32; }
-    .bar-cancelled  { background: #c62828; }
-
-    /* Action buttons */
-    .btn-receive {
-      padding: 9px 20px; background: var(--gold); color: #fff; border: none;
-      border-radius: 10px; font-size: 0.82rem; font-weight: 700; cursor: pointer;
-      font-family: var(--sans); display: flex; align-items: center; gap: 7px; transition: all 0.2s;
+    /* ── Modal action buttons ── */
+    .btn-modal-action {
+      width: 100%; padding: 12px; border: none; border-radius: 12px;
+      font-size: 0.86rem; font-weight: 700; cursor: pointer; font-family: var(--sans);
+      transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
     }
-    .btn-receive:hover { background: var(--brown); }
-    .btn-receive:disabled { opacity: 0.6; cursor: not-allowed; }
-    .btn-pay-cod {
-      padding: 9px 20px; background: #2e7d32; color: #fff; border: none;
-      border-radius: 10px; font-size: 0.82rem; font-weight: 700; cursor: pointer;
-      font-family: var(--sans); display: flex; align-items: center; gap: 7px; transition: all 0.2s;
+    .btn-modal-action:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-modal-receive { background: var(--gold); color: #fff; }
+    .btn-modal-receive:hover:not(:disabled) { background: var(--brown); }
+    .btn-modal-pay     { background: #2e7d32; color: #fff; }
+    .btn-modal-pay:hover:not(:disabled)     { background: #1b5e20; }
+    .btn-cancel-order {
+      width: 100%; padding: 12px; border: 1.5px solid rgba(198,40,40,0.35);
+      border-radius: 12px; background: transparent; color: #c62828;
+      font-size: 0.86rem; font-weight: 700; cursor: pointer; font-family: var(--sans);
+      transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
     }
-    .btn-pay-cod:hover { background: #1b5e20; }
-    .btn-pay-cod:disabled { opacity: 0.6; cursor: not-allowed; }
-    .btn-cancel-sm {
-      padding: 9px 20px; background: transparent; color: #c62828;
-      border: 1.5px solid rgba(198,40,40,0.3); border-radius: 10px;
-      font-size: 0.82rem; font-weight: 700; cursor: pointer; font-family: var(--sans);
-      display: flex; align-items: center; gap: 7px; transition: all 0.2s;
+    .btn-cancel-order:hover { background: rgba(198,40,40,0.06); border-color: #c62828; }
+    .btn-cancel-confirm {
+      flex: 1; padding: 10px; background: #c62828; color: #fff; border: none;
+      border-radius: 10px; font-size: 0.84rem; font-weight: 700; cursor: pointer;
+      font-family: var(--sans); transition: background 0.2s;
     }
-    .btn-cancel-sm:hover { background: rgba(198,40,40,0.06); border-color: #c62828; }
-    .btn-cancel-sm:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    /* COD paid badge */
-    .cod-paid-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 0.75rem; font-weight: 700; color: #2e7d32; background: rgba(46,125,50,0.1); padding: 5px 12px; border-radius: 100px; }
+    .btn-cancel-confirm:hover { background: #a32020; }
+    .btn-cancel-confirm:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-cancel-back {
+      flex: 1; padding: 10px; background: var(--cream); color: var(--brown); border: none;
+      border-radius: 10px; font-size: 0.84rem; font-weight: 600; cursor: pointer;
+      font-family: var(--sans); transition: background 0.2s;
+    }
+    .btn-cancel-back:hover { background: var(--border); }
+    .cod-paid-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 700; color: #2e7d32; background: rgba(46,125,50,0.1); padding: 10px 16px; border-radius: 12px; width: 100%; justify-content: center; }
 
     /* Empty state */
     .orders-empty-state { text-align: center; padding: 80px 20px; color: var(--muted); }
@@ -157,8 +161,8 @@
     }
     @media (max-width: 480px) {
       .orders-page-wrap { padding: 88px 14px 60px; }
-      .order-item__main { padding: 14px 16px 14px 20px; }
-      .order-item__actions { padding: 0 16px 14px 20px; }
+      .order-card { padding: 12px 14px; }
+      .order-date { font-size: 0.72rem; }
     }
   </style>
 </head>
@@ -262,6 +266,10 @@
       <div class="order-modal__items" id="modalItems"></div>
       <div class="order-modal__summary" id="modalSummary"></div>
       <div class="order-modal__footer" id="modalFooter"></div>
+      <!-- Action section -->
+      <div id="modalActionSection" style="display:none;padding:0 24px 28px">
+        <div style="border-top:1px solid var(--cream);padding-top:20px" id="modalActionInner"></div>
+      </div>
     </div>
   </div>
 
@@ -320,88 +328,42 @@
       }
 
       list.innerHTML = filtered.map(o => {
-        const st  = o.status || 'pending';
-        const cod = (o.paymentMethod || '').toLowerCase().includes('cod') || (o.paymentMethod || '').toLowerCase().includes('cash');
+        const st   = o.status || 'pending';
+        const date = fmtDate(o.createdAt);
+        const itemsSummary = (o.items || []).map(i => `${i.name} ×${i.qty}`).join(' · ') || 'No items';
+        const cod  = (o.paymentMethod || '').toLowerCase().includes('cod') || (o.paymentMethod || '').toLowerCase().includes('cash');
         const paid = o.paymentStatus === 'paid';
 
-        // Action buttons
-        let actions = '';
-        if (st === 'pending') {
-          actions = `<button class="btn-cancel-sm" data-action="cancel" data-id="${o.id}"><i class="fas fa-times-circle"></i> Cancel Order</button>`;
-        }
-        if (st === 'shipped') {
-          actions = `<button class="btn-receive" data-action="receive" data-id="${o.id}"><i class="fas fa-box-open"></i> Mark as Received</button>`;
-        }
-        if (st === 'delivered' && cod && !paid) {
-          actions += `<button class="btn-pay-cod" data-action="pay" data-id="${o.id}"><i class="fas fa-peso-sign"></i> Confirm COD Payment</button>`;
-        }
-        if (st === 'delivered' && cod && paid) {
-          actions += `<span class="cod-paid-badge"><i class="fas fa-check-circle"></i> Payment Confirmed</span>`;
-        }
-
-        // Product thumbnails (up to 4)
-        const thumbs = (o.items || []).slice(0, 4).map(item =>
-          item.image
-            ? `<img src="${item.image}" class="order-item__product-img" alt="${item.name}" onerror="this.style.display='none'">`
-            : `<div class="order-item__product-img-placeholder"><i class="fas fa-box"></i></div>`
-        ).join('');
-        const extraCount = (o.items||[]).length > 4 ? `<span style="font-size:0.76rem;color:var(--muted);align-self:center">+${(o.items||[]).length - 4} more</span>` : '';
+        // Small hint badge on the card for actionable orders
+        let hint = '';
+        if (st === 'shipped') hint = `<span style="font-size:0.7rem;color:#5a1585;font-weight:600;background:rgba(106,27,154,0.08);padding:2px 9px;border-radius:100px"><i class="fas fa-box-open" style="margin-right:4px"></i>Action needed</span>`;
+        if (st === 'delivered' && cod && !paid) hint = `<span style="font-size:0.7rem;color:#2e7d32;font-weight:600;background:rgba(46,125,50,0.08);padding:2px 9px;border-radius:100px"><i class="fas fa-peso-sign" style="margin-right:4px"></i>Payment pending</span>`;
 
         return `
-          <div class="order-item" data-id="${o.id}">
-            <div class="order-item__left-bar bar-${st}"></div>
-            <div class="order-item__main" data-detail="${o.id}">
-              <div class="order-item__head">
-                <span class="order-item__id">#${o.id.slice(-6).toUpperCase()}</span>
-                <span class="order-status status-${st}">${cap(st)}</span>
-                <span class="order-item__date">${fmtDate(o.createdAt)}</span>
-              </div>
-              <div class="order-item__products">${thumbs}${extraCount}</div>
-              <div class="order-item__foot">
-                <span class="order-item__total">₱${(o.total||0).toLocaleString()}</span>
-                <span class="order-item__pay">${o.paymentMethod || 'COD'}</span>
-                <span class="order-item__view"><i class="fas fa-eye" style="margin-right:4px"></i>View details</span>
-              </div>
+          <div class="order-card status-${st}" data-order-id="${o.id}">
+            <div class="order-card-head">
+              <span class="order-id">#${o.id.slice(-6).toUpperCase()}</span>
+              <span class="order-status status-${st}">${cap(st)}</span>
+              <span class="order-date">${date}</span>
             </div>
-            ${actions ? `<div class="order-item__actions">${actions}</div>` : ''}
+            <div class="order-items">${itemsSummary}</div>
+            <div class="order-footer">
+              <span class="order-total">₱${(o.total||0).toLocaleString()}</span>
+              <span class="order-pay">${o.paymentMethod || 'COD'}</span>
+              ${hint}
+            </div>
+            <div class="order-hint"><i class="fas fa-chevron-right" style="font-size:0.62rem;margin-right:3px"></i>Tap to view details</div>
           </div>`;
       }).join('');
 
-      attachActions();
+      attachCardClicks();
     }
 
-    // ── Attach button + detail click handlers ────────────────────
-    function attachActions() {
-      // Detail modal
-      document.querySelectorAll('[data-detail]').forEach(el => {
-        el.addEventListener('click', e => {
-          if (e.target.closest('button')) return;
-          const o = allOrders.find(x => x.id === el.dataset.detail);
+    function attachCardClicks() {
+      document.querySelectorAll('.order-card[data-order-id]').forEach(card => {
+        card.addEventListener('click', () => {
+          const o = allOrders.find(x => x.id === card.dataset.orderId);
           if (o) openModal(o);
-        });
-      });
-
-      // Cancel
-      document.querySelectorAll('[data-action="cancel"]').forEach(btn => {
-        btn.addEventListener('click', async () => {
-          if (!confirm('Cancel this order? This cannot be undone.')) return;
-          await doAction(btn, btn.dataset.id, { status: 'cancelled' }, 'Order Cancelled by Customer', 'order-cancelled');
-        });
-      });
-
-      // Mark as received
-      document.querySelectorAll('[data-action="receive"]').forEach(btn => {
-        btn.addEventListener('click', async () => {
-          if (!confirm('Mark this order as received?')) return;
-          await doAction(btn, btn.dataset.id, { status: 'delivered' }, 'Order Marked as Received', 'order-delivered');
-        });
-      });
-
-      // Confirm COD payment
-      document.querySelectorAll('[data-action="pay"]').forEach(btn => {
-        btn.addEventListener('click', async () => {
-          if (!confirm('Confirm that you have paid for this order?')) return;
-          await doAction(btn, btn.dataset.id, { paymentStatus: 'paid' }, 'COD Payment Confirmed by Customer', 'order-delivered');
         });
       });
     }
@@ -419,9 +381,9 @@
           category:   logCat,
           timestamp:  serverTimestamp()
         });
-        // Update local data
         const idx = allOrders.findIndex(x => x.id === orderId);
         if (idx !== -1) Object.assign(allOrders[idx], updateData);
+        closeModal();
         renderOrders();
         window.showToast?.(`<i class="fas fa-check-circle"></i> Done!`);
       } catch (err) {
@@ -495,6 +457,77 @@
           <i class="fas fa-credit-card" style="color:var(--gold)"></i>
           <span style="font-size:0.82rem;color:var(--brown)">${o.paymentMethod || 'Cash on Delivery'}</span>
         </div>`;
+
+      // ── Action section in modal ──────────────────────────────────
+      const actionSection = document.getElementById('modalActionSection');
+      const actionInner   = document.getElementById('modalActionInner');
+      const cod  = (o.paymentMethod || '').toLowerCase().includes('cod') || (o.paymentMethod || '').toLowerCase().includes('cash');
+      const paid = o.paymentStatus === 'paid';
+
+      if (st === 'pending') {
+        actionSection.style.display = 'block';
+        actionInner.innerHTML = `
+          <div id="cancelConfirmBox" style="display:none;background:#fff5f5;border:1.5px solid rgba(198,40,40,0.2);border-radius:14px;padding:18px 20px;margin-bottom:14px">
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <i class="fas fa-exclamation-triangle" style="color:#c62828;margin-top:2px;flex-shrink:0"></i>
+              <div>
+                <div style="font-size:0.88rem;font-weight:700;color:#c62828;margin-bottom:4px">Cancel this order?</div>
+                <div style="font-size:0.8rem;color:var(--muted);line-height:1.5">This cannot be undone. Your order will be cancelled and our team will be notified.</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:14px">
+              <button class="btn-cancel-confirm" id="cancelYes">Yes, Cancel Order</button>
+              <button class="btn-cancel-back" id="cancelNo">Keep Order</button>
+            </div>
+          </div>
+          <button class="btn-cancel-order" id="cancelOrderBtn">
+            <i class="fas fa-times-circle"></i> Cancel Order
+          </button>`;
+
+        document.getElementById('cancelOrderBtn').addEventListener('click', () => {
+          document.getElementById('cancelConfirmBox').style.display = 'block';
+          document.getElementById('cancelOrderBtn').style.display = 'none';
+        });
+        document.getElementById('cancelNo').addEventListener('click', () => {
+          document.getElementById('cancelConfirmBox').style.display = 'none';
+          document.getElementById('cancelOrderBtn').style.display = 'flex';
+        });
+        document.getElementById('cancelYes').addEventListener('click', async () => {
+          const btn = document.getElementById('cancelYes');
+          await doAction(btn, o.id, { status: 'cancelled' }, 'Order Cancelled by Customer', 'order-cancelled');
+        });
+
+      } else if (st === 'shipped') {
+        actionSection.style.display = 'block';
+        actionInner.innerHTML = `
+          <button class="btn-modal-action btn-modal-receive" id="receiveBtn">
+            <i class="fas fa-box-open"></i> Mark as Received
+          </button>
+          <p style="font-size:0.76rem;color:var(--muted);text-align:center;margin-top:10px">Confirm that you have received this order.</p>`;
+        document.getElementById('receiveBtn').addEventListener('click', async () => {
+          const btn = document.getElementById('receiveBtn');
+          await doAction(btn, o.id, { status: 'delivered' }, 'Order Marked as Received', 'order-delivered');
+        });
+
+      } else if (st === 'delivered' && cod && !paid) {
+        actionSection.style.display = 'block';
+        actionInner.innerHTML = `
+          <button class="btn-modal-action btn-modal-pay" id="payBtn">
+            <i class="fas fa-peso-sign"></i> Confirm COD Payment
+          </button>
+          <p style="font-size:0.76rem;color:var(--muted);text-align:center;margin-top:10px">Confirm that you have paid for this order in cash.</p>`;
+        document.getElementById('payBtn').addEventListener('click', async () => {
+          const btn = document.getElementById('payBtn');
+          await doAction(btn, o.id, { paymentStatus: 'paid' }, 'COD Payment Confirmed by Customer', 'order-delivered');
+        });
+
+      } else if (st === 'delivered' && cod && paid) {
+        actionSection.style.display = 'block';
+        actionInner.innerHTML = `<span class="cod-paid-badge"><i class="fas fa-check-circle"></i> Payment Confirmed</span>`;
+
+      } else {
+        actionSection.style.display = 'none';
+      }
 
       modal.classList.add('open');
       document.body.style.overflow = 'hidden';
