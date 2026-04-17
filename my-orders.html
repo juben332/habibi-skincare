@@ -580,7 +580,9 @@
               category:   'order-placed',
               timestamp:  serverTimestamp()
             });
-            // Add new order to local list so it shows immediately
+            // Remove the cancelled order and add the new pending one
+            const cancelledIdx = allOrders.findIndex(x => x.id === o.id);
+            if (cancelledIdx !== -1) allOrders.splice(cancelledIdx, 1);
             allOrders.unshift({ id: ref.id, ...newOrder, createdAt: { seconds: Date.now()/1000, toDate: () => new Date() } });
             closeModal();
             renderOrders();
