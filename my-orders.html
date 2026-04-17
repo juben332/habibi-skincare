@@ -525,6 +525,29 @@
         actionSection.style.display = 'block';
         actionInner.innerHTML = `<span class="cod-paid-badge"><i class="fas fa-check-circle"></i> Payment Confirmed</span>`;
 
+      } else if (st === 'cancelled') {
+        actionSection.style.display = 'block';
+        actionInner.innerHTML = `
+          <button class="btn-modal-action btn-modal-receive" id="buyAgainBtn">
+            <i class="fas fa-redo"></i> Buy Again
+          </button>
+          <p style="font-size:0.76rem;color:var(--muted);text-align:center;margin-top:10px">Re-add all items from this order to your cart.</p>`;
+        document.getElementById('buyAgainBtn').addEventListener('click', () => {
+          const items = o.items || [];
+          items.forEach(item => {
+            window.Cart?.add({
+              id:    item.id || item.productId || '',
+              name:  item.name,
+              price: item.price || 0,
+              size:  item.size  || '',
+              image: item.image || ''
+            });
+          });
+          closeModal();
+          window.CartUI?.open();
+          window.showToast?.('<i class="fas fa-shopping-bag"></i> Items added to your cart!');
+        });
+
       } else {
         actionSection.style.display = 'none';
       }
