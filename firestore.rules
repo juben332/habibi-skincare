@@ -22,7 +22,15 @@ service cloud.firestore {
         && (resource.data.userId == request.auth.uid
           || request.auth.token.email == 'wardopon123@gmail.com');
       allow update: if request.auth != null
-        && request.auth.token.email == 'wardopon123@gmail.com';
+        && (
+          // Admin can update anything
+          request.auth.token.email == 'wardopon123@gmail.com'
+          // Customer can only cancel their own order when it is still pending
+          || (resource.data.userId == request.auth.uid
+              && resource.data.status == 'pending'
+              && request.resource.data.status == 'cancelled'
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']))
+        );
     }
 
     // Subscribers (newsletter) — anyone can add, only admin reads
@@ -32,10 +40,11 @@ service cloud.firestore {
         && request.auth.token.email == 'wardopon123@gmail.com';
     }
 
-    // Activity log — only admin can write and read
+    // Activity log — admin full access; any signed-in user can create entries
     match /activityLog/{logId} {
-      allow read, write: if request.auth != null
+      allow read, update, delete: if request.auth != null
         && request.auth.token.email == 'wardopon123@gmail.com';
+      allow create: if request.auth != null;
     }
   }
 }
