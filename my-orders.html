@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Orders — Habibi Skincare</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .orders-page-wrap { max-width: 720px; margin: 0 auto; padding: 96px 20px 60px; }
+
+    /* Filter tabs */
+    .orders-filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+    .ofilter-tab {
+      padding: 7px 16px; border-radius: 100px; border: 1.5px solid var(--border);
+      background: #fff; font-size: 0.78rem; font-weight: 600; color: var(--muted);
+      cursor: pointer; transition: all 0.2s; font-family: var(--sans);
+    }
+    .ofilter-tab:hover { border-color: var(--gold); color: var(--brown); }
+    .ofilter-tab.active { background: var(--gold); border-color: var(--gold); color: #fff; }
+
+    /* Order card */
+    .order-item {
+      background: #fff; border-radius: 18px; border: 1.5px solid var(--border);
+      margin-bottom: 14px; overflow: hidden; transition: box-shadow 0.2s, border-color 0.2s;
+      position: relative;
+    }
+    .order-item:hover { box-shadow: 0 4px 20px rgba(61,26,34,0.09); border-color: rgba(212,104,122,0.3); }
+    .order-item__left-bar { position: absolute; left:0; top:0; bottom:0; width:4px; border-radius:4px 0 0 4px; }
+    .order-item__main { padding: 18px 20px 18px 24px; cursor: pointer; }
+    .order-item__head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+    .order-item__id { font-size: 0.9rem; font-weight: 800; color: var(--brown); letter-spacing: 0.04em; }
+    .order-item__date { font-size: 0.76rem; color: var(--muted); margin-left: auto; }
+    .order-item__products { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+    .order-item__product-img {
+      width: 48px; height: 48px; border-radius: 10px; object-fit: cover;
+      border: 1px solid var(--border); background: var(--beige); flex-shrink: 0;
+    }
+    .order-item__product-img-placeholder {
+      width: 48px; height: 48px; border-radius: 10px; background: var(--beige);
+      border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+      color: var(--border); font-size: 1rem; flex-shrink: 0;
+    }
+    .order-item__foot { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+    .order-item__total { font-family: var(--serif); font-size: 1rem; font-weight: 700; color: var(--brown); }
+    .order-item__pay { font-size: 0.76rem; color: var(--muted); background: var(--cream); padding: 3px 10px; border-radius: 100px; }
+    .order-item__view { font-size: 0.75rem; color: var(--gold); font-weight: 600; }
+
+    /* Action bar */
+    .order-item__actions { padding: 0 20px 16px 24px; display: flex; gap: 10px; flex-wrap: wrap; }
+
+    /* Status colors */
+    .bar-pending    { background: #e65100; }
+    .bar-processing { background: #1565c0; }
+    .bar-shipped    { background: #6a1b9a; }
+    .bar-delivered  { background: #2e7d32; }
+    .bar-cancelled  { background: #c62828; }
+
+    /* Action buttons */
+    .btn-receive {
+      padding: 9px 20px; background: var(--gold); color: #fff; border: none;
+      border-radius: 10px; font-size: 0.82rem; font-weight: 700; cursor: pointer;
+      font-family: var(--sans); display: flex; align-items: center; gap: 7px; transition: all 0.2s;
+    }
+    .btn-receive:hover { background: var(--brown); }
+    .btn-receive:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-pay-cod {
+      padding: 9px 20px; background: #2e7d32; color: #fff; border: none;
+      border-radius: 10px; font-size: 0.82rem; font-weight: 700; cursor: pointer;
+      font-family: var(--sans); display: flex; align-items: center; gap: 7px; transition: all 0.2s;
+    }
+    .btn-pay-cod:hover { background: #1b5e20; }
+    .btn-pay-cod:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-cancel-sm {
+      padding: 9px 20px; background: transparent; color: #c62828;
+      border: 1.5px solid rgba(198,40,40,0.3); border-radius: 10px;
+      font-size: 0.82rem; font-weight: 700; cursor: pointer; font-family: var(--sans);
+      display: flex; align-items: center; gap: 7px; transition: all 0.2s;
+    }
+    .btn-cancel-sm:hover { background: rgba(198,40,40,0.06); border-color: #c62828; }
+    .btn-cancel-sm:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* COD paid badge */
+    .cod-paid-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 0.75rem; font-weight: 700; color: #2e7d32; background: rgba(46,125,50,0.1); padding: 5px 12px; border-radius: 100px; }
+
+    /* Empty state */
+    .orders-empty-state { text-align: center; padding: 80px 20px; color: var(--muted); }
+    .orders-empty-state i { font-size: 3rem; display: block; margin-bottom: 16px; opacity: 0.2; }
+    .orders-empty-state h3 { font-family: var(--serif); color: var(--brown); margin-bottom: 8px; }
+
+    /* Login required */
+    .orders-login-required { text-align: center; padding: 80px 20px; }
+
+    /* ── Order detail modal ── */
+    .order-modal-overlay {
+      position: fixed; inset: 0; background: rgba(30,10,14,0.55);
+      backdrop-filter: blur(4px); z-index: 1100;
+      display: flex; align-items: flex-end; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .order-modal-overlay.open { opacity: 1; pointer-events: all; }
+    .order-modal {
+      background: #fff; border-radius: 28px 28px 0 0;
+      width: 100%; max-width: 560px; max-height: 88vh;
+      overflow-y: auto; transform: translateY(40px);
+      transition: transform 0.3s cubic-bezier(0.32,0.72,0,1);
+    }
+    .order-modal-overlay.open .order-modal { transform: translateY(0); }
+    .order-modal__drag { width: 40px; height: 4px; background: var(--border); border-radius: 4px; margin: 14px auto 0; }
+    .order-modal__head {
+      padding: 20px 24px 16px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    .order-modal__id { font-family: var(--serif); font-size: 1.1rem; font-weight: 700; color: var(--brown); }
+    .order-modal__close {
+      margin-left: auto; width: 32px; height: 32px; border-radius: 50%;
+      border: none; background: var(--cream); cursor: pointer; color: var(--muted);
+      display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: all 0.2s;
+    }
+    .order-modal__close:hover { background: var(--border); color: var(--brown); }
+    .order-timeline { display: flex; align-items: center; padding: 20px 24px; }
+    .ot-step { display: flex; flex-direction: column; align-items: center; flex: 1; position: relative; }
+    .ot-step:not(:last-child)::after {
+      content: ''; position: absolute; top: 14px; left: 50%; width: 100%;
+      height: 2px; background: var(--border); z-index: 0;
+    }
+    .ot-step.done:not(:last-child)::after { background: var(--gold); }
+    .ot-dot {
+      width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border);
+      background: #fff; display: flex; align-items: center; justify-content: center;
+      font-size: 0.72rem; color: var(--muted); position: relative; z-index: 1; transition: all 0.2s;
+    }
+    .ot-step.done .ot-dot { background: var(--gold); border-color: var(--gold); color: #fff; }
+    .ot-step.current .ot-dot { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 0 4px rgba(212,104,122,0.15); }
+    .ot-label { font-size: 0.62rem; font-weight: 600; color: var(--muted); margin-top: 6px; text-align: center; letter-spacing: 0.04em; text-transform: uppercase; }
+    .ot-step.done .ot-label, .ot-step.current .ot-label { color: var(--brown); }
+    .order-modal__items { padding: 8px 24px 4px; }
+    .order-modal__item { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--cream); }
+    .order-modal__item:last-child { border-bottom: none; }
+    .order-modal__item-img { width: 56px; height: 56px; border-radius: 10px; object-fit: cover; background: var(--beige); flex-shrink: 0; border: 1px solid var(--border); }
+    .order-modal__item-name { font-size: 0.88rem; font-weight: 600; color: var(--brown); margin-bottom: 3px; }
+    .order-modal__item-meta { font-size: 0.76rem; color: var(--muted); }
+    .order-modal__item-price { margin-left: auto; font-size: 0.88rem; font-weight: 700; color: var(--brown); white-space: nowrap; }
+    .order-modal__summary { margin: 0 24px; padding: 16px; background: var(--cream); border-radius: 14px; margin-bottom: 16px; }
+    .order-modal__row { display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 8px; }
+    .order-modal__row:last-child { margin-bottom: 0; }
+    .order-modal__row span:first-child { color: var(--muted); }
+    .order-modal__row span:last-child { font-weight: 600; color: var(--brown); }
+    .order-modal__footer { padding: 0 24px 28px; }
+    @media (min-width: 600px) {
+      .order-modal-overlay { align-items: center; }
+      .order-modal { border-radius: 24px; max-height: 85vh; }
+      .order-modal__drag { display: none; }
+    }
+    @media (max-width: 480px) {
+      .orders-page-wrap { padding: 88px 14px 60px; }
+      .order-item__main { padding: 14px 16px 14px 20px; }
+      .order-item__actions { padding: 0 16px 14px 20px; }
+    }
+  </style>
+</head>
+<body>
+<div id="pageLoader">
+  <img src="images/logo.png" alt="Habibi Skincare" class="loader-logo">
+  <div class="loader-dots"><span></span><span></span><span></span></div>
+</div>
+
+  <nav class="nav nav--scrolled" id="nav">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__logo"><img src="images/logo.png" alt="Habibi Skincare Logo" class="nav__logo-img">Habibi<span>.</span></a>
+      <ul class="nav__links">
+        <li><a href="shop.html" class="nav__link">Shop</a></li>
+        <li><a href="about.html" class="nav__link">Our Story</a></li>
+        <li><a href="routine.html" class="nav__link">Routine</a></li>
+        <li><a href="contact.html" class="nav__link">Contact</a></li>
+      </ul>
+      <div class="nav__actions">
+        <button class="nav__icon nav__search-btn" aria-label="Search"><i class="fas fa-search"></i></button>
+        <a href="wishlist.html" class="nav__icon" aria-label="Wishlist" style="position:relative;text-decoration:none">
+          <i class="far fa-heart"></i><span class="wishlist-count"></span>
+        </a>
+        <button class="nav__icon" data-cart-open aria-label="Cart">
+          <i class="fas fa-shopping-bag"></i><span class="cart-count"></span>
+        </button>
+        <a href="account.html" class="nav__login-btn" id="navLoginBtn">
+          <span id="navLoginLabel"><i class="fas fa-user-circle"></i> Account</span>
+        </a>
+        <button class="nav__hamburger" id="burger"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="nav__mobile" id="mobileMenu">
+    <button aria-label="Search" class="nav__mobile-search"><i class="fas fa-search"></i> Search Products</button>
+    <a href="shop.html" class="nav__link">Shop</a>
+    <a href="about.html" class="nav__link">Our Story</a>
+    <a href="routine.html" class="nav__link">Routine</a>
+    <a href="contact.html" class="nav__link">Contact</a>
+    <a href="account.html" class="nav__mobile-account" id="mobileAccountLink">
+      <span class="nav__mobile-account__avatar" id="mobileAccountAvatar"><i class="fas fa-user"></i></span>
+      <span id="mobileAccountLabel">My Account</span>
+    </a>
+  </div>
+
+  <div class="orders-page-wrap">
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:10px">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <a href="account.html" style="color:var(--muted);font-size:0.82rem;text-decoration:none;display:flex;align-items:center;gap:4px">
+            <i class="fas fa-chevron-left" style="font-size:0.65rem"></i> Account
+          </a>
+        </div>
+        <h2 style="font-family:var(--serif);color:var(--brown);margin:4px 0 0;font-size:1.6rem">My Orders</h2>
+      </div>
+      <span id="ordersPageCount" style="font-size:0.82rem;color:var(--muted)"></span>
+    </div>
+
+    <!-- Login required -->
+    <div id="loginRequired" style="display:none" class="orders-login-required">
+      <i class="fas fa-lock" style="font-size:2.5rem;color:var(--border);display:block;margin-bottom:16px"></i>
+      <h3 style="font-family:var(--serif);color:var(--brown);margin-bottom:8px">Sign in to view your orders</h3>
+      <p style="color:var(--muted);margin-bottom:24px;font-size:0.9rem">You need to be signed in to see your order history.</p>
+      <a href="account.html" class="btn btn-primary">Sign In</a>
+    </div>
+
+    <!-- Loading -->
+    <div id="ordersLoading" style="text-align:center;padding:60px;color:var(--muted)">
+      <i class="fas fa-spinner fa-spin" style="font-size:1.6rem;display:block;margin-bottom:12px"></i>Loading your orders...
+    </div>
+
+    <!-- Filter tabs -->
+    <div class="orders-filter-bar" id="ordersFilterBar" style="display:none">
+      <button class="ofilter-tab active" data-filter="all">All</button>
+      <button class="ofilter-tab" data-filter="pending">Pending</button>
+      <button class="ofilter-tab" data-filter="processing">Processing</button>
+      <button class="ofilter-tab" data-filter="shipped">Shipped</button>
+      <button class="ofilter-tab" data-filter="delivered">Delivered</button>
+      <button class="ofilter-tab" data-filter="cancelled">Cancelled</button>
+    </div>
+
+    <!-- Orders list -->
+    <div id="ordersList"></div>
+  </div>
+
+  <!-- Order detail modal -->
+  <div class="order-modal-overlay" id="orderModal">
+    <div class="order-modal">
+      <div class="order-modal__drag"></div>
+      <div class="order-modal__head">
+        <div>
+          <div class="order-modal__id" id="modalId"></div>
+          <div style="font-size:0.76rem;color:var(--muted);margin-top:2px" id="modalDate"></div>
+        </div>
+        <span class="order-status" id="modalStatus"></span>
+        <button class="order-modal__close" id="modalClose"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="order-timeline" id="modalTimeline"></div>
+      <div class="order-modal__items" id="modalItems"></div>
+      <div class="order-modal__summary" id="modalSummary"></div>
+      <div class="order-modal__footer" id="modalFooter"></div>
+    </div>
+  </div>
+
+  <!-- Cart sidebar -->
+  <div class="cart-overlay"></div>
+  <div class="cart-sidebar">
+    <div class="cart-sidebar__head"><h3>Your Cart</h3><button class="cart-close"><i class="fas fa-times"></i></button></div>
+    <div class="cart-sidebar__items"></div>
+    <div class="cart-sidebar__foot">
+      <div class="cart-subtotal"><span>Subtotal</span><strong>₱0</strong></div>
+      <button class="cart-checkout">Proceed to Checkout <i class="fas fa-arrow-right" style="margin-left:8px"></i></button>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script type="module">
+    import { auth, db } from './js/firebase-config.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      collection, query, where, getDocs, doc, updateDoc, addDoc, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    let allOrders = [];
+    let activeFilter = 'all';
+    let currentUser = null;
+
+    const STATUS_COLORS = {
+      pending: '#e65100', processing: '#1565c0', shipped: '#6a1b9a',
+      delivered: '#2e7d32', cancelled: '#c62828'
+    };
+
+    function fmtDate(ts) {
+      if (!ts?.toDate) return '—';
+      return ts.toDate().toLocaleDateString('en-PH', { month:'short', day:'numeric', year:'numeric' });
+    }
+    function fmtDateTime(ts) {
+      if (!ts?.toDate) return '—';
+      return ts.toDate().toLocaleDateString('en-PH', { month:'long', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    }
+    function cap(s) { return s ? s.charAt(0).toUpperCase()+s.slice(1) : ''; }
+
+    // ── Render orders list ──────────────────────────────────────
+    function renderOrders() {
+      const filtered = activeFilter === 'all' ? allOrders : allOrders.filter(o => (o.status||'pending') === activeFilter);
+      const list = document.getElementById('ordersList');
+      document.getElementById('ordersPageCount').textContent = `${filtered.length} order${filtered.length !== 1 ? 's' : ''}`;
+
+      if (!filtered.length) {
+        list.innerHTML = `<div class="orders-empty-state">
+          <i class="fas fa-box-open"></i>
+          <h3>${activeFilter === 'all' ? 'No orders yet' : 'No ' + activeFilter + ' orders'}</h3>
+          <p>${activeFilter === 'all' ? 'Start shopping to see your orders here.' : 'Nothing here for this status.'}</p>
+          ${activeFilter === 'all' ? '<a href="shop.html" class="btn btn-primary" style="margin-top:16px">Browse Products</a>' : ''}
+        </div>`;
+        return;
+      }
+
+      list.innerHTML = filtered.map(o => {
+        const st  = o.status || 'pending';
+        const cod = (o.paymentMethod || '').toLowerCase().includes('cod') || (o.paymentMethod || '').toLowerCase().includes('cash');
+        const paid = o.paymentStatus === 'paid';
+
+        // Action buttons
+        let actions = '';
+        if (st === 'pending') {
+          actions = `<button class="btn-cancel-sm" data-action="cancel" data-id="${o.id}"><i class="fas fa-times-circle"></i> Cancel Order</button>`;
+        }
+        if (st === 'shipped') {
+          actions = `<button class="btn-receive" data-action="receive" data-id="${o.id}"><i class="fas fa-box-open"></i> Mark as Received</button>`;
+        }
+        if (st === 'delivered' && cod && !paid) {
+          actions += `<button class="btn-pay-cod" data-action="pay" data-id="${o.id}"><i class="fas fa-peso-sign"></i> Confirm COD Payment</button>`;
+        }
+        if (st === 'delivered' && cod && paid) {
+          actions += `<span class="cod-paid-badge"><i class="fas fa-check-circle"></i> Payment Confirmed</span>`;
+        }
+
+        // Product thumbnails (up to 4)
+        const thumbs = (o.items || []).slice(0, 4).map(item =>
+          item.image
+            ? `<img src="${item.image}" class="order-item__product-img" alt="${item.name}" onerror="this.style.display='none'">`
+            : `<div class="order-item__product-img-placeholder"><i class="fas fa-box"></i></div>`
+        ).join('');
+        const extraCount = (o.items||[]).length > 4 ? `<span style="font-size:0.76rem;color:var(--muted);align-self:center">+${(o.items||[]).length - 4} more</span>` : '';
+
+        return `
+          <div class="order-item" data-id="${o.id}">
+            <div class="order-item__left-bar bar-${st}"></div>
+            <div class="order-item__main" data-detail="${o.id}">
+              <div class="order-item__head">
+                <span class="order-item__id">#${o.id.slice(-6).toUpperCase()}</span>
+                <span class="order-status status-${st}">${cap(st)}</span>
+                <span class="order-item__date">${fmtDate(o.createdAt)}</span>
+              </div>
+              <div class="order-item__products">${thumbs}${extraCount}</div>
+              <div class="order-item__foot">
+                <span class="order-item__total">₱${(o.total||0).toLocaleString()}</span>
+                <span class="order-item__pay">${o.paymentMethod || 'COD'}</span>
+                <span class="order-item__view"><i class="fas fa-eye" style="margin-right:4px"></i>View details</span>
+              </div>
+            </div>
+            ${actions ? `<div class="order-item__actions">${actions}</div>` : ''}
+          </div>`;
+      }).join('');
+
+      attachActions();
+    }
+
+    // ── Attach button + detail click handlers ────────────────────
+    function attachActions() {
+      // Detail modal
+      document.querySelectorAll('[data-detail]').forEach(el => {
+        el.addEventListener('click', e => {
+          if (e.target.closest('button')) return;
+          const o = allOrders.find(x => x.id === el.dataset.detail);
+          if (o) openModal(o);
+        });
+      });
+
+      // Cancel
+      document.querySelectorAll('[data-action="cancel"]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (!confirm('Cancel this order? This cannot be undone.')) return;
+          await doAction(btn, btn.dataset.id, { status: 'cancelled' }, 'Order Cancelled by Customer', 'order-cancelled');
+        });
+      });
+
+      // Mark as received
+      document.querySelectorAll('[data-action="receive"]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (!confirm('Mark this order as received?')) return;
+          await doAction(btn, btn.dataset.id, { status: 'delivered' }, 'Order Marked as Received', 'order-delivered');
+        });
+      });
+
+      // Confirm COD payment
+      document.querySelectorAll('[data-action="pay"]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (!confirm('Confirm that you have paid for this order?')) return;
+          await doAction(btn, btn.dataset.id, { paymentStatus: 'paid' }, 'COD Payment Confirmed by Customer', 'order-delivered');
+        });
+      });
+    }
+
+    async function doAction(btn, orderId, updateData, logAction, logCat) {
+      btn.disabled = true;
+      const originalHTML = btn.innerHTML;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Please wait...';
+      try {
+        await updateDoc(doc(db, 'orders', orderId), updateData);
+        await addDoc(collection(db, 'activityLog'), {
+          action:     logAction,
+          detail:     `Order #${orderId.slice(-6).toUpperCase()}`,
+          adminEmail: currentUser.email,
+          category:   logCat,
+          timestamp:  serverTimestamp()
+        });
+        // Update local data
+        const idx = allOrders.findIndex(x => x.id === orderId);
+        if (idx !== -1) Object.assign(allOrders[idx], updateData);
+        renderOrders();
+        window.showToast?.(`<i class="fas fa-check-circle"></i> Done!`);
+      } catch (err) {
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+        alert('Action failed. Please try again.');
+      }
+    }
+
+    // ── Detail modal ─────────────────────────────────────────────
+    const modal = document.getElementById('orderModal');
+
+    function openModal(o) {
+      const st = o.status || 'pending';
+      document.getElementById('modalId').textContent   = '#' + o.id.slice(-6).toUpperCase();
+      document.getElementById('modalDate').textContent = fmtDateTime(o.createdAt);
+      const statusEl = document.getElementById('modalStatus');
+      statusEl.textContent = cap(st);
+      statusEl.className   = `order-status status-${st}`;
+
+      // Timeline
+      const steps = ['pending','processing','shipped','delivered'];
+      const ci    = steps.indexOf(st);
+      document.getElementById('modalTimeline').innerHTML = (st === 'cancelled'
+        ? [{ icon:'fa-times', label:'Cancelled' }]
+        : steps.map((s,i) => ({
+            icon: s==='pending'?'fa-clock':s==='processing'?'fa-box':s==='shipped'?'fa-truck':'fa-check',
+            label: cap(s), done: i < ci, current: i === ci
+          }))
+      ).map(step => `
+        <div class="ot-step ${step.done?'done':''} ${step.current?'current':''}">
+          <div class="ot-dot"><i class="fas ${step.icon}"></i></div>
+          <div class="ot-label">${step.label}</div>
+        </div>`).join('');
+
+      // Items
+      const items = o.items || [];
+      document.getElementById('modalItems').innerHTML = items.length
+        ? items.map(item => `
+            <div class="order-modal__item">
+              ${item.image
+                ? `<img src="${item.image}" class="order-modal__item-img" alt="${item.name}" onerror="this.style.display='none'">`
+                : `<div class="order-modal__item-img" style="display:flex;align-items:center;justify-content:center;color:var(--border)"><i class="fas fa-box"></i></div>`}
+              <div style="flex:1;min-width:0">
+                <div class="order-modal__item-name">${item.name}</div>
+                <div class="order-modal__item-meta">${item.size||''} · Qty: ${item.qty}</div>
+              </div>
+              <div class="order-modal__item-price">₱${((item.price||0)*(item.qty||1)).toLocaleString()}</div>
+            </div>`).join('')
+        : '<div style="padding:20px 0;color:var(--muted);text-align:center;font-size:0.85rem">No item details.</div>';
+
+      // Summary
+      const sub = items.reduce((s,i) => s+(i.price||0)*(i.qty||1), 0);
+      document.getElementById('modalSummary').innerHTML = `
+        <div class="order-modal__row"><span>Subtotal</span><span>₱${sub.toLocaleString()}</span></div>
+        <div class="order-modal__row"><span>Shipping</span><span>${o.shipping ? '₱'+o.shipping.toLocaleString() : 'Free'}</span></div>
+        ${o.paymentStatus === 'paid' ? `<div class="order-modal__row"><span>Payment</span><span style="color:#2e7d32;font-weight:700"><i class="fas fa-check-circle"></i> Paid</span></div>` : ''}
+        <div class="order-modal__row" style="border-top:1px solid var(--border);padding-top:10px;margin-top:4px">
+          <span style="font-weight:700;color:var(--brown)">Total</span>
+          <span style="font-family:var(--serif);font-size:1.05rem;color:var(--brown);font-weight:700">₱${(o.total||0).toLocaleString()}</span>
+        </div>`;
+
+      // Footer
+      const addr = o.address;
+      document.getElementById('modalFooter').innerHTML = `
+        ${addr ? `<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:14px">
+          <i class="fas fa-map-marker-alt" style="color:var(--gold);margin-top:3px;flex-shrink:0"></i>
+          <div style="font-size:0.82rem;color:var(--brown);line-height:1.6">${[addr.name,addr.street,addr.city,addr.province,addr.zip].filter(Boolean).join(', ')}</div>
+        </div>` : ''}
+        <div style="display:flex;gap:10px;align-items:center">
+          <i class="fas fa-credit-card" style="color:var(--gold)"></i>
+          <span style="font-size:0.82rem;color:var(--brown)">${o.paymentMethod || 'Cash on Delivery'}</span>
+        </div>`;
+
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() { modal.classList.remove('open'); document.body.style.overflow = ''; }
+    document.getElementById('modalClose').addEventListener('click', closeModal);
+    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+    // ── Filter tabs ──────────────────────────────────────────────
+    document.querySelectorAll('.ofilter-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.ofilter-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        activeFilter = tab.dataset.filter;
+        renderOrders();
+      });
+    });
+
+    // ── Auth + load ──────────────────────────────────────────────
+    onAuthStateChanged(auth, async user => {
+      document.getElementById('ordersLoading').style.display = 'none';
+      if (!user) {
+        document.getElementById('loginRequired').style.display = 'block';
+        return;
+      }
+      currentUser = user;
+      // update nav
+      const btn = document.getElementById('navLoginBtn');
+      const lbl = document.getElementById('navLoginLabel');
+      if (btn && lbl) {
+        btn.href = 'account.html';
+        lbl.innerHTML = user.photoURL
+          ? `<img src="${user.photoURL}" class="nav__user-avatar" alt=""> ${(user.displayName||'').split(' ')[0]||'Account'}`
+          : `<i class="fas fa-user-circle"></i> ${(user.displayName||'').split(' ')[0]||'Account'}`;
+      }
+
+      try {
+        const snap = await getDocs(query(collection(db, 'orders'), where('userId', '==', user.uid)));
+        allOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+          .sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
+        document.getElementById('ordersFilterBar').style.display = 'flex';
+        renderOrders();
+      } catch(e) {
+        document.getElementById('ordersList').innerHTML = `<div class="orders-empty-state"><i class="fas fa-exclamation-circle"></i><p>Could not load orders.</p></div>`;
+      }
+    });
+  </script>
+</body>
+</html>

@@ -25,11 +25,21 @@ service cloud.firestore {
         && (
           // Admin can update anything
           request.auth.token.email == 'wardopon123@gmail.com'
-          // Customer can only cancel their own order when it is still pending
+          // Customer can cancel their own pending order
           || (resource.data.userId == request.auth.uid
               && resource.data.status == 'pending'
               && request.resource.data.status == 'cancelled'
               && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']))
+          // Customer can mark their own shipped order as delivered (received)
+          || (resource.data.userId == request.auth.uid
+              && resource.data.status == 'shipped'
+              && request.resource.data.status == 'delivered'
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']))
+          // Customer can confirm COD payment on their own delivered order
+          || (resource.data.userId == request.auth.uid
+              && resource.data.status == 'delivered'
+              && request.resource.data.paymentStatus == 'paid'
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['paymentStatus']))
         );
     }
 
