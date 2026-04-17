@@ -528,24 +528,68 @@
       } else if (st === 'cancelled') {
         actionSection.style.display = 'block';
         actionInner.innerHTML = `
+          <div id="buyAgainConfirmBox" style="display:none;background:#f0f7ff;border:1.5px solid rgba(21,101,192,0.2);border-radius:14px;padding:18px 20px;margin-bottom:14px">
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <i class="fas fa-redo" style="color:#1565c0;margin-top:2px;flex-shrink:0"></i>
+              <div>
+                <div style="font-size:0.88rem;font-weight:700;color:#1565c0;margin-bottom:4px">Place this order again?</div>
+                <div style="font-size:0.8rem;color:var(--muted);line-height:1.5">A new order will be created with the same items using your previous delivery details.</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:14px">
+              <button class="btn-cancel-confirm" style="background:#1565c0" id="buyAgainYes"><i class="fas fa-check"></i> Yes, Order Again</button>
+              <button class="btn-cancel-back" id="buyAgainNo">Cancel</button>
+            </div>
+          </div>
           <button class="btn-modal-action btn-modal-receive" id="buyAgainBtn">
             <i class="fas fa-redo"></i> Buy Again
-          </button>
-          <p style="font-size:0.76rem;color:var(--muted);text-align:center;margin-top:10px">Re-add all items from this order to your cart.</p>`;
+          </button>`;
+
         document.getElementById('buyAgainBtn').addEventListener('click', () => {
-          const items = o.items || [];
-          items.forEach(item => {
-            window.Cart?.add({
-              id:    item.id || item.productId || '',
-              name:  item.name,
-              price: item.price || 0,
-              size:  item.size  || '',
-              image: item.image || ''
+          document.getElementById('buyAgainConfirmBox').style.display = 'block';
+          document.getElementById('buyAgainBtn').style.display = 'none';
+        });
+        document.getElementById('buyAgainNo').addEventListener('click', () => {
+          document.getElementById('buyAgainConfirmBox').style.display = 'none';
+          document.getElementById('buyAgainBtn').style.display = 'flex';
+        });
+        document.getElementById('buyAgainYes').addEventListener('click', async () => {
+          const btn = document.getElementById('buyAgainYes');
+          btn.disabled = true;
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Placing order...';
+          try {
+            const newOrder = {
+              items:         o.items || [],
+              total:         o.total || 0,
+              customer:      o.customer || {},
+              address:       o.address  || null,
+              paymentMethod: o.paymentMethod || 'COD',
+              notes:         o.notes || '',
+              status:        'pending',
+              userId:        currentUser.uid,
+              createdAt:     serverTimestamp()
+            };
+            // Remove nullish address
+            if (!newOrder.address) delete newOrder.address;
+
+            const ref = await addDoc(collection(db, 'orders'), newOrder);
+            await addDoc(collection(db, 'activityLog'), {
+              action:     'Order Re-placed by Customer',
+              detail:     `New order #${ref.id.slice(-6).toUpperCase()} from cancelled order #${o.id.slice(-6).toUpperCase()}`,
+              adminEmail: currentUser.email,
+              category:   'order-placed',
+              timestamp:  serverTimestamp()
             });
-          });
-          closeModal();
-          window.CartUI?.open();
-          window.showToast?.('<i class="fas fa-shopping-bag"></i> Items added to your cart!');
+            // Add new order to local list so it shows immediately
+            allOrders.unshift({ id: ref.id, ...newOrder, createdAt: { seconds: Date.now()/1000, toDate: () => new Date() } });
+            closeModal();
+            renderOrders();
+            window.showToast?.('<i class="fas fa-check-circle"></i> Order placed! Your new order is now pending.');
+          } catch(err) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-check"></i> Yes, Order Again';
+            alert('Failed to place order. Please try again.');
+          }
         });
 
       } else {
