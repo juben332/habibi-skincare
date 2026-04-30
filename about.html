@@ -22,24 +22,13 @@
     <div class="nav__inner">
       <a href="index.html" class="nav__logo"><img src="images/logo.png" alt="Habibi Skincare Logo" class="nav__logo-img">Habibi<span>.</span></a>
       <ul class="nav__links">
-        <li><a href="shop.html" class="nav__link">Shop</a></li>
+        <li><a href="shop.html" class="nav__link">Collection</a></li>
         <li><a href="about.html" class="nav__link" style="color:var(--gold)">Our Story</a></li>
         <li><a href="routine.html" class="nav__link">Routine</a></li>
         <li><a href="contact.html" class="nav__link">Contact</a></li>
       </ul>
       <div class="nav__actions">
-        <button class="nav__icon"><i class="fas fa-search"></i></button>
-        <a href="wishlist.html" class="nav__icon" style="position:relative;text-decoration:none">
-          <i class="far fa-heart"></i>
-          <span class="wishlist-count"></span>
-        </a>
-        <button class="nav__icon" data-cart-open>
-          <i class="fas fa-shopping-bag"></i>
-          <span class="cart-count"></span>
-        </button>
-        <a href="account.html" class="nav__login-btn" id="navLoginBtn">
-          <span id="navLoginLabel"><i class="fas fa-user-circle"></i> Sign In</span>
-        </a>
+        <button class="nav__icon nav__search-btn" aria-label="Search"><i class="fas fa-search"></i></button>
         <button class="nav__hamburger" id="burger"><span></span><span></span><span></span></button>
       </div>
     </div>
@@ -50,14 +39,10 @@
     <button aria-label="Search" class="nav__mobile-search">
       <i class="fas fa-search"></i> Search Products
     </button>
-    <a href="shop.html" class="nav__link">Shop</a>
+    <a href="shop.html" class="nav__link">Collection</a>
     <a href="about.html" class="nav__link">Our Story</a>
     <a href="routine.html" class="nav__link">Routine</a>
     <a href="contact.html" class="nav__link">Contact</a>
-    <a href="account.html" class="nav__mobile-account" id="mobileAccountLink">
-      <span class="nav__mobile-account__avatar" id="mobileAccountAvatar"><i class="fas fa-user"></i></span>
-      <span id="mobileAccountLabel">My Account</span>
-    </a>
   </div>
 
   <!-- About Hero -->

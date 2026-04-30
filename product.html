@@ -22,7 +22,7 @@
     <div class="nav__inner">
       <a href="index.html" class="nav__logo"><img src="images/logo.png" alt="Habibi Skincare Logo" class="nav__logo-img">Habibi<span>.</span></a>
       <ul class="nav__links">
-        <li><a href="shop.html" class="nav__link">Shop</a></li>
+        <li><a href="shop.html" class="nav__link">Collection</a></li>
         <li><a href="about.html" class="nav__link">Our Story</a></li>
         <li><a href="routine.html" class="nav__link">Routine</a></li>
         <li><a href="contact.html" class="nav__link">Contact</a></li>
@@ -39,7 +39,7 @@
     <button aria-label="Search" class="nav__mobile-search">
       <i class="fas fa-search"></i> Search Products
     </button>
-    <a href="shop.html" class="nav__link">Shop</a>
+    <a href="shop.html" class="nav__link">Collection</a>
     <a href="about.html" class="nav__link">Our Story</a>
     <a href="routine.html" class="nav__link">Routine</a>
     <a href="contact.html" class="nav__link">Contact</a>
@@ -88,8 +88,6 @@
             <span class="product-info__review-ct">4.8 · 124 reviews</span>
           </div>
 
-          <div class="product-info__price" id="productPrice"></div>
-
           <p class="product-info__desc" id="productDesc"></p>
 
           <div class="product-info__option" id="sizeOption" style="display:none">
@@ -98,8 +96,6 @@
               <button class="size-btn active" id="sizeBtn"></button>
             </div>
           </div>
-
-          <div id="stockLabel" style="margin-bottom:12px;font-size:0.85rem;font-weight:500"></div>
 
           <div class="product-actions">
             <a href="contact.html" class="btn btn-primary btn-lg">
@@ -296,9 +292,8 @@
       thumbs.innerHTML = p.image ? `<div class="gallery-thumb active"><img src="${p.image}" alt="${p.name}"></div>` : '';
 
       // Info
-      document.getElementById('productCat').textContent = `${capitalize(p.category||'')}${p.badge ? ' · ' + (p.badge === 'best' ? 'Bestseller' : p.badge === 'new' ? 'New Launch' : capitalize(p.badge)) : ''}`;
+      document.getElementById('productCat').textContent = capitalize(p.category||'');
       document.getElementById('productName').textContent = p.name;
-      document.getElementById('productPrice').textContent = `₱${(p.price||0).toLocaleString()}`;
       document.getElementById('productDesc').textContent = p.description || p.benefit || '';
       document.getElementById('tabDescription').textContent = p.description || p.benefit || 'Premium skincare crafted with the finest natural ingredients.';
 
@@ -306,18 +301,6 @@
       if (p.size) {
         document.getElementById('sizeOption').style.display = '';
         document.getElementById('sizeBtn').textContent = p.size;
-      }
-
-      // Stock label
-      const stockEl = document.getElementById('stockLabel');
-      if (p.inStock === false) {
-        stockEl.innerHTML = '<i class="fas fa-times-circle" style="color:#c0392b;margin-right:5px"></i><span style="color:#c0392b">Out of stock</span>';
-      } else if (p.stock != null && p.stock <= 10) {
-        stockEl.innerHTML = `<i class="fas fa-fire" style="color:#e07b39;margin-right:5px"></i><span style="color:#e07b39">Only ${p.stock} left!</span>`;
-      } else if (p.stock != null) {
-        stockEl.innerHTML = `<i class="fas fa-check-circle" style="color:#2ecc71;margin-right:5px"></i><span style="color:#2ecc71">${p.stock} in stock</span>`;
-      } else {
-        stockEl.innerHTML = '<i class="fas fa-check-circle" style="color:#2ecc71;margin-right:5px"></i><span style="color:#2ecc71">In stock</span>';
       }
 
       // Show sections
