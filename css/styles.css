@@ -198,7 +198,7 @@ p { color: var(--muted); line-height: 1.8; }
 .nav--scrolled .nav__logo-sub { color: #F06292; }
 
 .nav__links { display: flex; align-items: center; gap: 36px; }
-.nav__link { font-size: 0.85rem; font-weight: 500; color: rgba(255,255,255,0.88); letter-spacing: 0.06em; position: relative; }
+.nav__link { font-size: 0.95rem; font-weight: 500; color: rgba(255,255,255,0.88); letter-spacing: 0.06em; position: relative; }
 .nav--scrolled .nav__link { color: var(--charcoal); }
 .nav__link::after { content:''; position:absolute; bottom:-4px; left:0; width:0; height:1px; background:var(--gold); transition:var(--ease); }
 .nav__link:hover::after { width: 100%; }
