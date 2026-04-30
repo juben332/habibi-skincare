@@ -785,7 +785,7 @@ p { color: var(--muted); line-height: 1.8; }
 /* 18. About Page
    ============================================================ */
 .about-hero {
-  min-height: 65vh; display: flex; align-items: center; padding: 140px 0 80px;
+  min-height: 65vh; display: flex; align-items: center; justify-content: flex-start; padding: 140px 0 80px;
   background: linear-gradient(160deg, var(--beige) 0%, var(--cream) 100%); position: relative; overflow: hidden;
 }
 .about-hero__img {
