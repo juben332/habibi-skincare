@@ -66,6 +66,7 @@
   --serif: 'Playfair Display', Georgia, serif;
   --sans: 'DM Sans', 'Helvetica Neue', Arial, sans-serif;
 
+  --topbar-h: 36px;
   --nav-h: 80px;
   --max-w: 1320px;
   --pad: 0 40px;
@@ -173,8 +174,32 @@ p { color: var(--muted); line-height: 1.8; }
 
 /* 6. Navigation
    ============================================================ */
+/* ── Top Bar ───────────────────────────────────────────────── */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1001;
+  height: var(--topbar-h); background: var(--gold); padding: 0 40px;
+  display: flex; align-items: center;
+}
+.topbar__inner {
+  width: 100%; max-width: var(--max-w); margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.topbar__left { display: flex; align-items: center; gap: 20px; }
+.topbar__link {
+  font-size: 0.72rem; font-weight: 500; color: #fff; text-decoration: none;
+  display: flex; align-items: center; gap: 6px; opacity: 0.9; transition: opacity 0.2s;
+}
+.topbar__link:hover { opacity: 1; }
+.topbar__right { display: flex; align-items: center; gap: 12px; }
+.topbar__social {
+  width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 0.72rem; opacity: 0.9; transition: opacity 0.2s; text-decoration: none;
+}
+.topbar__social:hover { opacity: 1; }
+@media (max-width: 640px) { .topbar { display: none; } }
+
 .nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  position: fixed; top: var(--topbar-h); left: 0; right: 0; z-index: 1000;
   height: var(--nav-h); padding: 0 40px; transition: var(--ease);
 }
 .nav--transparent { background: transparent; }
@@ -255,7 +280,7 @@ p { color: var(--muted); line-height: 1.8; }
 .nav__hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
 
 .nav__mobile {
-  display: none; position: fixed; top: var(--nav-h); left: 0; right: 0; bottom: 0;
+  display: none; position: fixed; top: calc(var(--topbar-h) + var(--nav-h)); left: 0; right: 0; bottom: 0;
   background: var(--cream); z-index: 999; flex-direction: column;
   align-items: center; justify-content: center; gap: 36px; padding: 40px;
 }
