@@ -51,17 +51,17 @@
 /* 1. CSS Variables
    ============================================================ */
 :root {
-  --cream: #FDF0F4;
-  --beige: #F8E1E8;
-  --sand: #E8A8B8;
-  --gold: #D4687A;
-  --gold-dark: #B5526A;
-  --gold-light: rgba(212, 104, 122, 0.14);
+  --cream: #FDF0F6;
+  --beige: #FCE4EE;
+  --sand: #F48FB1;
+  --gold: #F06292;
+  --gold-dark: #E91E63;
+  --gold-light: rgba(240, 98, 146, 0.14);
   --brown: #3D1A22;
   --charcoal: #4A2830;
   --muted: #8A606A;
   --white: #FFF8FA;
-  --border: rgba(212, 104, 122, 0.28);
+  --border: rgba(240, 98, 146, 0.28);
 
   --serif: 'Playfair Display', Georgia, serif;
   --sans: 'DM Sans', 'Helvetica Neue', Arial, sans-serif;
