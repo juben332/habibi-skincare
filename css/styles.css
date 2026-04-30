@@ -192,9 +192,9 @@ p { color: var(--muted); line-height: 1.8; }
 .nav__logo-img { height: 38px; width: auto; object-fit: contain; flex-shrink: 0; }
 .nav__logo-text { display: flex; flex-direction: column; line-height: 1; gap: 1px; }
 .nav__logo-main { font-family: var(--serif); font-size: 1.1rem; font-weight: 700; color: #F06292; letter-spacing: 0.02em; }
-.nav__logo-main em { font-style: italic; color: #C2185B; }
+.nav__logo-main em { font-style: italic; color: #F06292; }
 .nav--scrolled .nav__logo-main { color: #F06292; }
-.nav--scrolled .nav__logo-main em { color: #C2185B; }
+.nav--scrolled .nav__logo-main em { color: #F06292; }
 .nav__logo-sub { font-family: var(--sans); font-size: 0.6rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: #F06292; }
 .nav--scrolled .nav__logo-sub { color: #F06292; }
 
