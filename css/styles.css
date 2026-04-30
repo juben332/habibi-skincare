@@ -204,7 +204,7 @@ p { color: var(--muted); line-height: 1.8; }
 .nav__link:hover::after { width: 100%; }
 .nav__link:hover { color: var(--gold); }
 
-.nav__actions { display: flex; align-items: center; gap: 16px; }
+.nav__actions { display: flex; align-items: center; gap: 16px; margin-left: auto; }
 .nav__contact { display: flex; align-items: center; gap: 16px; }
 .nav__contact-link { font-size: 0.78rem; font-weight: 500; color: rgba(255,255,255,0.85); text-decoration: none; display: flex; align-items: center; gap: 5px; transition: var(--ease); white-space: nowrap; }
 .nav__contact-link i { font-size: 0.72rem; }
