@@ -139,9 +139,6 @@
             <span class="product-card__cat">${capitalize(p.category || '')}</span>
             <h3 class="product-card__name"><a href="product.html?id=${p.id}">${p.name}</a></h3>
             <p class="product-card__benefit">${p.benefit || ''}</p>
-            <div class="product-card__foot">
-              <span class="product-card__price">₱${(p.price || 0).toLocaleString()}</span>
-            </div>
           </div>
         </div>`).join('');
 
