@@ -349,13 +349,6 @@
       const withImg = products.filter(p => p.image && p.image.includes('cloudinary.com'));
       const allWithImg = products.filter(p => p.image);
 
-      // Hero — first Cloudinary product image as diagonal panel background
-      const heroProduct = withImg[0] || allWithImg[0];
-      if (heroProduct) {
-        const panel = document.getElementById('homeHeroImg');
-        panel.style.backgroundImage = `url('${heroProduct.image}')`;
-      }
-
       // Brand-story section — second Cloudinary product
       const storyProduct = withImg[1] || withImg[0] || allWithImg[0];
       if (storyProduct) {
