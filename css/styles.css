@@ -188,7 +188,6 @@ p { color: var(--muted); line-height: 1.8; }
 }
 .nav__logo { font-family: var(--serif); font-size: 1.55rem; font-weight: 700; color: #fff; letter-spacing: 0.03em; display: flex; align-items: center; gap: 10px; }
 .nav--scrolled .nav__logo { color: var(--brown); }
-.nav__logo span { color: var(--gold); }
 .nav__logo-img { height: 38px; width: auto; object-fit: contain; flex-shrink: 0; }
 .nav__logo-text { display: flex; flex-direction: column; line-height: 1; gap: 1px; }
 .nav__logo-main { font-family: var(--serif); font-size: 1.1rem; font-weight: 700; color: #F06292; letter-spacing: 0.02em; }
