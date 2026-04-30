@@ -33,17 +33,6 @@
 
       <div class="nav__actions">
         <button class="nav__icon nav__search-btn" aria-label="Search"><i class="fas fa-search"></i></button>
-        <a href="wishlist.html" class="nav__icon" aria-label="Wishlist" style="position:relative;text-decoration:none">
-          <i class="far fa-heart"></i>
-          <span class="wishlist-count"></span>
-        </a>
-        <button class="nav__icon" data-cart-open aria-label="Cart">
-          <i class="fas fa-shopping-bag"></i>
-          <span class="cart-count"></span>
-        </button>
-        <a href="account.html" class="nav__login-btn" id="navLoginBtn">
-          <span id="navLoginLabel"><i class="fas fa-user-circle"></i> Sign In</span>
-        </a>
         <button class="nav__hamburger" aria-label="Menu" id="burger">
           <span></span><span></span><span></span>
         </button>
@@ -60,10 +49,6 @@
     <a href="about.html" class="nav__link">Our Story</a>
     <a href="routine.html" class="nav__link">Routine</a>
     <a href="contact.html" class="nav__link">Contact</a>
-    <a href="account.html" class="nav__mobile-account" id="mobileAccountLink">
-      <span class="nav__mobile-account__avatar" id="mobileAccountAvatar"><i class="fas fa-user"></i></span>
-      <span id="mobileAccountLabel">My Account</span>
-    </a>
     <a href="shop.html" class="btn btn-primary mt-24">Shop Now</a>
   </div>
 
@@ -375,27 +360,6 @@
     </div>
   </footer>
 
-  <!-- ═══ CART SIDEBAR ══════════════════════════════════════════ -->
-  <div class="cart-overlay"></div>
-  <div class="cart-sidebar">
-    <div class="cart-sidebar__head">
-      <h3>Your Cart</h3>
-      <button class="cart-close" aria-label="Close cart"><i class="fas fa-times"></i></button>
-    </div>
-    <div class="cart-sidebar__items"></div>
-    <div class="cart-sidebar__foot">
-      <div class="cart-subtotal">
-        <span>Subtotal</span>
-        <strong>₱0</strong>
-      </div>
-      <button class="cart-checkout">Proceed to Checkout <i class="fas fa-arrow-right" style="margin-left:8px"></i></button>
-      <p style="text-align:center;font-size:0.75rem;color:var(--muted);margin-top:12px;">
-        <i class="fas fa-lock" style="color:var(--gold);margin-right:4px"></i>
-        Secure checkout · GCash · PayMaya · Visa · Mastercard
-      </p>
-    </div>
-  </div>
-
   <script src="js/main.js"></script>
 
   <!-- Hero product image — load from Firestore -->
@@ -425,26 +389,6 @@
     } catch (_) { /* stays empty if Firestore fails */ }
   </script>
 
-  <script type="module">
-    import { auth, isAdmin } from './js/firebase-config.js';
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    onAuthStateChanged(auth, user => {
-      const btn   = document.getElementById('navLoginBtn');
-      const label = document.getElementById('navLoginLabel');
-      if (!btn || !label) return;
-      if (user && isAdmin(user)) {
-        btn.href = 'admin/index.html';
-        label.innerHTML = '<i class="fas fa-shield-alt"></i> Dashboard';
-      } else if (user) {
-        btn.href = 'account.html';
-        label.innerHTML = user.photoURL
-          ? `<img src="${user.photoURL}" class="nav__user-avatar" alt=""> ${(user.displayName||'').split(' ')[0] || 'Account'}`
-          : `<i class="fas fa-user-circle"></i> ${(user.displayName||'').split(' ')[0] || 'Account'}`;
-      } else {
-        btn.href = 'account.html';
-        label.innerHTML = '<i class="fas fa-user-circle"></i> Sign In';
-      }
-    });
-  </script>
+
 </body>
 </html>

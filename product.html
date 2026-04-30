@@ -28,18 +28,7 @@
         <li><a href="contact.html" class="nav__link">Contact</a></li>
       </ul>
       <div class="nav__actions">
-        <button class="nav__icon"><i class="fas fa-search"></i></button>
-        <a href="wishlist.html" class="nav__icon" style="position:relative;text-decoration:none">
-          <i class="far fa-heart"></i>
-          <span class="wishlist-count"></span>
-        </a>
-        <button class="nav__icon" data-cart-open>
-          <i class="fas fa-shopping-bag"></i>
-          <span class="cart-count"></span>
-        </button>
-        <a href="account.html" class="nav__login-btn" id="navLoginBtn">
-          <span id="navLoginLabel"><i class="fas fa-user-circle"></i> Sign In</span>
-        </a>
+        <button class="nav__icon nav__search-btn" aria-label="Search"><i class="fas fa-search"></i></button>
         <button class="nav__hamburger" id="burger"><span></span><span></span><span></span></button>
       </div>
     </div>
@@ -54,10 +43,6 @@
     <a href="about.html" class="nav__link">Our Story</a>
     <a href="routine.html" class="nav__link">Routine</a>
     <a href="contact.html" class="nav__link">Contact</a>
-    <a href="account.html" class="nav__mobile-account" id="mobileAccountLink">
-      <span class="nav__mobile-account__avatar" id="mobileAccountAvatar"><i class="fas fa-user"></i></span>
-      <span id="mobileAccountLabel">My Account</span>
-    </a>
   </div>
 
   <!-- Breadcrumb -->
@@ -116,22 +101,10 @@
 
           <div id="stockLabel" style="margin-bottom:12px;font-size:0.85rem;font-weight:500"></div>
 
-          <div class="product-info__option">
-            <span class="option-label">Quantity</span>
-            <div class="qty-wrap">
-              <button class="qty-wrap-btn" data-minus><i class="fas fa-minus" style="font-size:0.7rem"></i></button>
-              <input class="qty-wrap-num" id="qtyInput" type="number" value="1" min="1" readonly>
-              <button class="qty-wrap-btn" data-plus><i class="fas fa-plus" style="font-size:0.7rem"></i></button>
-            </div>
-          </div>
-
           <div class="product-actions">
-            <button class="btn btn-primary btn-lg" id="addToCartBtn" data-add-to-cart>
-              <i class="fas fa-shopping-bag"></i> Add to Cart
-            </button>
-            <button class="wishlist-btn" id="wishlistBtn" style="width:52px;height:52px;font-size:1rem;flex-shrink:0" aria-label="Wishlist">
-              <i class="far fa-heart"></i>
-            </button>
+            <a href="contact.html" class="btn btn-primary btn-lg">
+              <i class="fas fa-envelope"></i> Enquire Now
+            </a>
           </div>
 
           <!-- Trust Signals -->
@@ -158,17 +131,6 @@
       </div>
     </div>
   </section>
-
-  <!-- Sticky Bar -->
-  <div class="sticky-bar" id="stickyBar" style="display:none">
-    <div class="sticky-bar__info">
-      <span class="sticky-bar__name" id="stickyName"></span>
-      <span class="sticky-bar__price" id="stickyPrice"></span>
-    </div>
-    <button class="btn btn-primary" id="stickyAddBtn" data-add-to-cart>
-      <i class="fas fa-shopping-bag"></i> Add to Cart
-    </button>
-  </div>
 
   <!-- Product Tabs -->
   <section class="section section--beige" id="productTabs" style="padding:80px 0;display:none">
@@ -285,45 +247,11 @@
     </div>
   </footer>
 
-  <!-- Cart Sidebar -->
-  <div class="cart-overlay"></div>
-  <div class="cart-sidebar">
-    <div class="cart-sidebar__head">
-      <h3>Your Cart</h3>
-      <button class="cart-close"><i class="fas fa-times"></i></button>
-    </div>
-    <div class="cart-sidebar__items"></div>
-    <div class="cart-sidebar__foot">
-      <div class="cart-subtotal"><span>Subtotal</span><strong>₱0</strong></div>
-      <button class="cart-checkout">Proceed to Checkout <i class="fas fa-arrow-right" style="margin-left:8px"></i></button>
-    </div>
-  </div>
-
   <script src="js/main.js"></script>
 
   <script type="module">
-    import { db, auth, isAdmin } from './js/firebase-config.js';
+    import { db } from './js/firebase-config.js';
     import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-    // Nav auth
-    onAuthStateChanged(auth, user => {
-      const btn   = document.getElementById('navLoginBtn');
-      const label = document.getElementById('navLoginLabel');
-      if (!btn || !label) return;
-      if (user && isAdmin(user)) {
-        btn.href = 'admin/index.html';
-        label.innerHTML = '<i class="fas fa-shield-alt"></i> Dashboard';
-      } else if (user) {
-        btn.href = 'account.html';
-        label.innerHTML = user.photoURL
-          ? `<img src="${user.photoURL}" class="nav__user-avatar" alt=""> ${(user.displayName||'').split(' ')[0]||'Account'}`
-          : `<i class="fas fa-user-circle"></i> ${(user.displayName||'').split(' ')[0]||'Account'}`;
-      } else {
-        btn.href = 'account.html';
-        label.innerHTML = '<i class="fas fa-user-circle"></i> Sign In';
-      }
-    });
 
     // Load product from URL param
     const productId = new URLSearchParams(window.location.search).get('id');
@@ -391,46 +319,6 @@
       } else {
         stockEl.innerHTML = '<i class="fas fa-check-circle" style="color:#2ecc71;margin-right:5px"></i><span style="color:#2ecc71">In stock</span>';
       }
-
-      // Add to cart buttons
-      const cartAttrs = {
-        'data-id': p.id,
-        'data-name': p.name,
-        'data-price': p.price || 0,
-        'data-size': p.size || '30ml',
-        'data-image': p.image || ''
-      };
-      const addBtn = document.getElementById('addToCartBtn');
-      const stickyBtn = document.getElementById('stickyAddBtn');
-      if (p.inStock === false) {
-        addBtn.disabled = true;
-        addBtn.style.opacity = '0.5';
-        addBtn.innerHTML = '<i class="fas fa-times-circle"></i> Out of Stock';
-        stickyBtn.disabled = true;
-        stickyBtn.style.opacity = '0.5';
-        stickyBtn.innerHTML = 'Out of Stock';
-      } else {
-        Object.entries(cartAttrs).forEach(([k,v]) => { addBtn.setAttribute(k,v); stickyBtn.setAttribute(k,v); });
-      }
-
-      // Wishlist button — expose product data for main.js Wishlist
-      const wBtn = document.getElementById('wishlistBtn');
-      wBtn.dataset.id = p.id;
-      // Wrap in a product-card-like div so main.js can read it
-      wBtn.closest('.product-actions').setAttribute('data-id', p.id);
-      wBtn.closest('.product-actions').setAttribute('data-price', p.price||0);
-      wBtn.closest('.product-actions').setAttribute('data-category', p.category||'');
-      // Check if already wishlisted
-      const wishlist = JSON.parse(localStorage.getItem('habibi_wishlist')||'[]');
-      if (wishlist.some(i => i.id === p.id)) {
-        wBtn.classList.add('wished');
-        wBtn.querySelector('i').className = 'fas fa-heart';
-      }
-
-      // Sticky bar
-      document.getElementById('stickyName').textContent = p.name;
-      document.getElementById('stickyPrice').textContent = `₱${(p.price||0).toLocaleString()}`;
-      document.getElementById('stickyBar').style.display = '';
 
       // Show sections
       document.getElementById('productLoading').style.display = 'none';
