@@ -103,7 +103,7 @@
               <div class="contact-info-icon"><i class="fas fa-envelope"></i></div>
               <div>
                 <div class="contact-info-label">Email</div>
-                <div class="contact-info-value">hello@habibiskincare.ph</div>
+                <div class="contact-info-value">ayaocris@gmail.com</div>
               </div>
             </div>
             <div class="contact-info-item">
@@ -252,7 +252,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script>
-    emailjs.init('YOUR_PUBLIC_KEY');
+    emailjs.init('tvLVIIrQWaEV5G0lC');
 
     function handleSubmit(e) {
       e.preventDefault();
@@ -261,7 +261,7 @@
       btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:8px"></i> Sending...';
 
       const form = document.getElementById('contactForm');
-      emailjs.sendForm('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', form)
+      emailjs.sendForm('XR-KQNf0fAnc8qfRBssi9', 'template_6olsiri', form)
         .then(() => {
           form.style.display = 'none';
           document.getElementById('cfSuccess').style.display = 'block';
