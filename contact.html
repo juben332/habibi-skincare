@@ -144,20 +144,20 @@
               <div class="cf-row">
                 <div class="cf-field">
                   <label>First Name</label>
-                  <input type="text" placeholder="Juan" required>
+                  <input type="text" name="first_name" placeholder="Juan" required>
                 </div>
                 <div class="cf-field">
                   <label>Last Name</label>
-                  <input type="text" placeholder="dela Cruz" required>
+                  <input type="text" name="last_name" placeholder="dela Cruz" required>
                 </div>
               </div>
               <div class="cf-field">
                 <label>Email</label>
-                <input type="email" placeholder="you@email.com" required>
+                <input type="email" name="reply_to" placeholder="you@email.com" required>
               </div>
               <div class="cf-field">
                 <label>Subject</label>
-                <select>
+                <select name="subject">
                   <option value="">Select a topic...</option>
                   <option>Order Inquiry</option>
                   <option>Product Question</option>
@@ -169,7 +169,7 @@
               </div>
               <div class="cf-field">
                 <label>Message</label>
-                <textarea placeholder="Tell us how we can help you..."></textarea>
+                <textarea name="message" placeholder="Tell us how we can help you..."></textarea>
               </div>
               <button type="submit" class="cf-submit" id="cfSubmitBtn">
                 <i class="fas fa-paper-plane" style="margin-right:8px"></i> Send Message
@@ -250,16 +250,27 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script>
+    emailjs.init('YOUR_PUBLIC_KEY');
+
     function handleSubmit(e) {
       e.preventDefault();
       const btn = document.getElementById('cfSubmitBtn');
       btn.disabled = true;
       btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:8px"></i> Sending...';
-      setTimeout(() => {
-        document.getElementById('contactForm').style.display = 'none';
-        document.getElementById('cfSuccess').style.display = 'block';
-      }, 1200);
+
+      const form = document.getElementById('contactForm');
+      emailjs.sendForm('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', form)
+        .then(() => {
+          form.style.display = 'none';
+          document.getElementById('cfSuccess').style.display = 'block';
+        })
+        .catch(() => {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-paper-plane" style="margin-right:8px"></i> Send Message';
+          alert('Something went wrong. Please try again or email us directly.');
+        });
     }
   </script>
   <script src="js/main.js"></script>
