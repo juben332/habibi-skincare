@@ -1014,6 +1014,21 @@ p { color: var(--muted); line-height: 1.8; }
 
 /* 22. Responsive
    ============================================================ */
+@media (max-width: 1440px) {
+  .hero-content { margin-left: 160px !important; }
+}
+@media (max-width: 1280px) {
+  :root { --nav-h: 80px; --pad: 0 28px; }
+  .hero-content { margin-left: 80px !important; }
+  .nav__links { gap: 24px; }
+  .nav__link { font-size: 0.88rem; }
+  .nav__logo-img { height: 32px; }
+  .nav__logo-main { font-size: 0.95rem; }
+  .nav__contact { gap: 10px; }
+  .nav__contact-link { font-size: 0.72rem; }
+  .grid-4 { grid-template-columns: repeat(2,1fr); }
+  .footer__top { grid-template-columns: 1fr 1fr; }
+}
 @media (max-width: 1200px) {
   :root { --pad: 0 24px; }
   .grid-4 { grid-template-columns: repeat(3,1fr); }
